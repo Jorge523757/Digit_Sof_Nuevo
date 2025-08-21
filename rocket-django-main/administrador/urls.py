@@ -1,10 +1,14 @@
 from django.urls import path
-from . import views
+from .views import (
+    AdministradorListView,
+    AdministradorCreateView,
+    AdministradorUpdateView,
+    AdministradorDeleteView,
+)
 
 urlpatterns = [
-    # Administrador
-    path("administradores/", views.AdministradorList.as_view(), name="administrador_list"),
-    path("administradores/nuevo/", views.AdministradorCreate.as_view(), name="administrador_create"),
-    path("administradores/<int:pk>/editar/", views.AdministradorUpdate.as_view(), name="administrador_update"),
-    path("administradores/<int:pk>/eliminar/", views.AdministradorDelete.as_view(), name="administrador_delete"),
+    path('administradores/', AdministradorListView.as_view(), name='administrador_listar'),
+    path('administradores/nuevo/', AdministradorCreateView.as_view(), name='administrador_crear'),
+    path('administradores/editar/<int:pk>/', AdministradorUpdateView.as_view(), name='administrador_editar'),
+    path('administradores/eliminar/<int:pk>/', AdministradorDeleteView.as_view(), name='administrador_eliminar'),
 ]

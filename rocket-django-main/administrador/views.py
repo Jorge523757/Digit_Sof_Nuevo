@@ -3,28 +3,28 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import Administrador
 from .forms import AdministradorForm
 
-# ================= Administrador =================
-class AdministradorList(ListView):
+# Listar
+class AdministradorListView(ListView):
     model = Administrador
-    template_name = "administrador/listar_administrador.html"
+    template_name = "categoria/listar_administrador.html"
     context_object_name = "administradores"
 
-class AdministradorCreate(CreateView):
+# Crear
+class AdministradorCreateView(CreateView):
     model = Administrador
     form_class = AdministradorForm
-    template_name = "administrador/crear.html"
-    success_url = reverse_lazy("administrador_list")
+    template_name = "categoria/administrador_form.html"
+    success_url = reverse_lazy('administrador_listar')
 
-class AdministradorUpdate(UpdateView):
+# Editar
+class AdministradorUpdateView(UpdateView):
     model = Administrador
     form_class = AdministradorForm
-    template_name = "administrador/crear.html"
-    success_url = reverse_lazy("administrador_list")
+    template_name = "categoria/administrador_form.html"
+    success_url = reverse_lazy('administrador_listar')
 
-class AdministradorDelete(DeleteView):
+# Eliminar
+class AdministradorDeleteView(DeleteView):
     model = Administrador
-    template_name = "administrador/eliminar.html"
-    success_url = reverse_lazy("administrador_list")
-
-
-
+    template_name = "categoria/administrador_confirm_delete.html"
+    success_url = reverse_lazy('administrador_listar')

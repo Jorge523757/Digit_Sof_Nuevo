@@ -20,6 +20,7 @@
             background-color: #1a1d29;
             color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
         }
         
         .sidebar {
@@ -31,6 +32,7 @@
             top: 0;
             padding: 20px 0;
             box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            overflow-y: auto; /* Barra de desplazamiento vertical */
         }
         
         .sidebar .nav-item {
@@ -304,11 +306,6 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#" onclick="toggleGlobalSearch()">
-                    <i class="fas fa-search"></i> Búsqueda Global
-                </a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href="#" data-tab="facturacion">
                     <i class="fas fa-file-invoice"></i> Facturación
                 </a>
@@ -369,7 +366,7 @@
         <div id="clientes" class="tab-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Gestión de Clientes</h2>
-                <button class="btn btn-primary" data-entity="clientes">
+                <button class="btn btn-primary create-btn" data-entity="clientes">
                     <i class="fas fa-plus"></i> Nuevo Cliente
                 </button>
             </div>
@@ -402,7 +399,7 @@
         <div id="productos" class="tab-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Gestión de Productos</h2>
-                <button class="btn btn-primary" data-entity="productos">
+                <button class="btn btn-primary create-btn" data-entity="productos">
                     <i class="fas fa-plus"></i> Nuevo Producto
                 </button>
             </div>
@@ -455,7 +452,7 @@
         <div id="marcas" class="tab-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Gestión de Marcas</h2>
-                <button class="btn btn-primary" data-entity="marcas">
+                <button class="btn btn-primary create-btn" data-entity="marcas">
                     <i class="fas fa-plus"></i> Nueva Marca
                 </button>
             </div>
@@ -486,7 +483,7 @@
         <div id="proveedores" class="tab-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Gestión de Proveedores</h2>
-                <button class="btn btn-primary" data-entity="proveedores">
+                <button class="btn btn-primary create-btn" data-entity="proveedores">
                     <i class="fas fa-plus"></i> Nuevo Proveedor
                 </button>
             </div>
@@ -518,7 +515,7 @@
         <div id="ventas" class="tab-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Gestión de Ventas</h2>
-                <button class="btn btn-primary" data-entity="ventas">
+                <button class="btn btn-primary create-btn" data-entity="ventas">
                     <i class="fas fa-plus"></i> Nueva Venta
                 </button>
             </div>
@@ -549,7 +546,7 @@
         <div id="compras" class="tab-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Gestión de Compras</h2>
-                <button class="btn btn-primary" data-entity="compras">
+                <button class="btn btn-primary create-btn" data-entity="compras">
                     <i class="fas fa-plus"></i> Nueva Compra
                 </button>
             </div>
@@ -582,7 +579,7 @@
         <div id="tecnicos" class="tab-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Gestión de Técnicos</h2>
-                <button class="btn btn-primary" data-entity="tecnicos">
+                <button class="btn btn-primary create-btn" data-entity="tecnicos">
                     <i class="fas fa-plus"></i> Nuevo Técnico
                 </button>
             </div>
@@ -616,7 +613,7 @@
         <div id="servicios" class="tab-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Servicios Técnicos</h2>
-                <button class="btn btn-primary" data-entity="servicios">
+                <button class="btn btn-primary create-btn" data-entity="servicios">
                     <i class="fas fa-plus"></i> Nuevo Servicio
                 </button>
             </div>
@@ -649,7 +646,7 @@
         <div id="equipos" class="tab-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Gestión de Equipos</h2>
-                <button class="btn btn-primary" data-entity="equipos">
+                <button class="btn btn-primary create-btn" data-entity="equipos">
                     <i class="fas fa-plus"></i> Nuevo Equipo
                 </button>
             </div>
@@ -680,7 +677,7 @@
         <div id="facturacion" class="tab-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Gestión de Facturación</h2>
-                <button class="btn btn-primary" data-entity="facturacion">
+                <button class="btn btn-primary create-btn" data-entity="facturacion">
                     <i class="fas fa-plus"></i> Nueva Factura
                 </button>
             </div>
@@ -731,7 +728,8 @@
     </div>
 
     <script>
-        const sampleData = {
+        // Simulando datos del servidor
+        let sampleData = {
             clientes: [
                 { id: 1, documento: '12345678', telefono: '3001234567', email: 'juan@email.com', direccion: 'Calle 123 #45-67' },
                 { id: 2, documento: '87654321', telefono: '3109876543', email: 'maria@email.com', direccion: 'Carrera 45 #12-34' },
@@ -787,222 +785,609 @@
             ],
             
             equipos: [
-                { id: 1, modelo: 'iPhone 13 Pro', clave: 'APL-IP13P-001', cliente: 'Juan Pérez', documento: '12345678' },
-                { id: 2, modelo: 'MacBook Pro 16"', clave: 'APL-MBP16-002', cliente: 'María García', documento: '87654321' },
-                { id: 3, modelo: 'iPad Air', clave: 'APL-IPAD-003', cliente: 'Carlos López', documento: '11223344' }
+                { id: 1, modelo: 'MacBook Pro 16', clave: 'Apple-M1-MAX', cliente: 'Juan Pérez', documento: '12345678' },
+                { id: 2, modelo: 'Dell XPS 15', clave: 'Dell-9510', cliente: 'María García', documento: '87654321' },
+                { id: 3, modelo: 'HP Spectre x360', clave: 'HP-14-EA', cliente: 'Carlos López', documento: '11223344' }
             ],
-            
+
             facturacion: [
-                { id: 1, fecha: '2024-08-15', venta: '001', descripcion: 'Venta iPhone 14 Pro + Accesorios', nit: '900123456-1', garantia: 'Sí' },
-                { id: 2, fecha: '2024-08-10', venta: '002', descripcion: 'Servicio técnico de MacBook', nit: '900123456-1', garantia: 'No' },
-                { id: 3, fecha: '2024-08-05', venta: '003', descripcion: 'Venta Galaxy S23', nit: '900123456-1', garantia: 'Sí' }
+                { id: 1, fecha: '2024-08-15', idVenta: 1, descripcion: 'Venta de 2 iPhones 14 Pro', nit: '900987654-3', garantia: '12 meses' },
+                { id: 2, fecha: '2024-08-12', idVenta: 2, descripcion: 'Venta de 1 Galaxy S23', nit: '900987654-3', garantia: '12 meses' },
+                { id: 3, fecha: '2024-08-10', idVenta: 3, descripcion: 'Venta de 3 MacBook Air', nit: '900987654-3', garantia: '12 meses' }
             ]
         };
 
-        const dataTables = {}; // Objeto para guardar las instancias de DataTables
+        let dataTables = {};
+        let activeTable = null;
+        let activeEntity = null;
 
-        // Mapeo de campos para cada entidad
-        const entityFields = {
-            clientes: ['documento', 'telefono', 'email', 'direccion'],
-            productos: ['nombre', 'modelo', 'cantidad', 'color', 'tipo', 'marca', 'estado'],
-            marcas: ['marca', 'color', 'descripcion'],
-            proveedores: ['nit', 'nombre', 'cedula', 'direccion', 'telefono'],
-            ventas: ['cliente', 'cantidad', 'valor', 'estado'],
-            compras: ['producto', 'cantidad', 'fecha', 'proveedor', 'precio', 'administrador'],
-            tecnicos: ['nombre', 'documento', 'telefono', 'email', 'direccion', 'tipo', 'servicios'],
-            servicios: ['cliente', 'tecnico', 'orden', 'telefono', 'email', 'estado'],
-            equipos: ['modelo', 'clave', 'cliente', 'documento'],
-            facturacion: ['fecha', 'venta', 'descripcion', 'nit', 'garantia']
+        const tableConfigs = {
+            clientes: {
+                id: '#clientesTable',
+                data: sampleData.clientes,
+                columns: [
+                    { data: 'id' },
+                    { data: 'documento' },
+                    { data: 'telefono' },
+                    { data: 'email' },
+                    { data: 'direccion' },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-warning btn-sm edit-btn" data-id="${data.id}" data-entity="clientes">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${data.id}" data-entity="clientes">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
+                formFields: [
+                    { name: 'documento', label: 'Documento', type: 'text' },
+                    { name: 'telefono', label: 'Teléfono', type: 'text' },
+                    { name: 'email', label: 'Email', type: 'email' },
+                    { name: 'direccion', label: 'Dirección', type: 'text' }
+                ]
+            },
+            productos: {
+                id: '#productosTable',
+                data: sampleData.productos,
+                columns: [
+                    { data: 'id' },
+                    { data: 'nombre' },
+                    { data: 'modelo' },
+                    { data: 'cantidad' },
+                    { data: 'color' },
+                    { data: 'tipo' },
+                    { data: 'marca' },
+                    {
+                        data: 'estado',
+                        render: function(data, type, row) {
+                            let badgeClass = '';
+                            if (data === 'En Stock') {
+                                badgeClass = 'btn-success';
+                            } else if (data === 'Stock Bajo') {
+                                badgeClass = 'btn-warning';
+                            } else if (data === 'Crítico') {
+                                badgeClass = 'btn-danger';
+                            }
+                            return `<span class="badge ${badgeClass}">${data}</span>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-warning btn-sm edit-btn" data-id="${data.id}" data-entity="productos">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${data.id}" data-entity="productos">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
+                formFields: [
+                    { name: 'nombre', label: 'Nombre', type: 'text' },
+                    { name: 'modelo', label: 'Modelo', type: 'text' },
+                    { name: 'cantidad', label: 'Cantidad', type: 'number' },
+                    { name: 'color', label: 'Color', type: 'text' },
+                    { name: 'tipo', label: 'Tipo', type: 'text' },
+                    { name: 'marca', label: 'Marca', type: 'text' },
+                    { name: 'estado', label: 'Estado', type: 'select', options: ['En Stock', 'Stock Bajo', 'Crítico'] }
+                ]
+            },
+            marcas: {
+                id: '#marcasTable',
+                data: sampleData.marcas,
+                columns: [
+                    { data: 'id' },
+                    { data: 'marca' },
+                    { data: 'color' },
+                    { data: 'descripcion' },
+                    { data: 'productos' },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-warning btn-sm edit-btn" data-id="${data.id}" data-entity="marcas">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${data.id}" data-entity="marcas">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
+                formFields: [
+                    { name: 'marca', label: 'Marca', type: 'text' },
+                    { name: 'color', label: 'Color', type: 'text' },
+                    { name: 'descripcion', label: 'Descripción', type: 'textarea' }
+                ]
+            },
+            proveedores: {
+                id: '#proveedoresTable',
+                data: sampleData.proveedores,
+                columns: [
+                    { data: 'nit' },
+                    { data: 'nombre' },
+                    { data: 'cedula' },
+                    { data: 'direccion' },
+                    { data: 'telefono' },
+                    { data: 'compras' },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-warning btn-sm edit-btn" data-id="${data.nit}" data-entity="proveedores">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${data.nit}" data-entity="proveedores">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
+                formFields: [
+                    { name: 'nit', label: 'NIT', type: 'text' },
+                    { name: 'nombre', label: 'Nombre', type: 'text' },
+                    { name: 'cedula', label: 'Cédula', type: 'text' },
+                    { name: 'direccion', label: 'Dirección', type: 'text' },
+                    { name: 'telefono', label: 'Teléfono', type: 'text' }
+                ]
+            },
+            ventas: {
+                id: '#ventasTable',
+                data: sampleData.ventas,
+                columns: [
+                    { data: 'id' },
+                    { data: 'cliente' },
+                    { data: 'cantidad' },
+                    {
+                        data: 'valor',
+                        render: function(data, type, row) {
+                            return `$${data.toLocaleString()}`;
+                        }
+                    },
+                    {
+                        data: 'estado',
+                        render: function(data, type, row) {
+                            let badgeClass = '';
+                            if (data === 'Completada') {
+                                badgeClass = 'btn-success';
+                            } else if (data === 'Pendiente') {
+                                badgeClass = 'btn-warning';
+                            } else if (data === 'En Proceso') {
+                                badgeClass = 'btn-primary';
+                            }
+                            return `<span class="badge ${badgeClass}">${data}</span>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-info btn-sm view-btn" data-id="${data.id}" data-entity="ventas">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${data.id}" data-entity="ventas">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
+                formFields: [
+                    { name: 'cliente', label: 'Cliente', type: 'text' },
+                    { name: 'cantidad', label: 'Cantidad', type: 'number' },
+                    { name: 'valor', label: 'Valor Total', type: 'number' },
+                    { name: 'estado', label: 'Estado', type: 'select', options: ['Completada', 'Pendiente', 'En Proceso'] }
+                ]
+            },
+            compras: {
+                id: '#comprasTable',
+                data: sampleData.compras,
+                columns: [
+                    { data: 'id' },
+                    { data: 'producto' },
+                    { data: 'cantidad' },
+                    { data: 'fecha' },
+                    { data: 'proveedor' },
+                    { data: 'precio' },
+                    { data: 'administrador' },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-warning btn-sm edit-btn" data-id="${data.id}" data-entity="compras">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${data.id}" data-entity="compras">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
+                formFields: [
+                    { name: 'producto', label: 'Producto', type: 'text' },
+                    { name: 'cantidad', label: 'Cantidad', type: 'number' },
+                    { name: 'fecha', label: 'Fecha', type: 'date' },
+                    { name: 'proveedor', label: 'Proveedor', type: 'text' },
+                    { name: 'precio', label: 'Precio', type: 'text' },
+                    { name: 'administrador', label: 'Administrador', type: 'text' }
+                ]
+            },
+            tecnicos: {
+                id: '#tecnicosTable',
+                data: sampleData.tecnicos,
+                columns: [
+                    { data: 'id' },
+                    { data: 'nombre' },
+                    { data: 'documento' },
+                    { data: 'telefono' },
+                    { data: 'email' },
+                    { data: 'direccion' },
+                    { data: 'tipo' },
+                    { data: 'servicios' },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-info btn-sm view-btn" data-id="${data.id}" data-entity="tecnicos">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-warning btn-sm edit-btn" data-id="${data.id}" data-entity="tecnicos">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${data.id}" data-entity="tecnicos">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
+                formFields: [
+                    { name: 'nombre', label: 'Nombre Completo', type: 'text' },
+                    { name: 'documento', label: 'Documento', type: 'text' },
+                    { name: 'telefono', label: 'Teléfono', type: 'text' },
+                    { name: 'email', label: 'Email', type: 'email' },
+                    { name: 'direccion', label: 'Dirección', type: 'text' },
+                    { name: 'tipo', label: 'Tipo Técnico', type: 'text' }
+                ]
+            },
+            servicios: {
+                id: '#serviciosTable',
+                data: sampleData.servicios,
+                columns: [
+                    { data: 'id' },
+                    { data: 'cliente' },
+                    { data: 'tecnico' },
+                    { data: 'orden' },
+                    { data: 'telefono' },
+                    { data: 'email' },
+                    {
+                        data: 'estado',
+                        render: function(data, type, row) {
+                            let badgeClass = '';
+                            if (data === 'Completado') {
+                                badgeClass = 'btn-success';
+                            } else if (data === 'En Proceso') {
+                                badgeClass = 'btn-primary';
+                            } else if (data === 'Pendiente') {
+                                badgeClass = 'btn-warning';
+                            }
+                            return `<span class="badge ${badgeClass}">${data}</span>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-info btn-sm view-btn" data-id="${data.id}" data-entity="servicios">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-warning btn-sm edit-btn" data-id="${data.id}" data-entity="servicios">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${data.id}" data-entity="servicios">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
+                formFields: [
+                    { name: 'cliente', label: 'Cliente', type: 'text' },
+                    { name: 'tecnico', label: 'Técnico', type: 'text' },
+                    { name: 'orden', label: 'N° Orden', type: 'text' },
+                    { name: 'telefono', label: 'Teléfono Cliente', type: 'text' },
+                    { name: 'email', label: 'Email Cliente', type: 'email' },
+                    { name: 'estado', label: 'Estado', type: 'select', options: ['Completado', 'En Proceso', 'Pendiente'] }
+                ]
+            },
+            equipos: {
+                id: '#equiposTable',
+                data: sampleData.equipos,
+                columns: [
+                    { data: 'id' },
+                    { data: 'modelo' },
+                    { data: 'clave' },
+                    { data: 'cliente' },
+                    { data: 'documento' },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-warning btn-sm edit-btn" data-id="${data.id}" data-entity="equipos">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${data.id}" data-entity="equipos">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
+                formFields: [
+                    { name: 'modelo', label: 'Modelo', type: 'text' },
+                    { name: 'clave', label: 'Clave', type: 'text' },
+                    { name: 'cliente', label: 'Cliente', type: 'text' },
+                    { name: 'documento', label: 'Documento Cliente', type: 'text' }
+                ]
+            },
+            facturacion: {
+                id: '#facturacionTable',
+                data: sampleData.facturacion,
+                columns: [
+                    { data: 'id' },
+                    { data: 'fecha' },
+                    { data: 'idVenta' },
+                    { data: 'descripcion' },
+                    { data: 'nit' },
+                    { data: 'garantia' },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-info btn-sm view-btn" data-id="${data.id}" data-entity="facturacion">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${data.id}" data-entity="facturacion">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
+                formFields: [
+                    { name: 'fecha', label: 'Fecha Venta', type: 'date' },
+                    { name: 'idVenta', label: 'ID Venta', type: 'number' },
+                    { name: 'descripcion', label: 'Descripción', type: 'textarea' },
+                    { name: 'nit', label: 'NIT DigitSoft', type: 'text' },
+                    { name: 'garantia', label: 'Garantía', type: 'text' }
+                ]
+            }
         };
 
         $(document).ready(function() {
-            // Lógica para el cambio de pestañas (Tabs)
-            $('.sidebar .nav-link').on('click', function(e) {
+            // Inicializar DataTables
+            for (const key in tableConfigs) {
+                if (tableConfigs.hasOwnProperty(key)) {
+                    const config = tableConfigs[key];
+                    dataTables[key] = $(config.id).DataTable({
+                        data: config.data,
+                        columns: config.columns,
+                        responsive: true,
+                        language: {
+                            url: 'https://cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json'
+                        }
+                    });
+                }
+            }
+
+            // Lógica de navegación del sidebar
+            $('.nav-link').on('click', function(e) {
                 e.preventDefault();
                 const tab = $(this).data('tab');
                 
-                // Si ya es la pestaña activa, no hacer nada
-                if ($(this).hasClass('active')) {
-                    return;
-                }
-
-                $('.sidebar .nav-link').removeClass('active');
+                $('.nav-link').removeClass('active');
                 $(this).addClass('active');
-
+                
                 $('.tab-content').removeClass('active');
-                $('#' + tab).addClass('active');
+                $(`#${tab}`).addClass('active');
 
-                // Asegura que la tabla se redibuje correctamente
-                if (dataTables[tab + 'Table']) {
-                    dataTables[tab + 'Table'].columns.adjust().draw();
+                // Ajustar DataTables para la pestaña activa
+                if (dataTables[tab]) {
+                    dataTables[tab].columns.adjust().responsive.recalc();
+                    activeTable = dataTables[tab];
+                    activeEntity = tab;
+                } else {
+                    activeTable = null;
+                    activeEntity = null;
                 }
             });
 
-            // Lógica para inicializar DataTables
-            function initializeDataTables() {
-                // Iterar sobre cada entidad para inicializar su tabla
-                for (const entity in entityFields) {
-                    if (entity === 'dashboard') continue;
-                    
-                    const tableId = `#${entity}Table`;
-                    const columns = entityFields[entity].map(field => ({ data: field }));
-                    
-                    // Añade la columna de acciones
-                    columns.push({
-                        data: null,
-                        render: function(data, type, row) {
-                            return `<div data-id="${row.id || row.nit}" data-entity="${entity}">
-                                        <button class="btn btn-sm btn-warning btn-edit"><i class="fas fa-pencil-alt"></i></button>
-                                        <button class="btn btn-sm btn-danger btn-delete"><i class="fas fa-trash-alt"></i></button>
-                                    </div>`;
-                        }
-                    });
-                    
-                    dataTables[tableId] = $(tableId).DataTable({
-                        data: sampleData[entity],
-                        columns: columns,
-                        responsive: true
-                    });
-                }
-            }
-
-            initializeDataTables();
-
-            // Manejar los clics en los botones de "Nuevo Registro"
-            $('[data-entity]').on('click', function() {
+            // Lógica para el botón "Nuevo"
+            $('.create-btn').on('click', function() {
                 const entity = $(this).data('entity');
-                openModal('add', entity);
-            });
-
-            // Manejar los clics en los botones de "Editar"
-            $(document).on('click', '.btn-edit', function() {
-                const row = $(this).closest('tr');
-                const table = row.closest('table').attr('id');
-                const entity = $(this).parent().data('entity');
-                const data = dataTables[`#${table}`].row(row).data();
-                
-                openModal('edit', entity, data);
-            });
-
-            // Manejar los clics en los botones de "Eliminar"
-            $(document).on('click', '.btn-delete', function() {
-                if (confirm('¿Estás seguro de que quieres eliminar este registro?')) {
-                    const row = $(this).closest('tr');
-                    const table = row.closest('table').attr('id');
-                    const entity = $(this).parent().data('entity');
-                    const data = dataTables[`#${table}`].row(row).data();
-
-                    // Encuentra el índice del registro en el array de datos
-                    const index = sampleData[entity].findIndex(item => item.id === data.id || item.nit === data.nit);
-                    if (index !== -1) {
-                        sampleData[entity].splice(index, 1);
-                        // Redibuja la tabla con los datos actualizados
-                        dataTables[`#${table}`].clear().rows.add(sampleData[entity]).draw();
-                    }
-                }
-            });
-
-            // Lógica para el modal de Guardar (Agregar/Editar)
-            $('#saveBtn').on('click', function() {
-                const entity = $(this).data('entity');
-                const mode = $(this).data('mode');
-                const formData = $('#crudForm').serializeArray().reduce((obj, item) => {
-                    obj[item.name] = item.value;
-                    return obj;
-                }, {});
-
-                if (mode === 'add') {
-                    // Lógica para agregar un nuevo registro
-                    formData.id = sampleData[entity].length + 1; // Asigna un nuevo ID simple
-                    sampleData[entity].push(formData);
-                } else if (mode === 'edit') {
-                    // Lógica para editar un registro existente
-                    const originalId = $(this).data('id');
-                    const index = sampleData[entity].findIndex(item => item.id == originalId || item.nit == originalId);
-                    if (index !== -1) {
-                        // Actualiza los campos
-                        Object.assign(sampleData[entity][index], formData);
-                    }
-                }
-                
-                // Redibuja la tabla con los datos actualizados
-                dataTables[`#${entity}Table`].clear().rows.add(sampleData[entity]).draw();
-                
-                $('#crudModal').modal('hide');
+                openModal(entity, 'new');
             });
             
-            // Función para abrir el modal y llenarlo
-            function openModal(mode, entity, data = null) {
-                const modalTitle = mode === 'add' ? `Nuevo Registro de ${capitalize(entity)}` : `Editar Registro de ${capitalize(entity)}`;
-                const formHtml = generateForm(entity, data);
+            // Lógica para el botón "Editar" (delegación de eventos)
+            $(document).on('click', '.edit-btn', function() {
+                const entity = $(this).data('entity');
+                const id = $(this).data('id');
+                openModal(entity, 'edit', id);
+            });
+
+            // Lógica para el botón "Eliminar" (delegación de eventos)
+            $(document).on('click', '.delete-btn', function() {
+                const entity = $(this).data('entity');
+                const id = $(this).data('id');
+                deleteRecord(entity, id);
+            });
+
+            // Lógica para guardar (Crear/Editar)
+            $('#saveBtn').on('click', function() {
+                saveRecord();
+            });
+
+            // Función para abrir el modal (crear o editar)
+            function openModal(entity, mode, id = null) {
+                $('#crudModalLabel').text(`${mode === 'edit' ? 'Editar' : 'Nuevo'} registro de ${entity}`);
+                $('#crudForm').empty();
+
+                let formHtml = '';
+                const config = tableConfigs[entity];
                 
-                $('#crudModalLabel').text(modalTitle);
+                // Generar campos del formulario
+                config.formFields.forEach(field => {
+                    formHtml += `
+                        <div class="form-group">
+                            <label for="${field.name}">${field.label}</label>
+                            ${field.type === 'textarea' ?
+                                `<textarea class="form-control" id="${field.name}"></textarea>` :
+                                field.type === 'select' ?
+                                `<select class="form-control" id="${field.name}">
+                                    ${field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                                </select>` :
+                                `<input type="${field.type}" class="form-control" id="${field.name}">`
+                            }
+                        </div>
+                    `;
+                });
+
                 $('#crudForm').html(formHtml);
-                $('#saveBtn').data('entity', entity).data('mode', mode).data('id', data ? (data.id || data.nit) : null);
+                $('#crudForm').data('entity', entity);
+                $('#crudForm').data('mode', mode);
+
+                if (mode === 'edit') {
+                    const record = sampleData[entity].find(r => r.id == id || r.nit == id);
+                    if (record) {
+                        $('#crudForm').data('id', id);
+                        for (const key in record) {
+                            if (record.hasOwnProperty(key)) {
+                                $(`#${key}`).val(record[key]);
+                            }
+                        }
+                    }
+                }
                 
                 $('#crudModal').modal('show');
             }
-            
-            // Genera dinámicamente el formulario del modal
-            function generateForm(entity, data) {
-                let html = '';
-                const fields = entityFields[entity];
 
-                fields.forEach(field => {
-                    const value = data ? data[field] : '';
-                    let label = capitalize(field.replace(/_|-/g, ' '));
-                    
-                    // Manejo de llaves foráneas y select
-                    if (['marca', 'cliente', 'tecnico', 'proveedor'].includes(field)) {
-                        let options = '';
-                        let foreignEntity = '';
-                        let foreignField = '';
-                        
-                        if (field === 'marca') {
-                            foreignEntity = 'marcas';
-                            foreignField = 'marca';
-                        } else if (field === 'cliente') {
-                            foreignEntity = 'clientes';
-                            foreignField = 'documento';
-                        } else if (field === 'tecnico') {
-                            foreignEntity = 'tecnicos';
-                            foreignField = 'nombre';
-                        } else if (field === 'proveedor') {
-                            foreignEntity = 'proveedores';
-                            foreignField = 'nombre';
-                        }
-
-                        sampleData[foreignEntity].forEach(item => {
-                            const isSelected = item[foreignField] === value ? 'selected' : '';
-                            options += `<option value="${item[foreignField]}" ${isSelected}>${item[foreignField]}</option>`;
-                        });
-
-                        html += `
-                            <div class="form-group">
-                                <label for="${field}">${label}</label>
-                                <select class="form-control" id="${field}" name="${field}">
-                                    ${options}
-                                </select>
-                            </div>
-                        `;
-                    } else {
-                        // Campos de texto normales
-                        html += `
-                            <div class="form-group">
-                                <label for="${field}">${label}</label>
-                                <input type="text" class="form-control" id="${field}" name="${field}" value="${value}">
-                            </div>
-                        `;
-                    }
+            // Función para guardar (crear o editar)
+            function saveRecord() {
+                const entity = $('#crudForm').data('entity');
+                const mode = $('#crudForm').data('mode');
+                const id = $('#crudForm').data('id');
+                
+                const newRecord = {};
+                tableConfigs[entity].formFields.forEach(field => {
+                    newRecord[field.name] = $(`#${field.name}`).val();
                 });
                 
-                return html;
+                if (mode === 'new') {
+                    // Simular ID automático
+                    newRecord.id = sampleData[entity].length > 0 ? Math.max(...sampleData[entity].map(r => r.id || 0)) + 1 : 1;
+                    sampleData[entity].push(newRecord);
+                } else if (mode === 'edit') {
+                    const index = sampleData[entity].findIndex(r => r.id == id || r.nit == id);
+                    if (index !== -1) {
+                        Object.assign(sampleData[entity][index], newRecord);
+                    }
+                }
+
+                refreshTable(entity);
+                $('#crudModal').modal('hide');
             }
 
-            // Función de ayuda para capitalizar la primera letra
-            function capitalize(str) {
-                return str.charAt(0).toUpperCase() + str.slice(1);
+            // Función para eliminar
+            function deleteRecord(entity, id) {
+                if (confirm('¿Está seguro de que desea eliminar este registro?')) {
+                    const index = sampleData[entity].findIndex(r => r.id == id || r.nit == id);
+                    if (index !== -1) {
+                        sampleData[entity].splice(index, 1);
+                        refreshTable(entity);
+                    }
+                }
             }
+
+            // Función para refrescar la tabla
+            function refreshTable(entity) {
+                dataTables[entity].clear().rows.add(sampleData[entity]).draw();
+            }
+
+            // Lógica para la selección de filas
+            $('table.dataTable tbody').on('click', 'tr', function() {
+                $(this).toggleClass('selected');
+                const selectedRows = $(this).closest('table').DataTable().rows('.selected').data();
+                if (selectedRows.length > 0) {
+                    $('#selectedInfo').text(`Filas seleccionadas: ${selectedRows.length}`).show();
+                } else {
+                    $('#selectedInfo').hide();
+                }
+            });
+
+            // Lógica de filtrado para productos
+            $('#marcaFilter, #tipoFilter').on('change', function() {
+                filterProducts();
+            });
+
+            $('#stockMinimo').on('keyup', function() {
+                filterProducts();
+            });
+
+            function filterProducts() {
+                const marca = $('#marcaFilter').val();
+                const tipo = $('#tipoFilter').val();
+                const stockMinimo = $('#stockMinimo').val();
+
+                // Filtrar los datos originales
+                const filteredData = sampleData.productos.filter(p => {
+                    const matchesMarca = !marca || p.marca === marca;
+                    const matchesTipo = !tipo || p.tipo === tipo;
+                    const matchesStock = !stockMinimo || p.cantidad >= parseInt(stockMinimo);
+                    return matchesMarca && matchesTipo && matchesStock;
+                });
+
+                // Refrescar la tabla con los datos filtrados
+                dataTables['productos'].clear().rows.add(filteredData).draw();
+            }
+
+            // Inicializar filtros de productos (al cargar la página)
+            const marcas = [...new Set(sampleData.productos.map(p => p.marca))];
+            marcas.forEach(marca => $('#marcaFilter').append(`<option value="${marca}">${marca}</option>`));
+
+            const tipos = [...new Set(sampleData.productos.map(p => p.tipo))];
+            tipos.forEach(tipo => $('#tipoFilter').append(`<option value="${tipo}">${tipo}</option>`));
         });
     </script>
 </body>
