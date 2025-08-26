@@ -1,11 +1,10 @@
 from django.urls import path
 from apps.dyn_dt import views 
+from administrador.views import *
 
 urlpatterns = [
     path('dynamic-dt/', views.index, name="dynamic_dt"),
 
-    path('create-filter/<str:model_name>/', views.create_filter, name="create_filter"),
-    path('create-page-items/<str:model_name>/', views.create_page_items, name="create_page_items"),
     path('create-hide-show-items/<str:model_name>/', views.create_hide_show_filter, name="create_hide_show_filter"),
     path('delete-filter/<str:model_name>/<int:id>/', views.delete_filter, name="delete_filter"),
     path('create/<str:aPath>/', views.create, name="create"),

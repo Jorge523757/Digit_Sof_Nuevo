@@ -13,4 +13,5 @@ urlpatterns = [
     path('api/<str:model_name>/'          , views.DynamicAPI.as_view(), name="model_api"),
     path('api/<str:model_name>/<str:id>'  , views.DynamicAPI.as_view()),
     path('api/<str:model_name>/<str:id>/' , views.DynamicAPI.as_view()),
+    
 ]
