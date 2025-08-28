@@ -1,3 +1,5 @@
+{%load static%}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -565,21 +567,65 @@
 
     <!-- Productos -->
     <section id="productos" class="py-20 bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12">Nuestros Productos</h2>
-            
-            <div class="text-center mb-12">
-                <button class="filter-btn active" data-filter="all">Todos</button>
-                <button class="filter-btn" data-filter="laptop">Laptops</button>
-                <button class="filter-btn" data-filter="desktop">Computadoras</button>
-                <button class="filter-btn" data-filter="accesorio">Accesorios</button>
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-12">Nuestros Productos</h2>
+        
+        <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-8">
+
+            <div class="product-card laptop p-4 bg-white rounded-lg shadow-md transition-transform transform hover:scale-105">
+                <img src="{% static 'dist/images/imagen.jpg' %}" alt="Laptop XYZ" class="w-full h-48 object-cover rounded-md mb-4">
+                <h4 class="text-xl font-semibold text-gray-800">Laptop XYZ</h4>
+                <p class="text-gray-600">Potente laptop para uso profesional.</p>
+                <span class="text-lg font-bold text-blue-600 mt-2 block">$6'000.000</span>
+            </div>
+
+            <div class="product-card desktop p-4 bg-white rounded-lg shadow-md transition-transform transform hover:scale-105">
+                <img src="{% static 'dist/images/OIP.jpg' %}" alt="Computadora Gaming" class="w-full h-48 object-cover rounded-md mb-4">
+                <h4 class="text-xl font-semibold text-gray-800">Computadora Gaming</h4>
+                <p class="text-gray-600">Rendimiento extremo para tus juegos.</p>
+                <span class="text-lg font-bold text-blue-600 mt-2 block">$4'800.000</span>
             </div>
             
-            <div id="productsGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Los productos se cargarán dinámicamente -->
+            <div class="product-card accesorio p-4 bg-white rounded-lg shadow-md transition-transform transform hover:scale-105">
+                <img src="{% static 'dist/images/MouseErgonomico.jpg' %}" alt="Mouse Inalámbrico" class="w-full h-48 object-cover rounded-md mb-4">
+                <h4 class="text-xl font-semibold text-gray-800">Mouse Inalámbrico</h4>
+                <p class="text-gray-600">Precisión y comodidad en un solo clic.</p>
+                <span class="text-lg font-bold text-blue-600 mt-2 block">$200.000</span>
             </div>
+
+            <div class="product-card nuevo-producto-1 p-4 bg-white rounded-lg shadow-md transition-transform transform hover:scale-105">
+                <img src="{% static 'dist/images/curvogamer.jpg' %}" alt="Teclado Mecánico" class="w-full h-48 object-cover rounded-md mb-4">
+                <h4 class="text-xl font-semibold text-gray-800">Curvo Gamer</h4>
+                <p class="text-gray-600">Velocidad y respuesta para gamers.</p>
+                <span class="text-lg font-bold text-blue-600 mt-2 block">$5'550.000</span>
+            </div>
+
+            <div class="product-card nuevo-producto-2 p-4 bg-white rounded-lg shadow-md transition-transform transform hover:scale-105">
+                <img src="{% static 'dist/images/Todoenuno.jpg' %}" alt="Monitor Ultrawide" class="w-full h-48 object-cover rounded-md mb-4">
+                <h4 class="text-xl font-semibold text-gray-800">Todo en Uno</h4>
+                <p class="text-gray-600">Experiencia visual inmersiva.</p>
+                <span class="text-lg font-bold text-blue-600 mt-2 block">$2'500.000</span>
+            </div>
+            
+            <div class="product-card nuevo-producto-3 p-4 bg-white rounded-lg shadow-md transition-transform transform hover:scale-105">
+                <img src="{% static 'dist/images/Tecladomecanico.jpg' %}" alt="Audífonos Gaming" class="w-full h-48 object-cover rounded-md mb-4">
+                <h4 class="text-xl font-semibold text-gray-800">Teclado Mecanico</h4>
+                <p class="text-gray-600">Color de la retroiluminación: Rainbow.
+                                         Ergonómico y apto para diversos usos.
+                                         Función antighosting incorporada.
+                                         Tipo de teclado: mecánico.
+                                         Con conector USB 2.0.
+                                         Con cable removible.
+                                         Medidas: 30cm de ancho, 4.3cm de alto y 11.5cm de profundidad.</p>
+                <span class="text-lg font-bold text-blue-600 mt-2 block">$450.000</span>
+            </div>
+
         </div>
-    </section>
+            
+        <div id="productsGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div>
+    </div>
+</section>
 
     <!-- Nosotros -->
     <section id="nosotros" class="py-20 bg-gradient-to-r from-blue-50 to-purple-50">
@@ -621,11 +667,18 @@
                     <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8">
                         <div class="w-32 h-32 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mx-auto mb-6 flex items-center justify-center">
                             <i class="fas fa-building text-4xl text-white"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold mb-4">Digit Soft</h3>
-                        <p class="text-gray-600">Ubicados en Duitama, Boyacá</p>
-                        <p class="text-sm text-gray-500 mt-2">Calle 15 # 14-26</p>
-                    </div>
+                       <div>
+                <h3 class="text-2xl font-bold mb-4">Digit Soft</h3>
+                <iframe 
+                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3969.193466299143!2d-73.03737692525273!3d5.828325194154824!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e6a3f901de92f89%3A0xf1a748fcde3846f9!2sSoporte%20Tecnico%20-%20Digit%20Soft!5e0!3m2!1ses!2sco!4v1756225727043!5m2!1ses!2sco"
+                 width="600" 
+                 height="450" 
+                 style="border:0;" 
+                 allowfullscreen="" 
+                 loading="lazy" 
+                 referrerpolicy="no-referrer-when-downgrade">
+                 </iframe> 
+                 </div>
                 </div>
             </div>
         </div>
@@ -707,7 +760,7 @@
             const grid = document.getElementById('productsGrid');
             const productosFilter = categoria === 'all' ? productos : productos.filter(p => p.categoria === categoria);
             
-            grid.innerHTML = productosFilter.map(producto => `
+            grid.innerHTML = productosFilter.map(producto =>)
                 <div class="product-card">
                     <div class="p-6 text-center">
                         <div class="text-6xl mb-4">${producto.imagen}</div>
@@ -718,4 +771,5 @@
                         </button>
                     </div>
                 </div>
-            `
+                 }
+            

@@ -109,7 +109,7 @@
                     <div class="col-span-6 sm:col-span-3">
                         <label for="current_password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contraseña actual</label>
                         <div class="relative w-full">
-                            <input type="password" id="current_password" name="current_password" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border-l-gray-100 border-l-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Current password" required>
+                            <input type="password" id="cotraseña actual" name="cotraseña actual" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border-l-gray-100 border-l-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Cotraseña Actual" required>
                             <button type="button" id="show_current_password" class="absolute top-0 right-0 p-2.5 h-full text-sm font-thin text-white rounded-r-lg">
                                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 14">
                                     <g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
@@ -123,7 +123,7 @@
                     <div class="col-span-6 sm:col-span-3">
                         <label for="new_password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contraseña actual</label>
                         <div class="relative w-full">
-                            <input type="password" id="new_password" name="new_password" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border-l-gray-100 border-l-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="New password" required>
+                            <input type="password" id="new_password" name="new_password" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border-l-gray-100 border-l-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Nueva Cotraseña" required>
                             <button type="button" id="show_new_password" class="absolute top-0 right-0 p-2.5 h-full text-sm font-thin text-white rounded-r-lg">
                                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 14">
                                     <g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
@@ -165,7 +165,7 @@
         });
 
         function togglePasswordVisibility(input, button) {
-            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            const type = input.getAttribute('type') === 'Cotraseña' ? 'text' : 'Cotraseña';
             input.setAttribute('type', type);
 
             toggleEyeIcon(button, type);
@@ -174,7 +174,7 @@
         function toggleEyeIcon(button, type) {
             const eyeIcon = button.querySelector('svg');
 
-            if (type === 'password') {
+            if (type === 'Cotraseña') {
                 eyeIcon.innerHTML = `
                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 14">
                     <g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">

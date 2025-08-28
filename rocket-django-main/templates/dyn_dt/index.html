@@ -391,6 +391,10 @@
             transform: scale(1.1);
             box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
         }
+        .sidebar {
+    height: 100vh; /* Establece la altura al 100% de la altura de la ventana (viewport) */
+    overflow-y: auto; /* Habilita el desplazamiento vertical si el contenido se desborda */
+}
         
         /* Modal Styling */
         .modal-content {
@@ -436,6 +440,12 @@
             margin-bottom: 0.5rem;
             display: block;
         }
+        .form-control:disabled, 
+        .form-control[readonly] {
+            background: linear-gradient(to bottom, #0d1a3b, #183285);
+            color: #fff;
+        }
+
         
         /* Dropdown styles */
         .dropdown-content {
@@ -599,6 +609,11 @@
                 </a>
             </li>
             <li class="nav-item">
+            <a class="nav-link" href="#" data-tab="administradores">
+                <i class="fas fa-user-shield"></i> <span class="sidebar-text">Administradores</span>
+            </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="#" data-tab="equipos">
                     <i class="fas fa-laptop"></i> <span class="sidebar-text">Equipos</span>
                 </a>
@@ -656,7 +671,15 @@
             </li>
         </ul>
     </div>
+    <style>
+    .sidebar {
+        /* ... otros estilos ... */
+        height: 100vh;
+        overflow-y: auto;
+    }
     
+    /* Agrega aquí los demás estilos que uses, como el del .dropdown-content */
+</style>
     <div class="main-content" id="mainContent">
         <!-- DASHBOARD -->
         <div id="dashboard" class="tab-content active">
@@ -747,6 +770,34 @@
                                 <th>Teléfono</th>
                                 <th>Correo</th>
                                 <th>Dirección</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+         <!-- ADMINISTRADORES -->
+        <div id="administradores" class="tab-content">
+             <div class="page-header d-flex justify-content-between align-items-center">
+                <h2><i class="fas fa-user-shield"></i> Gestión de Administradores</h2>
+                <button class="btn btn-primary create-btn" data-entity="administradores">
+                    <i class="fas fa-plus"></i> Nuevo Administrador
+                </button>
+            </div>
+    
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Lista de Administradores</h5>
+                </div>
+                <div class="card-body">
+                    <table id="administradoresTable" class="table table-striped table-hover" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Correo</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -1231,6 +1282,14 @@
                         { id: 4, nombre: 'Ana Sofía Rodríguez', numero_documento: '5566778899', numero_telefonico: '3155667788', correo_electronico: 'ana@email.com', direccion: 'Calle 89 #23-45, Barranquilla' },
                         { id: 5, nombre: 'Luis Fernando Martínez', numero_documento: '9988776655', numero_telefonico: '3009988776', correo_electronico: 'luis@email.com', direccion: 'Carrera 12 #34-56, Cartagena' }
                     ],
+
+                    administradores: [
+                        { id: 1, nombre: 'Andrés Felipe Gómez',Cotraseña:'5325352',correo:'AndresFeli@gmail.com'},
+                        { id: 2, nombre: 'Laura Viviana Torres',Cotraseña:'67325352',correo:'Laura@hotmail.com'},
+                        { id: 3, nombre: 'Miguel Ángel Ramírez',Cotraseña:'98753252',correo:'Miguel@email.com'},
+                        { id: 4, nombre: 'Sofía Camila Vargas',Cotraseña:'12353252',correo:'SofiaVar@hotmail.com'},
+                        { id: 5, nombre: 'Diego Alejandro Fernández',Cotraseña:'456753252',correo:'Diego#08@gmail.com'}
+                    ],
                     
                     marcas: [
                         { id: 1, color: '#007AFF', marca: 'Apple', descripcion: 'Tecnología innovadora y diseño premium para dispositivos móviles y computadores' },
@@ -1420,6 +1479,12 @@
                             (item.numero_documento === record.numero_documento || 
                              item.correo_electronico === record.correo_electronico)
                         );
+                    case 'administradores':   // 👈 Aquí añadimos el caso nuevo
+                        return data.some((item, index) =>
+                            index !== excludeIndex &&
+                            (item.nombre === record.nombre || 
+                             item.correo_electronico === record.correo_electronico)
+                        );
                     case 'proveedores':
                         return data.some((item, index) => 
                             index !== excludeIndex && 
@@ -1518,6 +1583,69 @@
                         type: 'text', 
                         required: true,
                         validation: ['required', { type: 'minLength', value: 10 }]
+                    }
+                ]
+            },
+
+            administradores: {
+                id: '#administradoresTable',
+                    columns: [
+                    { data: 'id' },
+                    { data: 'nombre' },
+                    { data: 'correo_electronico' }, 
+                    { 
+                        data: 'contrasena',
+                        render: function(data, type, row) {
+                            return '********'; // Para no mostrar la contraseña directamente
+                    }
+                },
+            {
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-info btn-sm view-btn" data-id="${data.id}" data-entity="administradores" title="Ver">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-warning btn-sm edit-btn" data-id="${data.id}" data-entity="administradores" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${data.id}" data-entity="administradores" title="Eliminar">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                `           ;
+                        }
+                   }
+               ],
+               formFields: [
+                   { 
+                    name: 'nombre', 
+                    label: 'Nombre del Administrador', 
+                    type: 'text', 
+                    required: true,
+                    validation: ['required', { type: 'regex', value: '^[a-zA-Z\\s]+$', message: 'El nombre no puede contener números' }]
+                   },
+                   { 
+                    name: 'correo_electronico', 
+                    label: 'Correo Electrónico', 
+                    type: 'email', 
+                    required: true,
+                    validation: ['required', 'email', { type: 'unique', entity: 'administradores', field: 'correo_electronico' }]
+                   },
+                   { 
+                    name: 'contrasena', 
+                    label: 'Contraseña', 
+                    type: 'password', 
+                    required: true,
+                    validation: ['required', { type: 'minLength', value: 8 }, { type: 'regex', value: '(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])', message: 'Debe contener mayúsculas, minúsculas, números y caracteres especiales' }]
+                   },
+                   {  
+                    name: 'confirmar_contrasena', 
+                    label: 'Confirmar Contraseña', 
+                    type: 'password', 
+                    required: true,
+                    validation: ['required', { type: 'match', field: 'contrasena', message: 'Las contraseñas no coinciden' }]
                     }
                 ]
             },
