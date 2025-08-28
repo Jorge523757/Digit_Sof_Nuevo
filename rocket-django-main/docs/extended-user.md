@@ -17,9 +17,9 @@ Here are some common reasons for extending the Django user model:
 
 > Codebase: related app, model, template, js 
 
-### Rocket Django User model
+### DigitSoft Django User model
 
-**Rocket Django** uses an extended user model that allows additional user information to be saved. An authenticated user can save their information and an image avatar. The extended user model is defined in the `apps/users/models.py` file. The `Profile` model in `apps/users/models.py` stores additional user information like full name, address, and avatar.
+**DigitSoft Django** uses an extended user model that allows additional user information to be saved. An authenticated user can save their information and an image avatar. The extended user model is defined in the `apps/users/models.py` file. The `Profile` model in `apps/users/models.py` stores additional user information like full name, address, and avatar.
 
 ```py
 # apps/users/models.py
@@ -102,14 +102,14 @@ def profile(request):
 {% endfor %}
 ```
 
-Visit http://localhost:8000/users/profile to interact with the **Rocket Django** profile form. This can be adapted easily into any page of the route you want for your application.
+Visit http://localhost:8000/users/profile to interact with the **DigitSoft Django** profile form. This can be adapted easily into any page of the route you want for your application.
 
-![Rocket Django - Styled with Tailwind-Flowbite AppSeed - User profile page](https://github.com/app-generator/dummy/assets/57325382/5488a471-2398-4565-aaf1-fbcfa5b9843b)
+![DigitSoft Django - Styled with Tailwind-Flowbite AppSeed - User profile page](https://github.com/app-generator/dummy/assets/57325382/5488a471-2398-4565-aaf1-fbcfa5b9843b)
 
 
 ## Conclusion
-Easily store additional user data, implement custom authentication logic, and integrate with third-party services, all while maintaining the security and reliability of Django's built-in user model. Take control of your user management and tailor it to your specific needs with Rocket Django.
+Easily store additional user data, implement custom authentication logic, and integrate with third-party services, all while maintaining the security and reliability of Django's built-in user model. Take control of your user management and tailor it to your specific needs with DigitSoft Django.
 
 ## ✅ Resources
-- 👉 [Rocket Django](https://app-generator.dev/docs/products/django/rocket/index.html) product offering
-- 👉 Join the [Community](https://discord.com/invite/fZC6hup) and chat with the team behind **Rocket Django**
+- 👉 [DigitSoft Django](https://app-generator.dev/docs/products/django/DigitSoft/index.html) product offering
+- 👉 Join the [Community](https://discord.com/invite/fZC6hup) and chat with the team behind **DigitSoft Django**

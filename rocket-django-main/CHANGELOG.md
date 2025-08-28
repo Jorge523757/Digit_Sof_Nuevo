@@ -1,7 +1,7 @@
 # Change Log
 
 ## [1.0.30] 2025-04-25
-### [Django Rocket](https://app-generator.dev/product/rocket/django/) Changes
+### [Django DigitSoft](https://app-generator.dev/product/DigitSoft/django/) Changes
 
 - Added Dynamic Tables module
 - Added Dynamic API Module  
@@ -17,17 +17,17 @@
 ### Changes
 
 - Update Product Links
-  - [Rocket Django](https://app-generator.dev/product/rocket/django/) - Product Page
-  - [Rocket Django](https://app-generator.dev/docs/products/django/rocket/index.html) - Documentation
-  - [Rocket Django PRO](https://app-generator.dev/product/rocket-pro/django/) - The premium version
+  - [DigitSoft Django](https://app-generator.dev/product/DigitSoft/django/) - Product Page
+  - [DigitSoft Django](https://app-generator.dev/docs/products/django/DigitSoft/index.html) - Documentation
+  - [DigitSoft Django PRO](https://app-generator.dev/product/DigitSoft-pro/django/) - The premium version
 
 ## [1.0.27] 2024-11-24
 ### Changes
 
 - Update RM Links
-  - [Rocket Django](https://app-generator.dev/product/rocket/django/) - Product Page
-  - [Rocket Django](https://app-generator.dev/docs/products/django/rocket/index.html) - Documentation
-  - [Rocket Django PRO](https://app-generator.dev/product/rocket-pro/django/) - The premium version
+  - [DigitSoft Django](https://app-generator.dev/product/DigitSoft/django/) - Product Page
+  - [DigitSoft Django](https://app-generator.dev/docs/products/django/DigitSoft/index.html) - Documentation
+  - [DigitSoft Django PRO](https://app-generator.dev/product/DigitSoft-pro/django/) - The premium version
 
 ## [1.0.26] 2024-05-18
 ### Changes
@@ -56,8 +56,8 @@
 ## [1.0.22] 2024-05-13
 ### Changes
 
-- Update [PRO Version](https://appseed.us/product/rocket-pro/django/) Features:
-  - **Enhanced** [DataTables](https://rocket-django-pro.onrender.com/tables/)
+- Update [PRO Version](https://appseed.us/product/DigitSoft-pro/django/) Features:
+  - **Enhanced** [DataTables](https://DigitSoft-django-pro.onrender.com/tables/)
   - Codebase CleanUP
 
 ## [1.0.21] 2024-05-11
@@ -75,7 +75,7 @@
 ## [1.0.19] 2024-04-17
 ### Changes
 
-- Update [PRO Version](https://appseed.us/product/rocket-pro/django/) Features:
+- Update [PRO Version](https://appseed.us/product/DigitSoft-pro/django/) Features:
   - Added React/Webpack
   - Showcase charts via React ApexCharts
 
@@ -108,9 +108,9 @@
 
 - Update DOCS (readme)
 - Update Links
-  - [Rocket Django](https://appseed.us/product/rocket/django/) - `Product page`
-  - [Rocket Django PRO](https://appseed.us/product/rocket-pro/django/) - `PRO Version`
-  - [Rocket eCommerce](https://appseed.us/product/rocket-ecommerce/django/) - `Premium Starter`
+  - [DigitSoft Django](https://appseed.us/product/DigitSoft/django/) - `Product page`
+  - [DigitSoft Django PRO](https://appseed.us/product/DigitSoft-pro/django/) - `PRO Version`
+  - [DigitSoft eCommerce](https://appseed.us/product/DigitSoft-ecommerce/django/) - `Premium Starter`
 
 ## [1.0.13] 2024-03-19
 ### Changes
@@ -127,14 +127,14 @@
 ### Changes
 
 - Update `README`
-- [Rocket PRO](https://rocket-django-pro.onrender.com/), update pricing
-  - [$99](https://appseed.gumroad.com/l/rocket-django) (one-time payment) 
+- [DigitSoft PRO](https://DigitSoft-django-pro.onrender.com/), update pricing
+  - [$99](https://appseed.gumroad.com/l/DigitSoft-django) (one-time payment) 
 
 ## [1.0.10] 2024-02-29
 ### Changes
 
-- [Rocket PRO](https://rocket-django-pro.onrender.com/), update pricing
-  - [$199](https://appseed.gumroad.com/l/rocket-django) (one-time payment) 
+- [DigitSoft PRO](https://DigitSOft-django-pro.onrender.com/), update pricing
+  - [$199](https://appseed.gumroad.com/l/DigitSoft-django) (one-time payment) 
 
 ## [1.0.9] 2024-01-31
 ### Changes
@@ -147,7 +147,7 @@
 ## [1.0.8] 2024-01-03
 ### Changes
 
-- Fix [Change/Recover Password](https://rocket-django.onrender.com/users/password-reset/) flow
+- Fix [Change/Recover Password](https://DigitSoft-django.onrender.com/users/password-reset/) flow
 
 ## [1.0.7] 2023-12-13
 ### Changes
@@ -160,28 +160,28 @@
 ### Changes
 
 - Update DOCS (readme)
-  - [File Manager](https://rocket-django-pro.onrender.com/file-manager/) - `PRO Feature`
+  - [File Manager](https://DigitSoft-django-pro.onrender.com/file-manager/) - `PRO Feature`
 
 ## [1.0.5] 2023-12-12
 ### Changes
 
 - Curate Profile Page
 - Update Sidebar 
-  - Added PRO Links: [Charts](https://rocket-django-pro.onrender.com/charts/) & [DataTables](https://rocket-django-pro.onrender.com/tables/)
+  - Added PRO Links: [Charts](https://DigitSoft-django-pro.onrender.com/charts/) & [DataTables](https://DigitSoft-django-pro.onrender.com/tables/)
 
 ## [1.0.4] 2023-12-12
 ### Changes
 
 - Update DOCS:
-  - [Charts](https://github.com/app-generator/rocket-django/blob/main/docs/charts.md) (template view) 
-  - [Charts via API](https://github.com/app-generator/rocket-django/blob/main/docs/charts-via-api.md)
-  - [Celery](https://github.com/app-generator/rocket-django/blob/main/docs/celery.md) (rename file)
+  - [Charts](https://github.com/app-generator/DigitSoft-django/blob/main/docs/charts.md) (template view) 
+  - [Charts via API](https://github.com/app-generator/DigitSoft-django/blob/main/docs/charts-via-api.md)
+  - [Celery](https://github.com/app-generator/DigitSoft-django/blob/main/docs/celery.md) (rename file)
  
 ## [1.0.3] 2023-12-09
 ### Changes
 
 - Update DOCS (readme)
-  - [Rocket Django - Video Presentation](https://www.youtube.com/watch?v=rSFLcv00Bw8)
+  - [DigitSoft Django - Video Presentation](https://www.youtube.com/watch?v=rSFLcv00Bw8)
 - Fix #26 - Sidebar - Apps Menu needs to stay expanded  
 
 ## [1.0.2] 2023-12-08
@@ -202,12 +202,12 @@
 
 - STABLE Release 
 - DOCS Update:
-  - [Celery](https://github.com/app-generator/rocket-django/blob/main/docs/CELERY.md)
-  - [Charts](https://github.com/app-generator/rocket-django/blob/main/docs/charts.md) via Apex Charts Library
-  - [CI/CD](https://github.com/app-generator/rocket-django/blob/main/docs/ci-cd.md)
-  - [DataTables](https://github.com/app-generator/rocket-django/blob/main/docs/datatables.md)
-  - [Docker](https://github.com/app-generator/rocket-django/blob/main/docs/docker.md)
-  - [Extended User Model](https://github.com/app-generator/rocket-django/blob/main/docs/extended-user.md)
+  - [Celery](https://github.com/app-generator/DigitSoft-django/blob/main/docs/CELERY.md)
+  - [Charts](https://github.com/app-generator/DigitSoft-django/blob/main/docs/charts.md) via Apex Charts Library
+  - [CI/CD](https://github.com/app-generator/DigitSoft-django/blob/main/docs/ci-cd.md)
+  - [DataTables](https://github.com/app-generator/DigitSoft-django/blob/main/docs/datatables.md)
+  - [Docker](https://github.com/app-generator/DigitSoft-django/blob/main/docs/docker.md)
+  - [Extended User Model](https://github.com/app-generator/DigitSoft-django/blob/main/docs/extended-user.md)
 
 ## [0.0.13] 2023-11-29
 ### Changes
@@ -217,8 +217,8 @@
 ## [0.0.12] 2023-10-20
 ### Changes
 
-- Refactor [Charts Page](https://rocket-django.onrender.com/charts/)
-- Fix #18 - [Document the API](https://rocket-django.onrender.com/api/docs/)
+- Refactor [Charts Page](https://DigitSoft-django.onrender.com/charts/)
+- Fix #18 - [Document the API](https://DigitSoft-django.onrender.com/api/docs/)
   - Via `DRF-spectacular`
 - Fix #14 - Charts, Render Options  
 
@@ -233,7 +233,7 @@
 ## [0.0.10] 2023-10-18
 ### Changes
 
-- Update [Charts Page](https://rocket-django.onrender.com/charts/)
+- Update [Charts Page](https://DigitSoft-django.onrender.com/charts/)
 
 ## [0.0.9] 2023-10-14
 ### Changes
@@ -250,12 +250,12 @@
 ### Changes
 
 - Added AUTH
-  - [Sign IN](https://rocket-django.onrender.com/users/signin/), SignUP, Change Pass
+  - [Sign IN](https://DigitSoft-django.onrender.com/users/signin/), SignUP, Change Pass
 - API Via DRF
-  - [Products Model](https://rocket-django.onrender.com/api/product/)
+  - [Products Model](https://DigitSoft-django.onrender.com/api/product/)
 - DataTables 
-  - [Products Model](https://rocket-django.onrender.com/tables/)
-- [Sample Charts](https://rocket-django.onrender.com/charts/)
+  - [Products Model](https://DigitSoft-django.onrender.com/tables/)
+- [Sample Charts](https://DigitSoft-django.onrender.com/charts/)
  
 ## [0.0.7] 2023-10-11
 ### Changes
@@ -292,7 +292,7 @@
 - Update DOCS (README) 
 - Added Docker 
 - CI/CD Scripts for Render
-  - [Rocket Django](https://rocket-django.onrender.com/) - `LIVE Deploy`
+  - [DigitSoft Django](https://DigitSoft-django.onrender.com/) - `LIVE Deploy`
 
 ## [0.0.2] 2023-10-02 
 ### Changes

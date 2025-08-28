@@ -6,20 +6,20 @@ Experience the magic of Docker as it helps you push updates to your users instan
 
 > Intro: What we offer
 
-**Rocket Django** can be tested and deployed using Docker containers. It contains the `Dockerfile` and `docker-compose.yml` which holds the configuration that allows the seamless creation of Docker containers and the deployment of Rocket Django.
+**DigitSoft Django** can be tested and deployed using Docker containers. It contains the `Dockerfile` and `docker-compose.yml` which holds the configuration that allows the seamless creation of Docker containers and the deployment of DigitSoft Django.
 
 
 ### Understanding Docker configuration files
 
-**Rocket Django** uses two configuration files to set up the Docker environment. These files are `Dockerfile` and `docker-compose.yml`, both found in the root directory of the project.
+**DigitSoft Django** uses two configuration files to set up the Docker environment. These files are `Dockerfile` and `docker-compose.yml`, both found in the root directory of the project.
 
-`docker-compose.yml` is a YAML file used to configure the application services. With a single command, this configuration is used to create applications with multiple parts. These are the configurations for Rocket Django:
+`docker-compose.yml` is a YAML file used to configure the application services. With a single command, this configuration is used to create applications with multiple parts. These are the configurations for DigitSoft Django:
 
 ```yaml
 version: '3.8'
 services:
-  rocket-django:
-    container_name: rocket_django
+  DigitSoft-django:
+    container_name: DigitSoft_django
     restart: always
     build: .
     networks:
@@ -36,7 +36,7 @@ services:
     networks:
       - web_network
     depends_on: 
-      - rocket-django
+      - DigitSoft-django
 networks:
   db_network:
     driver: bridge
@@ -44,34 +44,34 @@ networks:
     driver: bridge
 ```
 
-It defines a multi-container application with two services, `rocket-django` and `nginx`.
+It defines a multi-container application with two services, `DigitSoft-django` and `nginx`.
 
-- `rocket-django` service:
+- `DigitSoft-django` service:
 
-    - container_name: This sets the container name to rocket_django.
+    - container_name: This sets the container name to DigitSoft_django.
     - restart: This tells Docker to automatically restart the container if it exits.
     - build: This instructs Docker to build the container image from the current directory (.).
     - networks: This specifies that the container should be connected to two networks: db_network and web_network.
-    - depends_on: Indicates that the rocket-django container should be started before the nginx container, ensuring the application is ready before serving web traffic.
+    - depends_on: Indicates that the DigitSoft-django container should be started before the nginx container, ensuring the application is ready before serving web traffic.
 
 - `nginx` service:
 
     - container_name: This sets the container name to nginx.
-    restart: Similar to rocket-django, this ensures automatic restarts.
+    restart: Similar to DigitSoft-django, this ensures automatic restarts.
     - image: Instead of building its image, this service uses the pre-built nginx:latest image.
     - ports: This maps the container port 5085 to the host port 5085. This means any request sent to your host on port 5085 will be forwarded to the container on port 5085.
     - volumes: This mounts thetainer_name: This sets the container name to nginx.
-    restart: Similar to rocket-django, this ensures automatic restarts.
+    restart: Similar to DigitSoft-django, this ensures automatic restarts.
     - image: Instead of building its image, this service uses the pre-built nginx:latest image.
     - ports: This maps the container port 5085 to the host port 5085. This means any request sent to your host on port 5085 will be forwarded to the container on port 5085.
     - volumes: This mounts the local directory `./nginx` to the container's `/etc/nginx/conf.d` directory. This allows you to easily update your Nginx configuration without rebuilding the image.
-    - networks: Same as rocket-django, this connects the container to web_network.
-    - depends_on: This ensures the Nginx container only starts after the rocket-django container is up and running.
+    - networks: Same as DigitSoft-django, this connects the container to web_network.
+    - depends_on: This ensures the Nginx container only starts after the DigitSoft-django container is up and running.
 
 - `Networks`:
 
     - db_network: This defines a bridge network named db_network. This allows containers connected to this network to communicate with each other, potentially including a database server.
-    - web_network: Another bridge network named web_network is used for communication between the nginx and rocket-django containers.
+    - web_network: Another bridge network named web_network is used for communication between the nginx and DigitSoft-django containers.
 
 A `Dockerfile` is a text document that contains all the commands a user could call on the command line to assemble an image. This is the content of the `Dockerfile`:
 
@@ -115,7 +115,7 @@ RUN python manage.py migrate
 CMD ["gunicorn", "--config", "gunicorn-cfg.py", "config.wsgi"]
 ```
 
-This Dockerfile defines a multi-stage build for the Rocket Django application, consisting of three stages:
+This Dockerfile defines a multi-stage build for the DigitSoftt Django application, consisting of three stages:
 
 Stage 1 - Python environment setup:
 
@@ -149,11 +149,11 @@ Stage 3 - Application preparation and startup:
 This multi-stage build separates the Python and Node.js environments for efficiency. It also streamlines the application setup and preparation for running in the container.
 
 
-### Running Rocket Django using Docker
+### Running DigitSoft Django using Docker
 
 > How to use it 
 
-To use the docker command, Docker must be installed on your machine. Follow the [installation guide](https://docs.docker.com/desktop/) if you don't have it. To start the Rocket Django application, run this command from the terminal in the same directory as the application:
+To use the docker command, Docker must be installed on your machine. Follow the [installation guide](https://docs.docker.com/desktop/) if you don't have it. To start the DigitSoft Django application, run this command from the terminal in the same directory as the application:
 
 ```bash
 $ docker compose up
@@ -163,17 +163,17 @@ It uses the configuration information in the `docker-compose.yml` file to pull t
 
 Now, open http://127.0.0.1:5085 or http://localhost:5085 to see your app in action!
 
-![Rocket Django - Styled with Tailwind-Flowbite AppSeed - Home page](https://github.com/app-generator/dummy/assets/57325382/d3d175ef-42e8-4d72-83e1-22acad6f6d88)
+![DigitSoft Django - Styled with Tailwind-Flowbite AppSeed - Home page](https://github.com/app-generator/dummy/assets/57325382/d3d175ef-42e8-4d72-83e1-22acad6f6d88)
 
 And that's it! Your app is up and running, ready to wow your users.
 
 
 ## Conclusion
-**Rocket Django** is ready to deploy using Docker without any extra configuration. With Docker, the complexities of managing dependencies, environments, and infrastructure are abstracted, providing a consistent development and deployment experience.
+**DigitSoft Django** is ready to deploy using Docker without any extra configuration. With Docker, the complexities of managing dependencies, environments, and infrastructure are abstracted, providing a consistent development and deployment experience.
 
 
 ## ✅ Resources
 - 👉 [Docker](https://docs.docker.com/get-started/overview/) Overview
 - 👉 [Dockerfile](https://docs.docker.com/engine/reference/builder/) Reference
 - 👉 [Docker compose](https://docs.docker.com/compose/gettingstarted/) starter guide
-- 👉 Join the [Community](https://discord.com/invite/fZC6hup) and chat with the team behind **Rocket Django**
+- 👉 Join the [Community](https://discord.com/invite/fZC6hup) and chat with the team behind **DigitSoft Django**

@@ -62,7 +62,7 @@ def profile(request):
 
         if form.is_valid():
             form.save()
-            messages.success(request, 'Profile updated successfully')
+            messages.success(request, 'Perfil actualizado con éxito')
     else:
         form = ProfileForm(instance=profile)
     

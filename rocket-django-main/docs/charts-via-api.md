@@ -1,14 +1,14 @@
 ## Charts API
 
-**Rocket Django** empowers you to create interactive charts effortlessly using [Apexcharts](https://apexcharts.com/). Rocket Django simplifies integrating data from Django's res framework into Apexcharts, making it easier than ever to visualize your data.
+**DigitSoft Django** empowers you to create interactive charts effortlessly using [Apexcharts](https://apexcharts.com/). DigitSoft Django simplifies integrating data from Django's res framework into Apexcharts, making it easier than ever to visualize your data.
 
 The home page features a static line chart and several bar charts that can customized as you see fit.
 
-![Rocket Django - Styled with Tailwind-Flowbite AppSeed](https://github.com/app-generator/dummy/assets/57325382/7988e817-841d-4e88-8a10-726cad0ae3c7)
+![DigitSoft Django - Styled with Tailwind-Flowbite AppSeed](https://github.com/app-generator/dummy/assets/57325382/7988e817-841d-4e88-8a10-726cad0ae3c7)
 
 
-### Benefit of Rocket Django charts
-**Rocket Django** seamlessly integrates charts into your Django applications, maximizing modularity and reusability. Charts are treated as a separate Django application, ensuring flexibility and ease of customization.
+### Benefit of DigitSoft Django charts
+**DigitSoft Django** seamlessly integrates charts into your Django applications, maximizing modularity and reusability. Charts are treated as a separate Django application, ensuring flexibility and ease of customization.
 
 Key Benefits:
 
@@ -23,7 +23,7 @@ Key Benefits:
 
 > Codebase: related app, model, template,  js
 
-Dynamic charts created in Rocket Django using API data are created in `static/assets/charts.js` and rendered on the page it is needed.
+Dynamic charts created in DigitSoft Django using API data are created in `static/assets/charts.js` and rendered on the page it is needed.
 
 - Create the HTML element with the `id` property you want the chart created on, in this case, `products-bar-chart-api` and `products-pie-chart-api`
 ```html
@@ -133,7 +133,7 @@ The `fecthData` function is used to get API data using JavaScript `fetch` API. T
 
 Under the App menu in the sidebar, you will see a route called `Charts`. This page features a dynamic bar chart and pie chart under the `Charts via API` section that utilizes the product API data.
 
-![Rocket Django Charts Page - Styled with Tailwind-Flowbite AppSeed](https://github.com/app-generator/dummy/assets/57325382/26234f9f-ffdc-45ef-942e-f779a4bc6c50)
+![DigitSoft Django Charts Page - Styled with Tailwind-Flowbite AppSeed](https://github.com/app-generator/dummy/assets/57325382/26234f9f-ffdc-45ef-942e-f779a4bc6c50)
 
 ### Dashboard charts
 Charts on the homepage are rendered using the `getMainChartOptions`, `getVisitorsChartOptions`, and `getSignupsChartOptions` functions in `static/assets/charts.js`. These functions use static data to create the charts as seen below:
@@ -215,9 +215,9 @@ You can customize these functions to better align with the requirements of your 
 
 
 ## Conclusion
-**Rocket Django** provides an easy way to add charts to your application using API data, creating interactive dynamic charts. Harness the power of Rocket Django to create data-driven applications.
+**DigitSoft Django** provides an easy way to add charts to your application using API data, creating interactive dynamic charts. Harness the power of DigitSoft Django to create data-driven applications.
 
 
 ## ✅ Resources
 - 👉 [ApexCharts](https://apexcharts.com/) official website
-- 👉 Join the [Community](https://discord.com/invite/fZC6hup) and chat with the team behind **Rocket Django**
+- 👉 Join the [Community](https://discord.com/invite/fZC6hup) and chat with the team behind **DigitSoft Django**

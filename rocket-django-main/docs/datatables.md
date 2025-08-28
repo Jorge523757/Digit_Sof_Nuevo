@@ -2,7 +2,7 @@
 
 > Intro: What we offer
 
-**Rocket Django** allows you to easily create data tables. Datatables makes it easier to perform operations like creating, reading, updating and deleting database table records.
+**DigitSoft Django** allows you to easily create data tables. Datatables makes it easier to perform operations like creating, reading, updating and deleting database table records.
 
 Datatable can be accessed from the `DataTables` route under the `Apps` menu on the sidebar. Datatable gives you the ability to query the `Product` table and perform basic database operations on the same page.
 
@@ -155,20 +155,20 @@ urlpatterns = [
 The `fetch` function is used to query the API route that returns the products data from the database. This is then passed as the data to the datatable. This can be adapted to match whatever model you're working with.
 
 
-![Rocket Django - Styled with Tailwind-Flowbite AppSeed - Datatable view](https://github.com/app-generator/dummy/assets/57325382/0ca99722-23e6-470f-8f9b-66544fb04ad0)
+![DigitSoft Django - Styled with Tailwind-Flowbite AppSeed - Datatable view](https://github.com/app-generator/dummy/assets/57325382/0ca99722-23e6-470f-8f9b-66544fb04ad0)
 
-![Rocket Django - Styled with Tailwind-Flowbite AppSeed - Datatable create](https://github.com/app-generator/dummy/assets/57325382/95cbe45d-d421-406e-8ccc-4ee48654d133)
+![DigitSoft Django - Styled with Tailwind-Flowbite AppSeed - Datatable create](https://github.com/app-generator/dummy/assets/57325382/95cbe45d-d421-406e-8ccc-4ee48654d133)
 
-![Rocket Django - Styled with Tailwind-Flowbite AppSeed - Datatable update](https://github.com/app-generator/dummy/assets/57325382/e0f9b9f7-32df-4979-b3ef-75e63afc9d75)
+![DigitSoft Django - Styled with Tailwind-Flowbite AppSeed - Datatable update](https://github.com/app-generator/dummy/assets/57325382/e0f9b9f7-32df-4979-b3ef-75e63afc9d75)
 
-![Rocket Django - Styled with Tailwind-Flowbite AppSeed - Datatable delete confirmation](https://github.com/app-generator/dummy/assets/57325382/f2bd6933-cdd1-46ad-96a2-e83bb65c85dd)
+![DigitSoft Django - Styled with Tailwind-Flowbite AppSeed - Datatable delete confirmation](https://github.com/app-generator/dummy/assets/57325382/f2bd6933-cdd1-46ad-96a2-e83bb65c85dd)
 
 
 Datatables can be extended to match any data model, and simplifying the data creation and manipulation process.
 
 ## Conclusion
-Rocket Django empowers you to seamlessly integrate DataTables into your applications, simplifying data viewing, creation, and manipulation. Datatables is an important feature of Rocket generator. It is easily customizable, and it can be extended as a template for other datatable creation.
+DigitSoft Django empowers you to seamlessly integrate DataTables into your applications, simplifying data viewing, creation, and manipulation. Datatables is an important feature of DigitSoft generator. It is easily customizable, and it can be extended as a template for other datatable creation.
 
 ## ✅ Resources
 - 👉 [DataTables](https://datatables.net/extensions/scroller/examples/styling/jqueryui.html) documentation
-- 👉 Join the [Community](https://discord.com/invite/fZC6hup) and chat with the team behind **Rocket Django**
+- 👉 Join the [Community](https://discord.com/invite/fZC6hup) and chat with the team behind **DigitSoft Django**

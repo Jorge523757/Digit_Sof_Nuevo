@@ -3,12 +3,12 @@
 ### Celery introduction
 Celery is a tool that helps you manage tasks in the background, independent of the main application's workflow. Celery is a tool that helps you run time-consuming tasks without slowing down your application or making it unresponsive. Celery allows you to distribute tasks/jobs across several threads.
 
-**Rocket Django** offers the `Async task manager` feature, which makes use of Celery to run scripts in the background without affecting the main application's performance. This is done by placing the scripts in a task queue, which Celery then manages and executes. This allows users to run time-consuming tasks without having to wait for them to finish before continuing with other tasks.
+**DigitSoft Django** offers the `Async task manager` feature, which makes use of Celery to run scripts in the background without affecting the main application's performance. This is done by placing the scripts in a task queue, which Celery then manages and executes. This allows users to run time-consuming tasks without having to wait for them to finish before continuing with other tasks.
 
 ### Requirements
 Celery needs a way to send and receive messages, so you'll need to install a message broker like RabbitMQ or Redis.
 
-**Rocket Django** is pre-configured to utilize Redis as its message broker, but you have the flexibility to switch to your preferred broker if needed.
+**DigitSoft Django** is pre-configured to utilize Redis as its message broker, but you have the flexibility to switch to your preferred broker if needed.
 
 ### Installation and setup
 - Install the dependencies
@@ -94,11 +94,11 @@ $ python manage.py runserver
 
 Visit https://localhost:8000 to view the application.
 
-![Rocket Django - Styled with Tailwind-Flowbite AppSeed](https://github.com/app-generator/dummy/assets/57325382/409d6211-d1ed-4be0-8fca-d5ea58693481)
+![DigitSoft Django - Styled with Tailwind-Flowbite AppSeed](https://github.com/app-generator/dummy/assets/57325382/409d6211-d1ed-4be0-8fca-d5ea58693481)
 
 - Under the App menu in the sidebar, you will see a new route called `Tasks`.
 
-![Rocket Django Tasks Page - Styled with Tailwind-Flowbite AppSeed](https://github.com/app-generator/dummy/assets/57325382/d3b2ae6b-6971-4005-aec4-7aa95c7eac5a)
+![DigitSoft Django Tasks Page - Styled with Tailwind-Flowbite AppSeed](https://github.com/app-generator/dummy/assets/57325382/d3b2ae6b-6971-4005-aec4-7aa95c7eac5a)
 
 - You can start and cancel any task from the UI that exists as a script in the `tasks_scripts` folder.
 
@@ -146,17 +146,17 @@ Tasks to be executed by Celery can be added from the user interface of the appli
 
 - To execute tasks, you need to be logged in as an administrator. However, anyone can view the progress of tasks in execution.
 
-![Rocket Django Tasks Page - Styled with Tailwind-Flowbite AppSeed](https://github.com/app-generator/dummy/assets/57325382/aad832d4-ff62-44a1-a973-23c42e13acd8)
+![DigitSoft Django Tasks Page - Styled with Tailwind-Flowbite AppSeed](https://github.com/app-generator/dummy/assets/57325382/aad832d4-ff62-44a1-a973-23c42e13acd8)
 
 On the tasks page, you can select and execute the desired tasks. The status of the last executed task and a history of previously executed tasks are displayed for your reference.
 
-![Rocket Django Tasks Page - Styled with Tailwind-Flowbite AppSeed](https://github.com/app-generator/dummy/assets/57325382/cada9eb2-93ec-4f9c-85be-163798060471)
+![DigitSoft Django Tasks Page - Styled with Tailwind-Flowbite AppSeed](https://github.com/app-generator/dummy/assets/57325382/cada9eb2-93ec-4f9c-85be-163798060471)
 
 ## Conclusion
 The Asynchronous task handler feature makes it easy to run time-consuming tasks without affecting the user experience. This can be helpful for tasks like sending emails, processing payments, or generating reports.
 
-Rocket Django utilizing celery serves as a valuable tool for streamlining task processes and improving the overall user experience in your web development projects.
+DigitSoft Django utilizing celery serves as a valuable tool for streamlining task processes and improving the overall user experience in your web development projects.
 
 ## ✅ Resources
 - 👉 [Celery](https://docs.celeryq.dev/en/stable/getting-started/introduction.html) official documentation
-- 👉 Join the [Community](https://discord.com/invite/fZC6hup) and chat with the team behind **Rocket Django**
+- 👉 Join the [Community](https://discord.com/invite/fZC6hup) and chat with the team behind **DigitSoft Django**

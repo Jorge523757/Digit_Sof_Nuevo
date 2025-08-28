@@ -34,7 +34,7 @@ DEBUG = os.environ.get("DEBUG", "").lower()
 
 # Hosts Settings
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://localhost:5085', 'http://127.0.0.1:8000', 'http://127.0.0.1:5085', 'https://rocket-django.onrender.com']
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://localhost:5085', 'http://127.0.0.1:8000', 'http://127.0.0.1:5085', 'https://DigitSoft-django.onrender.com']
 
 
 
@@ -176,7 +176,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, 'rocket-django-main', 'static'),
+    os.path.join(BASE_DIR, 'DigitSoft-django-main', 'static'),
 )
 
 # Default primary key field type

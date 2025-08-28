@@ -1,14 +1,14 @@
 ## Charts template view
 
 
-**Rocket Django** empowers you to create interactive charts effortlessly using [Apexcharts](https://apexcharts.com/). Rocket Django simplifies integrating data from Django's ORM into Apexcharts, making it easier than ever to visualize your data.
+**DigitSoft Django** empowers you to create interactive charts effortlessly using [Apexcharts](https://apexcharts.com/). DigitSoft Django simplifies integrating data from Django's ORM into Apexcharts, making it easier than ever to visualize your data.
 
 Under the App menu in the sidebar, you will see a new route called `Charts`. This page features a dynamic bar chart and pie chart under the Charts (Template View) section utilizing data from the database.
 
-![Rocket Django Charts Page - Styled with Tailwind-Flowbite AppSeed](https://github.com/app-generator/dummy/assets/57325382/5b18f498-7cfc-4270-86f8-e77b2fb80e08)
+![DigitSoft Django Charts Page - Styled with Tailwind-Flowbite AppSeed](https://github.com/app-generator/dummy/assets/57325382/5b18f498-7cfc-4270-86f8-e77b2fb80e08)
 
-### Benefit of Rocket Django charts
-**Rocket Django** seamlessly integrates charts into your Django applications, maximizing modularity and reusability. Charts are treated as a separate Django application, ensuring flexibility and ease of customization.
+### Benefit of DigitSoft Django charts
+**DigitSoft Django** seamlessly integrates charts into your Django applications, maximizing modularity and reusability. Charts are treated as a separate Django application, ensuring flexibility and ease of customization.
 
 Key Benefits:
 
@@ -23,9 +23,9 @@ Key Benefits:
 
 > Codebase: related app, model, template,  js
 
-Charts in Rocket Django can be created in the `charts` app and rendered as views, with model data sent as context to the template of the page. 
+Charts in DigitSoft Django can be created in the `charts` app and rendered as views, with model data sent as context to the template of the page. 
 
-- To create a dynamic chart using the template view in Rocket Django, create the function to render the page in `apps/charts/views.py`. Model data that is used for the chart can be obtained by importing the model into the module used in creating the chart. Data from the `Product` model in `apps/common/models.py` is used to create the chart.
+- To create a dynamic chart using the template view in DigitSoft Django, create the function to render the page in `apps/charts/views.py`. Model data that is used for the chart can be obtained by importing the model into the module used in creating the chart. Data from the `Product` model in `apps/common/models.py` is used to create the chart.
 ```py
 # apps/charts/views.py
 from django.shortcuts import render
@@ -103,9 +103,9 @@ The `getProductsBarChart` and `getProductsPieChart` functions are used to insert
 
 
 ## Conclusion
-**Rocket Django** provides an easy way to add charts to your application using model and API data, creating interactive dynamic charts. Harness the power of Rocket Django to create data-driven applications.
+**DigitSoft Django** provides an easy way to add charts to your application using model and API data, creating interactive dynamic charts. Harness the power of DigitSoft Django to create data-driven applications.
 
 
 ## ✅ Resources
 - 👉 [ApexCharts](https://apexcharts.com/) official website
-- 👉 Join the [Community](https://discord.com/invite/fZC6hup) and chat with the team behind **Rocket Django**
+- 👉 Join the [Community](https://discord.com/invite/fZC6hup) and chat with the team behind **DigitSoft Django**
