@@ -1,0 +1,122 @@
+{% extends "categoria/plantilla.html" %}
+{% load static %}
+{% block content %}
+
+<br><br><br><br>
+
+<br><br><br><br><br><br><br><br><br>
+
+
+<div class="col-md-12">
+  <div class="card card-default">
+    <div class="card-header">
+      <h3 class="card-title">
+        <i class="fas fa-tools"></i>
+        GESTIÓN SERVICIO TÉCNICO
+      </h3>
+    </div>
+    <div class="card-body table-responsive p-0">
+      <table id="tabla_servicios" class="table table-bordered table-hover">
+        <thead class="thead-dark">
+          <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Técnico</th>
+            <th>Teléfono</th>
+            <th>Correo</th>
+            <th>Opciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in servicio_list %}
+          <tr>
+            <td>{{ s.id_servicio_tecnico }}</td>
+            <td>{{ s.nombre_cliente_registro }}</td>
+            <td>{{ s.nombre_tecnico_asignado_registro }}</td>
+            <td>{{ s.telefono_tecnico_asignado_registro }}</td>
+            <td>{{ s.correo_cliente_registro }}</td>
+            <td>
+              <a href="{% url 'apl:servicio_editar' s.id_servicio_tecnico %}" class="btn btn-warning btn-sm">Editar</a>
+              <a href="{% url 'apl:servicio_eliminar' s.id_servicio_tecnico %}" class="btn btn-danger btn-sm">Eliminar</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer">
+      <a href="{% url 'apl:servicio_crear' %}" class="btn btn-success btn-sm">Agregar Servicio</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    $('#tabla_servicios').DataTable();
+  });
+</script>
+{% endblock %}
+        <i class="fas fa-tools"></i> SERVICIO TÉCNICO DIGIT SOFT
+      </h3>
+    </div>
+
+    <div class="card-body">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">GESTIÓN SERVICIO TÉCNICO</h3>
+            </div>
+
+            <div class="card-body table-responsive p-0">
+              <div class="col-sm-12">
+                <table id="tabla_servicios" class="table table-bordered table-hover dataTable dtr-inline">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Cliente</th>
+                      <th>Técnico</th>
+                      <th>Orden de Servicio</th>
+                      <th>Tel. Cliente</th>
+                      <th>Tel. Técnico</th>
+                      <th>Correo</th>
+                      <th>OPCIONES</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for s in servicios %}
+                    <tr>
+                      <td>{{ s.id_servicio_tecnico }}</td>
+                      <td>{{ s.cliente_id_cliente }}</td>
+                      <td>{{ s.tecnicos_id_tecnico }}</td>
+                      <td>{{ s.orden_servicio_id_orden_servicio }}</td>
+                      <td>{{ s.telefono_cliente_registro }}</td>
+                      <td>{{ s.telefono_tecnico_asignado_registro }}</td>
+                      <td>{{ s.correo_cliente_registro }}</td>
+                      <td>
+                        <a href="{% url 'apl:servicio_editar' s.id_servicio_tecnico %}" class="btn btn-primary btn-xs">
+                          <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'apl:servicio_eliminar' s.id_servicio_tecnico %}" class="btn btn-danger btn-xs">
+                          <i class="fas fa-trash"></i>
+                        </a>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                <div class="card-footer">
+                  <a href="{% url 'apl:servicio_crear' %}" class="btn btn-success btn btn-xs">
+                    <i class="fas fa-plus-circle"></i> Agregar
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <script>
+              $(document).ready(function () {
+                $('#tabla_servicios').DataTable();
+              });
+            </script>
+{% endblock %}
+
