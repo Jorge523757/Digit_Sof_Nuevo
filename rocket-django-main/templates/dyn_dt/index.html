@@ -18,6 +18,8 @@
     <!-- SweetAlert2 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.4.8/sweetalert2.all.min.js"></script>
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <style>
         :root {
             --primary-color: #3b82f6;
@@ -1160,6 +1162,39 @@
                 </div>
             </div>
         </div>
+
+        <!-- NUEVO SECCIÓN DE PRODUCTOS Y VENTA -->
+        <section id="productos-venta" class="container py-4">
+            <h2 class="mb-4">Productos</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Marca</th>
+                        <th>Precio</th>
+                        <th>Imagen</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaProductosBody"></tbody>
+            </table>
+
+            <h2 class="mt-5 mb-4">Venta</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Marca</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaVentaBody"></tbody>
+            </table>
+            <button onclick="guardarVenta()" class="btn btn-primary mt-3">Guardar Venta y Generar Factura</button>
+        </section>
     </div>
     
     <!-- Modal CRUD -->
@@ -1657,7 +1692,7 @@
                     { data: 'modelo' },
                     { data: 'clave' },
                     { data: 'cliente' },
-                    { data: 'marca' },
+                                       { data: 'marca' },
                     {
                         data: null,
                         render: function(data, type, row) {
@@ -2366,6 +2401,9 @@
                                     <button class="btn btn-info btn-sm view-btn" data-id="${data.id_recibo}" data-entity="facturacion" title="Ver">
                                         <i class="fas fa-eye"></i>
                                     </button>
+                                    <button class="btn btn-success btn-sm pdf-btn" data-id="${data.id_recibo}" title="Descargar PDF">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </button>
                                     <button class="btn btn-warning btn-sm edit-btn" data-id="${data.id_recibo}" data-entity="facturacion" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </button>
@@ -2670,33 +2708,44 @@
 
         function generateForm(entity, fields) {
             let formHTML = '';
-            
+
             fields.forEach(field => {
                 const required = field.required ? 'required' : '';
                 const requiredStar = field.required ? '<span class="text-danger">*</span>' : '';
-                
+
                 formHTML += `<div class="form-group">`;
                 formHTML += `<label for="${field.name}">${field.label} ${requiredStar}</label>`;
-                
-                switch (field.type) {
-                    case 'textarea':
-                        formHTML += `<textarea class="form-control" id="${field.name}" name="${field.name}" ${required} rows="4"></textarea>`;
-                        break;
-                    case 'select':
-                        formHTML += `<select class="form-control" id="${field.name}" name="${field.name}" ${required}>`;
-                        formHTML += `<option value="">Seleccione una opción</option>`;
-                        field.options.forEach(option => {
-                            formHTML += `<option value="${option}">${option}</option>`;
-                        });
-                        formHTML += `</select>`;
-                        break;
-                    default:
-                        formHTML += `<input type="${field.type}" class="form-control" id="${field.name}" name="${field.name}" ${required}>`;
+
+                if (field.type === 'password') {
+                    formHTML += `
+                <div class="input-group">
+                    <input type="password" class="form-control" id="${field.name}" name="${field.name}" ${required}>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="${field.name}">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="${field.name}">
+                            <i class="fas fa-eye-slash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+                } else if (field.type === 'textarea') {
+                    formHTML += `<textarea class="form-control" id="${field.name}" name="${field.name}" ${required} rows="4"></textarea>`;
+                } else if (field.type === 'select') {
+                    formHTML += `<select class="form-control" id="${field.name}" name="${field.name}" ${required}>`;
+                    formHTML += `<option value="">Seleccione una opción</option>`;
+                    field.options.forEach(option => {
+                        formHTML += `<option value="${option}">${option}</option>`;
+                    });
+                    formHTML += `</select>`;
+                } else {
+                    formHTML += `<input type="${field.type}" class="form-control" id="${field.name}" name="${field.name}" ${required}>`;
                 }
-                
+
                 formHTML += `</div>`;
             });
-            
+
             $('#crudForm').html(formHTML);
         }
 
@@ -2731,22 +2780,22 @@
 
         function saveRecord() {
             if (!currentEntity || !currentMode) return;
-            
+
             // Recopilar datos del formulario
             const formData = {};
             const config = tableConfigs[currentEntity];
             let hasErrors = false;
-            
+
             // Limpiar errores anteriores
             $('.form-control').each(function() {
                 Validator.clearFieldError($(this).attr('name'));
             });
-            
+
             // Validar cada campo
             config.formFields.forEach(field => {
                 const fieldValue = $(`#${field.name}`).val();
                 formData[field.name] = fieldValue;
-                
+
                 if (field.validation) {
                     const errors = Validator.validateField(field, fieldValue, field.validation);
                     if (errors.length > 0) {
@@ -2755,7 +2804,7 @@
                     }
                 }
             });
-            
+
             if (hasErrors) {
                 Swal.fire({
                     icon: 'error',
@@ -2766,10 +2815,35 @@
                 });
                 return;
             }
-            
+
             try {
+                let nuevo;
                 if (currentMode === 'create') {
-                    db.create(currentEntity, formData);
+                    nuevo = db.create(currentEntity, formData);
+
+                    // Facturación automática para ventas y compras
+                    if (currentEntity === 'ventas') {
+                        db.create('facturacion', {
+                            fecha: formData.fecha_venta,
+                            venta: `Venta #${nuevo.id_venta}`,
+                            descripcion_venta: `${formData.producto} - ${formData.cantidad} unidades`,
+                            terminos_y_condiciones: 'Garantía 12 meses por defectos de fábrica',
+                            nit_digisoft: '900987654-3',
+                            administrador: 'Admin Principal',
+                            orden_servicio: null
+                        });
+                    } else if (currentEntity === 'compras') {
+                        db.create('facturacion', {
+                            fecha: formData.fecha_compra,
+                            venta: null,
+                            descripcion_venta: `${formData.producto} - Compra de mercancía`,
+                            terminos_y_condiciones: 'Verifique la mercancía al recibirla',
+                            nit_digisoft: '900987654-3',
+                            administrador: 'Admin Principal',
+                            orden_servicio: null
+                        });
+                    }
+
                     Swal.fire({
                         icon: 'success',
                         title: 'Registro Creado',
@@ -2814,9 +2888,33 @@
         }
 
         function deleteRecord(entity, recordId) {
+            // Obtener el registro antes de eliminar
+            let data = db.getData(entity);
+            let record;
+            if (entity === 'ventas') {
+                record = data.find(r => r.id_venta == recordId);
+            } else if (entity === 'ordenes-servicio') {
+                record = data.find(r => r.id_ordenServicio == recordId);
+            } else if (entity === 'facturacion') {
+                record = data.find(r => r.id_recibo == recordId);
+            } else if (entity === 'proveedores') {
+                record = data.find(r => r.nit_proveedor == recordId);
+            } else {
+                record = data.find(r => r.id == recordId);
+            }
+
+            let detalles = '';
+            if (record) {
+                detalles = '<ul style="text-align:left;">';
+                Object.keys(record).forEach(key => {
+                    detalles += `<li><strong>${key}:</strong> ${record[key]}</li>`;
+                });
+                detalles += '</ul>';
+            }
+
             Swal.fire({
                 title: '¿Estás seguro?',
-                text: "No podrás revertir esta acción",
+                html: `No podrás revertir esta acción.<br><br><strong>Datos a eliminar:</strong>${detalles}`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
@@ -2829,15 +2927,15 @@
                 if (result.isConfirmed) {
                     try {
                         db.delete(entity, recordId);
-                        
+
                         // Actualizar tabla
                         if (tables[entity]) {
                             tables[entity].clear().rows.add(db.getData(entity)).draw();
                         }
-                        
+
                         // Actualizar métricas
                         updateDashboardMetrics();
-                        
+
                         Swal.fire({
                             icon: 'success',
                             title: 'Eliminado',
@@ -2846,7 +2944,7 @@
                             color: '#ffffff',
                             timer: 2000
                         });
-                        
+
                     } catch (error) {
                         Swal.fire({
                             icon: 'error',
@@ -2905,6 +3003,169 @@
         // Exponer funciones globales
         window.toggleSidebar = toggleSidebar;
         window.toggleDropdown = toggleDropdown;
+
+        $(document).on('click', '.toggle-password', function() {
+            const target = $(this).data('target');
+            const input = $(`#${target}`);
+            const icon = $(this).find('i');
+            if (input.attr('type') === 'password') {
+                input.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                input.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+
+        $(document).on('click', '.pdf-btn', function() {
+            const id = $(this).data('id');
+            const factura = db.getData('facturacion').find(f => f.id_recibo == id);
+            if (!factura) return;
+
+            // Buscar la venta relacionada
+            let venta = null;
+            if (factura.venta) {
+                const ventas = db.getData('ventas');
+                const ventaId = factura.venta.match(/\d+/) ? parseInt(factura.venta.match(/\d+/)[0]) : null;
+                venta = ventas.find(v => v.id_venta == ventaId);
+            }
+
+            // Buscar el cliente
+            let cliente = null;
+            if (venta && venta.cliente) {
+                const clientes = db.getData('clientes');
+                cliente = clientes.find(c => c.nombre === venta.cliente);
+            }
+
+            // Buscar productos vendidos (puede ser uno o varios)
+            let productosVenta = [];
+            if (venta) {
+                if (Array.isArray(venta.productos)) {
+                    // Si la venta tiene varios productos
+                    venta.productos.forEach(prod => {
+                        productosVenta.push({
+                            cantidad: prod.cantidad,
+                            descripcion: `${prod.nombre} ${prod.modelo}`,
+                            precio_unitario: prod.precio_unitario,
+                            importe: prod.cantidad * prod.precio_unitario
+                        });
+                    });
+                } else {
+                    const productos = db.getData('productos');
+                    const producto = productos.find(p => p.nombre_producto === venta.producto);
+                    productosVenta.push({
+                        cantidad: venta.cantidad,
+                        descripcion: producto ? `${producto.nombre_producto} ${producto.modelo_producto}` : venta.producto,
+                        precio_unitario: producto ? parseInt(producto.valor_producto) : venta.total,
+                        importe: venta.total
+                    });
+                }
+            }
+
+            // Buscar garantía
+            let garantia = null;
+            if (venta && cliente) {
+                const garantias = db.getData('garantias');
+                garantia = garantias.find(g => g.cliente === cliente.nombre && g.producto_servicio === venta.producto);
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Encabezado DigitSoft
+            doc.setFillColor(59, 130, 246); // Azul DigitSoft
+            doc.rect(0, 0, 210, 22, 'F');
+            doc.setFontSize(28);
+            doc.setTextColor(255,255,255);
+            doc.text('DigitSoft', 20, 15);
+            doc.setFontSize(12);
+            doc.text('Soluciones Informáticas Integrales', 120, 15);
+
+            // Línea decorativa
+            doc.setDrawColor(59, 130, 246);
+            doc.line(20, 25, 190, 25);
+
+            // Datos empresa
+            doc.setFontSize(11);
+            doc.setTextColor(0,0,0);
+            doc.text('DigitSoft S.A.S', 20, 32);
+            doc.text('Calle 123 #45-67, Bogotá', 20, 38);
+            doc.text(`NIT: ${factura.nit_digisoft}`, 20, 44);
+
+            // Datos factura
+            doc.text(`N° DE FACTURA: ${factura.id_recibo}`, 140, 32);
+            doc.text(`FECHA: ${factura.fecha}`, 140, 38);
+            doc.text(`VENCIMIENTO: ${factura.fecha}`, 140, 44);
+
+            // Cliente
+            doc.setFontSize(12);
+            doc.text('Facturar a:', 20, 56);
+            doc.setFontSize(11);
+            doc.text(`Nombre: ${cliente ? cliente.nombre : (venta ? venta.cliente : 'N/A')}`, 20, 62);
+            doc.text(`Documento: ${cliente ? cliente.numero_documento : 'N/A'}`, 20, 68);
+            doc.text(`Dirección: ${cliente ? cliente.direccion : 'N/A'}`, 20, 74);
+
+            // Tabla productos con fondo
+            doc.setFontSize(12);
+            doc.setFillColor(230, 240, 255);
+            doc.rect(20, 82, 170, 8, 'F'); // Encabezado tabla
+            doc.setTextColor(40, 40, 40);
+            doc.text('CANT.', 22, 88);
+            doc.text('DESCRIPCIÓN', 40, 88);
+            doc.text('PRECIO UNITARIO', 120, 88);
+            doc.text('IMPORTE', 160, 88);
+
+            // Productos vendidos
+            let y = 96;
+            doc.setTextColor(0, 0, 0);
+            productosVenta.forEach(prod => {
+                doc.rect(20, y-6, 170, 8);
+                doc.text(`${prod.cantidad}`, 22, y);
+                doc.text(`${prod.descripcion}`, 40, y);
+                doc.text(`$${parseInt(prod.precio_unitario).toLocaleString()}`, 120, y);
+                doc.text(`$${parseInt(prod.importe).toLocaleString()}`, 160, y);
+                y += 10;
+            });
+
+            // Subtotal, IVA, Total
+            let subtotal = productosVenta.reduce((sum, p) => sum + parseInt(p.importe), 0);
+            let iva = Math.round(subtotal * 0.19);
+            let total = subtotal + iva;
+
+            doc.setFontSize(11);
+            doc.text(`Subtotal: $${subtotal.toLocaleString()}`, 120, y+10);
+            doc.text(`IVA 19%: $${iva.toLocaleString()}`, 120, y+18);
+            doc.setFontSize(16);
+            doc.setTextColor(59, 130, 246);
+            doc.rect(120, y+25, 70, 12);
+            doc.text(`TOTAL: $${total.toLocaleString()}`, 125, y+34);
+
+            // Garantía
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            if (garantia) {
+                doc.text('Garantía:', 20, y+50);
+                doc.setFontSize(11);
+                doc.text(`Estado: ${garantia.estado}`, 20, y+56);
+                doc.text(`Válida hasta: ${garantia.fecha_vencimiento}`, 20, y+62);
+            }
+
+            // Condiciones y forma de pago
+            doc.setFontSize(12);
+            doc.setTextColor(59, 130, 246);
+            doc.text('Condiciones y forma de pago:', 20, y+80);
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.text(`${factura.terminos_y_condiciones}`, 20, y+86, { maxWidth: 170 });
+
+            // Firma
+            doc.setFontSize(14);
+            doc.setTextColor(59, 130, 246);
+            doc.text('_________________________', 120, y+100);
+            doc.text('Firma Administrador', 120, y+106);
+
+            doc.save(`DigitSoft_Factura_${factura.id_recibo}.pdf`);
+        });
     </script>
 </body>
 </html>
