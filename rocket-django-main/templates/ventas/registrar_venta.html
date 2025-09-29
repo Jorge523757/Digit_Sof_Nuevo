@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Finalizar compra</h1>
+<form method="post">{% csrf_token %}
+    <input type="text" name="nombre" placeholder="Nombre completo" required><br>
+    <input type="text" name="cedula" placeholder="Cédula" required><br>
+    <input type="text" name="telefono" placeholder="Teléfono" required><br>
+    <input type="email" name="correo" placeholder="Correo" required><br>
+    <input type="text" name="direccion" placeholder="Dirección"><br>
+    <label>Método de pago:</label>
+    <select name="metodo_pago" required>
+        <option value="Efectivo">Efectivo</option>
+        <option value="Tarjeta">Tarjeta</option>
+        <option value="Transferencia">Transferencia</option>
+    </select><br>
+    <button type="submit">Comprar y facturar</button>
+</form>
+<a href="{% url 'ventas:ver_carrito' %}">Volver al carrito</a>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block title %}Facturar Pedido #{{ pedido.pk }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-file-invoice"></i> Facturar Pedido #{{ pedido.pk }}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Información del cliente y pedido -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Información del Cliente:</h6>
+                            <p><strong>{{ pedido.cliente.nombre }}</strong></p>
+                            <p>Cédula: {{ pedido.cliente.cedula }}</p>
+                            <p>Teléfono: {{ pedido.cliente.telefono }}</p>
+                            <p>Email: {{ pedido.cliente.correo }}</p>
+                            {% if pedido.cliente.direccion %}
+                                <p>Dirección: {{ pedido.cliente.direccion }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Información del Pedido:</h6>
+                            <p>Fecha pedido: {{ pedido.fecha_pedido|date:"d/m/Y H:i" }}</p>
+                            <p>Estado: 
+                                <span class="badge badge-warning">{{ pedido.get_estado_display }}</span>
+                            </p>
+                            <p>Total: <strong>${{ pedido.total|floatformat:0 }}</strong></p>
+                        </div>
+                    </div>
+
+                    <!-- Verificación de stock -->
+                    <div class="mb-4">
+                        <h6>Verificación de Stock:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Cantidad Pedida</th>
+                                        <th>Stock Disponible</th>
+                                        <th>Estado</th>
+                                        <th>Precio Unit.</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for detalle in detalles %}
+                                    <tr>
+                                        <td>{{ detalle.producto.nombre }}</td>
+                                        <td>{{ detalle.cantidad }}</td>
+                                        <td>{{ detalle.producto.stock }}</td>
+                                        <td>
+                                            {% if detalle.cantidad <= detalle.producto.stock %}
+                                                <span class="badge badge-success">
+                                                    <i class="fas fa-check"></i> Disponible
+                                                </span>
+                                            {% else %}
+                                                <span class="badge badge-danger">
+                                                    <i class="fas fa-times"></i> Sin stock suficiente
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>${{ detalle.precio_unitario|floatformat:0 }}</td>
+                                        <td>${{ detalle.subtotal|floatformat:0 }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr class="font-weight-bold">
+                                        <td colspan="5">TOTAL A FACTURAR:</td>
+                                        <td>${{ pedido.total|floatformat:0 }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Notas del cliente -->
+                    {% if pedido.notas_cliente %}
+                    <div class="mb-4">
+                        <h6>Notas del Cliente:</h6>
+                        <div class="alert alert-light">
+                            {{ pedido.notas_cliente }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Formulario de facturación -->
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="metodo_pago">Método de Pago:</label>
+                                    <select name="metodo_pago" class="form-control" required>
+                                        {% for valor, texto in metodos_pago %}
+                                            <option value="{{ valor }}">{{ texto }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="procesado_por">Procesado por:</label>
+                                    <input type="text" name="procesado_por" class="form-control" 
+                                           value="Administrador" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Atención:</strong> Al facturar este pedido se descontará automáticamente el stock de los productos y se generará una venta en el sistema.
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="{% url 'ventas:admin_pedidos' %}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Volver a pedidos
+                                </a>
+                                <a href="{% url 'ventas:procesar_pedido' pedido.pk %}" class="btn btn-info">
+                                    <i class="fas fa-cog"></i> Procesar
+                                </a>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-file-invoice"></i> Generar Factura
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

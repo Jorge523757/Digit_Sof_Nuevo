@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Factura</h1>
+<p><b>DigitSoft</b> - NIT: {{ venta.nit_empresa }}</p>
+<p>Cliente: {{ venta.cliente.nombre }} | Cédula: {{ venta.cliente.cedula }}</p>
+<p>Teléfono: {{ venta.cliente.telefono }} | Correo: {{ venta.cliente.correo }}</p>
+<p>Dirección: {{ venta.cliente.direccion }}</p>
+<p>Fecha: {{ venta.fecha }}</p>
+<p>Método de pago: {{ venta.metodo_pago }}</p>
+<table border="1">
+    <tr>
+        <th>Producto</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th>
+    </tr>
+    {% for d in venta.detalles.all %}
+    <tr>
+        <td>{{ d.producto.nombre }}</td>
+        <td>{{ d.cantidad }}</td>
+        <td>${{ d.precio_unitario }}</td>
+        <td>${{ d.subtotal }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<p><b>Total: ${{ venta.total }}</b></p>
+<div id="barcode"></div>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<script>
+    JsBarcode("#barcode", "{{ venta.id }}", {format:"CODE128", width:2, height:40, displayValue:true});
+</script>
+<a href="{% url 'ventas:lista_productos' %}">Volver a la tienda</a>
+{% endblock %}

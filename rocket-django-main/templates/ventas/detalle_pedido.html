@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}Pedido #{{ pedido.pk }} - DigitSoft{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-receipt"></i> Pedido #{{ pedido.pk }}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Estado del pedido -->
+                    <div class="alert {% if pedido.estado == 'pendiente' %}alert-warning{% elif pedido.estado == 'procesando' %}alert-info{% elif pedido.estado == 'completado' or pedido.estado == 'facturado' %}alert-success{% elif pedido.estado == 'cancelado' %}alert-danger{% endif %}">
+                        <h5 class="mb-0">
+                            <i class="fas fa-{% if pedido.estado == 'pendiente' %}clock{% elif pedido.estado == 'procesando' %}cog{% elif pedido.estado == 'completado' %}check-circle{% elif pedido.estado == 'facturado' %}file-invoice{% elif pedido.estado == 'cancelado' %}times-circle{% endif %}"></i>
+                            Estado: {{ pedido.get_estado_display }}
+                        </h5>
+                    </div>
+
+                    <!-- Información del pedido -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Información del Cliente:</h6>
+                            <p class="mb-1"><strong>{{ pedido.cliente.nombre }}</strong></p>
+                            <p class="mb-1">Cédula: {{ pedido.cliente.cedula }}</p>
+                            <p class="mb-1">Teléfono: {{ pedido.cliente.telefono }}</p>
+                            <p class="mb-1">Email: {{ pedido.cliente.correo }}</p>
+                            {% if pedido.cliente.direccion %}
+                                <p class="mb-1">Dirección: {{ pedido.cliente.direccion }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Información del Pedido:</h6>
+                            <p class="mb-1">Fecha: {{ pedido.fecha_pedido|date:"d/m/Y H:i" }}</p>
+                            {% if pedido.procesado_por %}
+                                <p class="mb-1">Procesado por: {{ pedido.procesado_por }}</p>
+                            {% endif %}
+                            {% if pedido.fecha_procesamiento %}
+                                <p class="mb-1">Fecha procesamiento: {{ pedido.fecha_procesamiento|date:"d/m/Y H:i" }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Notas del cliente -->
+                    {% if pedido.notas_cliente %}
+                    <div class="mb-4">
+                        <h6>Notas del Cliente:</h6>
+                        <div class="alert alert-light">
+                            {{ pedido.notas_cliente }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Detalles del pedido -->
+                    <h6>Productos:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio Unitario</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for detalle in detalles %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ detalle.producto.nombre }}</strong>
+                                        {% if detalle.producto.marca %}
+                                            <br><small class="text-muted">{{ detalle.producto.marca }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ detalle.cantidad }}</td>
+                                    <td>${{ detalle.precio_unitario|floatformat:0 }}</td>
+                                    <td>${{ detalle.subtotal|floatformat:0 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="thead-light">
+                                <tr>
+                                    <th colspan="3">TOTAL:</th>
+                                    <th>${{ pedido.total|floatformat:0 }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Información adicional según el estado -->
+                    {% if pedido.estado == 'pendiente' %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            Tu pedido está pendiente de procesamiento. Nos contactaremos contigo pronto para coordinar la entrega y el pago.
+                        </div>
+                    {% elif pedido.estado == 'procesando' %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-cog"></i>
+                            Tu pedido está siendo procesado. Te contactaremos pronto para finalizar la transacción.
+                        </div>
+                    {% elif pedido.estado == 'completado' %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            ¡Tu pedido ha sido completado exitosamente!
+                        </div>
+                    {% elif pedido.estado == 'facturado' %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-file-invoice"></i>
+                            Tu pedido ha sido facturado y completado. ¡Gracias por tu compra!
+                        </div>
+                    {% elif pedido.estado == 'cancelado' %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-times-circle"></i>
+                            Este pedido ha sido cancelado.
+                        </div>
+                    {% endif %}
+
+                    <div class="text-center mt-4">
+                        <a href="{% url 'ventas:catalogo_publico' %}" class="btn btn-primary">
+                            <i class="fas fa-store"></i> Volver al catálogo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

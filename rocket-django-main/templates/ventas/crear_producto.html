@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Agregar producto</h1>
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+    <input type="text" name="nombre" placeholder="Nombre" required><br>
+    <textarea name="descripcion" placeholder="Descripción" required></textarea><br>
+    <input type="number" name="precio" placeholder="Precio" required><br>
+    <input type="number" name="stock" placeholder="Stock" required><br>
+    <input type="text" name="categoria" placeholder="Categoría" required><br>
+    <input type="text" name="marca" placeholder="Marca"><br>
+    <input type="file" name="imagen"><br>
+    <button type="submit">Guardar</button>
+</form>
+<a href="{% url 'ventas:lista_productos' %}">Volver</a>
+{% endblock %}

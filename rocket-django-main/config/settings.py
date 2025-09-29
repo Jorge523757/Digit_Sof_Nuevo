@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "apps.users",
     "apps.charts", 
     "apps.tasks",
+    "apps.ventas",
 
     "django_celery_results",
 
@@ -126,12 +127,18 @@ if DB_ENGINE and DB_NAME and DB_Nombre_de_usuario:
         }, 
     }
 else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'db.sqlite3',
-        }
+    
+    
+   DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'digitsoft_db',
+        'USER': 'root',
+        'PASSWORD': 'david17.',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
+}
 
 
 # Password validation

@@ -34,6 +34,9 @@ urlpatterns = [
     # 🚀 Aquí añadimos tu app administrador
     path("administrador/", include("administrador.urls")),
 
+    # App ventas (e-commerce)
+    path("ventas/", include("apps.ventas.urls")),
+
     path('api/docs/schema', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     #path("__debug__/", include("debug_toolbar.urls")),#

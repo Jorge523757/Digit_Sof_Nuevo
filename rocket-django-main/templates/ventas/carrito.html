@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}Carrito de Compras - DigitSoft{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-shopping-cart"></i> Carrito de Compras</h2>
+                <a href="{% url 'ventas:catalogo_publico' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-store"></i> Seguir comprando
+                </a>
+            </div>
+
+            {% if productos %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Precio Unitario</th>
+                                        <th>Cantidad</th>
+                                        <th>Subtotal</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in productos %}
+                                    <tr class="cart-item">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if item.producto.imagen %}
+                                                    <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" 
+                                                         class="me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                {% endif %}
+                                                <div>
+                                                    <h6 class="mb-0">{{ item.producto.nombre }}</h6>
+                                                    {% if item.producto.marca %}
+                                                        <small class="text-muted">{{ item.producto.marca }}</small>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>${{ item.producto.precio|floatformat:0 }}</td>
+                                        <td>
+                                            <span class="badge badge-secondary badge-pill">{{ item.cantidad }}</span>
+                                        </td>
+                                        <td><strong>${{ item.subtotal|floatformat:0 }}</strong></td>
+                                        <td>
+                                            <a href="{% url 'ventas:eliminar_del_carrito' item.producto.pk %}" 
+                                               class="btn btn-sm btn-outline-danger" 
+                                               onclick="return confirm('¿Eliminar este producto del carrito?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot class="thead-light">
+                                    <tr>
+                                        <th colspan="3">TOTAL:</th>
+                                        <th>${{ total|floatformat:0 }}</th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="fas fa-shopping-bag"></i> Crear Pedido</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">Envía tu pedido para que nuestro equipo lo procese y te contacte para coordinar la entrega y el pago.</p>
+                                <a href="{% url 'ventas:crear_pedido' %}" class="btn btn-info btn-block">
+                                    <i class="fas fa-paper-plane"></i> Enviar Pedido
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="fas fa-credit-card"></i> Compra Directa</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">Procede directamente al pago si ya tienes todos los datos necesarios.</p>
+                                <a href="{% url 'ventas:registrar_venta' %}" class="btn btn-success btn-block">
+                                    <i class="fas fa-shopping-cart"></i> Comprar Ahora
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            {% else %}
+                <!-- Carrito vacío -->
+                <div class="text-center py-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Tu carrito está vacío</h4>
+                            <p class="text-muted">Agrega algunos productos para continuar</p>
+                            <a href="{% url 'ventas:catalogo_publico' %}" class="btn btn-primary">
+                                <i class="fas fa-store"></i> Ir al catálogo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

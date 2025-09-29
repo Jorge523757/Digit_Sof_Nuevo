@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ producto.nombre }}</h1>
+{% if producto.imagen %}<img src="{{ producto.imagen.url }}" width="200">{% endif %}
+<p>{{ producto.descripcion }}</p>
+<p>Precio: ${{ producto.precio }}</p>
+<p>Stock: {{ producto.stock }}</p>
+<p>Marca: {{ producto.marca }}</p>
+<p>Categoría: {{ producto.categoria }}</p>
+<a href="{% url 'ventas:agregar_al_carrito' producto.pk %}">Agregar al carrito</a>
+<h2>Comentarios</h2>
+<ul>
+    {% for comentario in comentarios %}
+    <li><b>{{ comentario.nombre }}</b> ({{ comentario.fecha|date:'d/m/Y H:i' }}): {{ comentario.mensaje }}</li>
+    {% empty %}
+    <li>No hay comentarios.</li>
+    {% endfor %}
+</ul>
+<form method="post">{% csrf_token %}
+    <input type="text" name="nombre" placeholder="Tu nombre" required><br>
+    <textarea name="mensaje" placeholder="Escribe un comentario..." required></textarea><br>
+    <button type="submit">Comentar</button>
+</form>
+<a href="{% url 'ventas:lista_productos' %}">Volver</a>
+{% endblock %}
