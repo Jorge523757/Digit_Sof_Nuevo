@@ -1,0 +1,698 @@
+{% load static %}
+<footer class="modern-footer">
+    <!-- Wave Animation Background -->
+    <div class="footer-waves">
+        <svg width="100%" height="100%" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M1200 120L0 16.48V0h1200v120z" class="wave-fill"></path>
+        </svg>
+    </div>
+
+    <div class="footer-container">
+        <!-- Main Footer Content -->
+        <div class="footer-content">
+            <!-- Company Section -->
+            <div class="footer-section company-section">
+                <div class="footer-logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h2>Digit Soft</h2>
+                </div>
+                <p class="company-description">
+                    🚀 Soluciones informáticas integrales para hogares y empresas.
+                    <br>🎯 Calidad, confianza y profesionalismo garantizados.
+                </p>
+                <div class="company-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-users"></i>
+                        <span>500+ Clientes</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>1000+ Servicios</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-star"></i>
+                        <span>5★ Calificación</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Links Section -->
+            <div class="footer-section links-section">
+                <h3><i class="fas fa-link"></i> Enlaces Rápidos</h3>
+                <div class="links-grid">
+                    <div class="link-column">
+                        <a href="{% url 'main:home' %}#inicio" class="footer-link">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                        <a href="{% url 'main:home' %}#servicios" class="footer-link">
+                            <i class="fas fa-cogs"></i> Servicios
+                        </a>
+                        <a href="{% url 'main:home' %}#productos" class="footer-link">
+                            <i class="fas fa-box"></i> Productos
+                        </a>
+                        <a href="{% url 'main:home' %}#nosotros" class="footer-link">
+                            <i class="fas fa-users"></i> Nosotros
+                        </a>
+                    </div>
+                    <div class="link-column">
+                        <a href="{% url 'main:home' %}#contacto" class="footer-link">
+                            <i class="fas fa-phone"></i> Contacto
+                        </a>
+                        <a href="#ingreso" class="footer-link">
+                            <i class="fas fa-sign-in-alt"></i> Ingreso
+                        </a>
+                        <a href="#crear-usuario" class="footer-link">
+                            <i class="fas fa-user-plus"></i> Registro
+                        </a>
+                        <a href="/carrito/" class="footer-link">
+                            <i class="fas fa-shopping-cart"></i> Carrito
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services Section -->
+            <div class="footer-section services-section">
+                <h3><i class="fas fa-tools"></i> Nuestros Servicios</h3>
+                <div class="services-list">
+                    <div class="service-item">
+                        <i class="fas fa-server"></i>
+                        <div>
+                            <strong>Infraestructura TI</strong>
+                            <p>Redes y servidores</p>
+                        </div>
+                    </div>
+                    <div class="service-item">
+                        <i class="fas fa-wrench"></i>
+                        <div>
+                            <strong>Soporte Técnico</strong>
+                            <p>24/7 disponible</p>
+                        </div>
+                    </div>
+                    <div class="service-item">
+                        <i class="fas fa-code"></i>
+                        <div>
+                            <strong>Desarrollo</strong>
+                            <p>Software y web</p>
+                        </div>
+                    </div>
+                    <div class="service-item">
+                        <i class="fas fa-shopping-bag"></i>
+                        <div>
+                            <strong>Ventas</strong>
+                            <p>Hardware y software</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Newsletter Section -->
+            <div class="footer-section newsletter-section">
+                <h3><i class="fas fa-envelope"></i> ¡Mantente Conectado!</h3>
+                <p class="newsletter-description">
+                    📧 Recibe promociones exclusivas, noticias tecnológicas y ofertas especiales.
+                </p>
+                <form id="newsletterForm" class="newsletter-form">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" 
+                                   placeholder="tu@email.com" 
+                                   required 
+                                   class="newsletter-input">
+                        </div>
+                        <button type="submit" class="newsletter-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Suscribirse</span>
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Social Media -->
+                <div class="social-media">
+                    <h4>🌐 Síguenos</h4>
+                    <div class="social-links">
+                        <a href="#" class="social-link facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-link twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link linkedin">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="social-link whatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <div class="copyright">
+                    <p>
+                        <i class="fas fa-copyright"></i> 
+                        {% now "Y" %} <strong>Digit Soft</strong> - Todos los derechos reservados
+                    </p>
+                    <p class="made-with">
+                        Hecho con <i class="fas fa-heart pulse"></i> en Colombia 🇨🇴
+                    </p>
+                </div>
+                <div class="footer-info">
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Bogotá, Colombia</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <span>+57 (1) 234-5678</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>info@digitsoft.com</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Back to Top Button -->
+    <button id="backToTop" class="back-to-top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+</footer>
+
+<!-- Footer Styles -->
+<style>
+.modern-footer {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    margin-top: 50px;
+}
+
+.footer-waves {
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    z-index: 1;
+}
+
+.wave-fill {
+    fill: #f8f9fa;
+    opacity: 0.3;
+}
+
+.footer-container {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 20px 0;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+/* Company Section */
+.company-section .footer-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.logo-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.logo-icon i {
+    font-size: 24px;
+    color: white;
+}
+
+.company-section h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.company-description {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    opacity: 0.9;
+}
+
+.company-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.stat-item i {
+    color: #667eea;
+    width: 16px;
+}
+
+/* Links Section */
+.footer-section h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.footer-section h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 2px;
+}
+
+.footer-section h3 i {
+    margin-right: 8px;
+    color: #667eea;
+}
+
+.links-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.footer-link {
+    display: flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    padding: 8px 0;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+}
+
+.footer-link:hover {
+    color: #667eea;
+    transform: translateX(5px);
+    padding-left: 10px;
+}
+
+.footer-link i {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+}
+
+/* Services Section */
+.services-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.service-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.service-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.service-item i {
+    color: #667eea;
+    font-size: 20px;
+    margin-top: 2px;
+}
+
+.service-item strong {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.service-item p {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* Newsletter Section */
+.newsletter-description {
+    font-size: 14px;
+    margin-bottom: 20px;
+    opacity: 0.9;
+}
+
+.newsletter-form {
+    margin-bottom: 30px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #667eea;
+    z-index: 1;
+}
+
+.newsletter-input {
+    width: 100%;
+    padding: 15px 15px 15px 45px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.newsletter-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.newsletter-input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+}
+
+.newsletter-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.newsletter-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+/* Social Media */
+.social-media h4 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    opacity: 0.9;
+}
+
+.social-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.social-link:hover {
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.social-link.facebook { background: #3b5998; }
+.social-link.facebook:hover { background: #4c70ba; }
+
+.social-link.twitter { background: #1da1f2; }
+.social-link.twitter:hover { background: #4ab3f4; }
+
+.social-link.instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+
+.social-link.linkedin { background: #0077b5; }
+.social-link.linkedin:hover { background: #0099d4; }
+
+.social-link.whatsapp { background: #25d366; }
+.social-link.whatsapp:hover { background: #38d373; }
+
+/* Footer Bottom */
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 30px 0;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.footer-bottom-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.copyright {
+    text-align: left;
+}
+
+.copyright p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.made-with {
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+    color: #e74c3c;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.footer-info {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.info-item i {
+    color: #667eea;
+    width: 16px;
+    text-align: center;
+}
+
+/* Back to Top Button */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.back-to-top:hover {
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .footer-content {
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    
+    .links-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-bottom-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .footer-info {
+        justify-content: center;
+    }
+    
+    .input-group {
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-container {
+        padding: 40px 15px 0;
+    }
+    
+    .company-section h2 {
+        font-size: 24px;
+    }
+    
+    .social-links {
+        justify-content: center;
+    }
+}
+</style>
+
+<!-- Footer JavaScript -->
+<script>
+// Newsletter Form
+document.getElementById('newsletterForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = this.querySelector('input[type="email"]').value;
+    
+    // Simulate newsletter subscription
+    const btn = this.querySelector('.newsletter-btn');
+    const originalText = btn.innerHTML;
+    
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Enviando...</span>';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-check"></i> <span>¡Suscrito!</span>';
+        btn.style.background = '#28a745';
+        
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            btn.style.background = '';
+            this.reset();
+        }, 2000);
+    }, 1500);
+});
+
+// Back to Top Button
+const backToTop = document.getElementById('backToTop');
+
+window.addEventListener('scroll', () => {
+    if (window.pageYOffset > 300) {
+        backToTop.classList.add('visible');
+    } else {
+        backToTop.classList.remove('visible');
+    }
+});
+
+backToTop.addEventListener('click', () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+});
+
+// Smooth hover animations for service items
+document.querySelectorAll('.service-item').forEach(item => {
+    item.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-5px)';
+    });
+    
+    item.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+    });
+});
+</script>

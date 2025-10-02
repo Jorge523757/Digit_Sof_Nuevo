@@ -1,0 +1,837 @@
+{% extends 'main/gestion/base_gestion.html' %}
+
+{% block header_icon %}<i class="fas fa-shopping-cart"></i>{% endblock %}
+
+{% block stats_section %}
+<div class="stats-cards">
+    <div class="stat-card">
+        <div class="stat-number" id="cartItemsCount">0</div>
+        <div class="stat-label">Productos en Carrito</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" id="cartTotalPrice">$0</div>
+        <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" id="cartTotalQuantity">0</div>
+        <div class="stat-label">Cantidad Total</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" id="cartDiscount">0%</div>
+        <div class="stat-label">Descuento</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block table_icon %}<i class="fas fa-shopping-basket"></i>{% endblock %}
+{% block table_title %}Carrito de Compras{% endblock %}
+
+{% block table_content %}
+<div id="cartContainer">
+    <!-- Estado vacío -->
+    <div id="emptyCart" class="empty-cart-state">
+        <div class="empty-cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <h3>Tu carrito está vacío</h3>
+        <p>Agrega productos desde el módulo de productos para comenzar tu compra</p>
+        <div class="empty-cart-actions">
+            <a href="/gestion-productos/" class="btn-primary">
+                <i class="fas fa-box"></i> Ver Productos
+            </a>
+            <button onclick="loadSampleProducts()" class="btn-secondary">
+                <i class="fas fa-magic"></i> Cargar Productos de Ejemplo
+            </button>
+        </div>
+    </div>
+
+    <!-- Contenido del carrito -->
+    <div id="cartContent" style="display: none;">
+        <div class="cart-header">
+            <div class="cart-actions">
+                <button onclick="clearCart()" class="btn-danger">
+                    <i class="fas fa-trash"></i> Vaciar Carrito
+                </button>
+                <button onclick="saveCart()" class="btn-success">
+                    <i class="fas fa-save"></i> Guardar Carrito
+                </button>
+                <button onclick="processCheckout()" class="btn-primary">
+                    <i class="fas fa-credit-card"></i> Procesar Compra
+                </button>
+            </div>
+        </div>
+
+        <div class="cart-table-container">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Producto</th>
+                        <th>Precio Unitario</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="cartTableBody">
+                    <!-- Los productos del carrito se cargarán aquí -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="cart-summary">
+            <div class="summary-section">
+                <h4><i class="fas fa-calculator"></i> Resumen de Compra</h4>
+                <div class="summary-item">
+                    <span>Subtotal:</span>
+                    <span id="summarySubtotal">$0</span>
+                </div>
+                <div class="summary-item">
+                    <span>IVA (19%):</span>
+                    <span id="summaryIVA">$0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Descuento:</span>
+                    <span id="summaryDiscount">$0</span>
+                </div>
+                <div class="summary-item total">
+                    <span><strong>Total:</strong></span>
+                    <span id="summaryTotal"><strong>$0</strong></span>
+                </div>
+            </div>
+
+            <div class="discount-section">
+                <h4><i class="fas fa-tag"></i> Aplicar Descuento</h4>
+                <div class="discount-input">
+                    <input type="text" id="discountCode" placeholder="Código de descuento" class="form-control">
+                    <button onclick="applyDiscount()" class="btn-info">
+                        <i class="fas fa-percent"></i> Aplicar
+                    </button>
+                </div>
+                <div class="discount-presets">
+                    <button onclick="applyPresetDiscount(10)" class="discount-preset">10%</button>
+                    <button onclick="applyPresetDiscount(15)" class="discount-preset">15%</button>
+                    <button onclick="applyPresetDiscount(20)" class="discount-preset">20%</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Sistema de carrito de compras
+const cartSystem = {
+    items: [],
+    discountPercent: 0,
+    
+    // Productos disponibles con imágenes
+    availableProducts: [
+        {
+            id: 1,
+            name: 'Laptop HP',
+            price: 850000,
+            image: '/static/productos/imagenes/laptop-hp.svg',
+            category: 'Equipos',
+            stock: 15,
+            description: 'Laptop HP de alto rendimiento para trabajo y entretenimiento'
+        },
+        {
+            id: 2,
+            name: 'Mouse Logitech',
+            price: 45000,
+            image: '/static/productos/imagenes/mouse-logitech.svg',
+            category: 'Accesorios',
+            stock: 3,
+            description: 'Mouse óptico Logitech con precisión profesional'
+        },
+        {
+            id: 3,
+            name: 'Teclado Mecánico RGB',
+            price: 120000,
+            image: '/static/productos/imagenes/teclado-mecanico.svg',
+            category: 'Accesorios',
+            stock: 0,
+            description: 'Teclado mecánico con iluminación RGB personalizable'
+        },
+        {
+            id: 4,
+            name: 'Monitor 24" Full HD',
+            price: 320000,
+            image: '/static/productos/imagenes/monitor-24.svg',
+            category: 'Equipos',
+            stock: 8,
+            description: 'Monitor LED de 24 pulgadas con resolución Full HD'
+        },
+        {
+            id: 5,
+            name: 'Impresora Epson',
+            price: 180000,
+            image: '/static/productos/imagenes/impresora-epson.svg',
+            category: 'Equipos',
+            stock: 2,
+            description: 'Impresora multifuncional Epson con escáner incorporado'
+        }
+    ],
+
+    // Agregar producto al carrito
+    addItem: function(productId, quantity = 1) {
+        const product = this.availableProducts.find(p => p.id === productId);
+        if (!product) {
+            showErrorToast('❌ Producto no encontrado');
+            return false;
+        }
+
+        if (product.stock === 0) {
+            showErrorToast('❌ Producto agotado');
+            return false;
+        }
+
+        if (quantity > product.stock) {
+            showErrorToast(\`❌ Stock insuficiente. Disponible: \${product.stock}\`);
+            return false;
+        }
+
+        // Verificar si el producto ya está en el carrito
+        const existingItem = this.items.find(item => item.id === productId);
+        
+        if (existingItem) {
+            const newQuantity = existingItem.quantity + quantity;
+            if (newQuantity > product.stock) {
+                showErrorToast(\`❌ No puedes agregar más. Máximo disponible: \${product.stock}\`);
+                return false;
+            }
+            existingItem.quantity = newQuantity;
+        } else {
+            this.items.push({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                quantity: quantity,
+                category: product.category,
+                description: product.description
+            });
+        }
+
+        this.updateDisplay();
+        showSuccessToast(\`✅ \${product.name} agregado al carrito\`);
+        return true;
+    },
+
+    // Remover producto del carrito
+    removeItem: function(productId) {
+        const itemIndex = this.items.findIndex(item => item.id === productId);
+        if (itemIndex !== -1) {
+            const item = this.items[itemIndex];
+            this.items.splice(itemIndex, 1);
+            this.updateDisplay();
+            showSuccessToast(\`✅ \${item.name} eliminado del carrito\`);
+        }
+    },
+
+    // Actualizar cantidad de producto
+    updateQuantity: function(productId, newQuantity) {
+        const item = this.items.find(item => item.id === productId);
+        const product = this.availableProducts.find(p => p.id === productId);
+        
+        if (!item || !product) return;
+
+        if (newQuantity <= 0) {
+            this.removeItem(productId);
+            return;
+        }
+
+        if (newQuantity > product.stock) {
+            showErrorToast(\`❌ Stock máximo: \${product.stock}\`);
+            return;
+        }
+
+        item.quantity = newQuantity;
+        this.updateDisplay();
+    },
+
+    // Vaciar carrito
+    clear: function() {
+        this.items = [];
+        this.discountPercent = 0;
+        this.updateDisplay();
+        showSuccessToast('🗑️ Carrito vaciado');
+    },
+
+    // Calcular totales
+    calculateTotals: function() {
+        const subtotal = this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const discount = subtotal * (this.discountPercent / 100);
+        const subtotalWithDiscount = subtotal - discount;
+        const iva = subtotalWithDiscount * 0.19;
+        const total = subtotalWithDiscount + iva;
+
+        return {
+            subtotal,
+            discount,
+            iva,
+            total,
+            itemCount: this.items.length,
+            totalQuantity: this.items.reduce((sum, item) => sum + item.quantity, 0)
+        };
+    },
+
+    // Actualizar visualización
+    updateDisplay: function() {
+        const totals = this.calculateTotals();
+        
+        // Actualizar estadísticas
+        document.getElementById('cartItemsCount').textContent = totals.itemCount;
+        document.getElementById('cartTotalPrice').textContent = \`$\${totals.total.toLocaleString()}\`;
+        document.getElementById('cartTotalQuantity').textContent = totals.totalQuantity;
+        document.getElementById('cartDiscount').textContent = \`\${this.discountPercent}%\`;
+
+        // Mostrar/ocultar contenido
+        const emptyCart = document.getElementById('emptyCart');
+        const cartContent = document.getElementById('cartContent');
+        
+        if (this.items.length === 0) {
+            emptyCart.style.display = 'block';
+            cartContent.style.display = 'none';
+        } else {
+            emptyCart.style.display = 'none';
+            cartContent.style.display = 'block';
+            this.renderCartTable();
+            this.updateSummary(totals);
+        }
+    },
+
+    // Renderizar tabla del carrito
+    renderCartTable: function() {
+        const tbody = document.getElementById('cartTableBody');
+        tbody.innerHTML = '';
+
+        this.items.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = \`
+                <td class="product-image">
+                    <img src="\${item.image}" alt="\${item.name}" class="cart-product-image">
+                </td>
+                <td class="product-info">
+                    <div class="product-name">\${item.name}</div>
+                    <div class="product-category">\${item.category}</div>
+                    <div class="product-description">\${item.description}</div>
+                </td>
+                <td class="product-price">$\${item.price.toLocaleString()}</td>
+                <td class="product-quantity">
+                    <div class="quantity-controls">
+                        <button onclick="cartSystem.updateQuantity(\${item.id}, \${item.quantity - 1})" class="qty-btn">-</button>
+                        <input type="number" value="\${item.quantity}" min="1" 
+                               onchange="cartSystem.updateQuantity(\${item.id}, parseInt(this.value))"
+                               class="qty-input">
+                        <button onclick="cartSystem.updateQuantity(\${item.id}, \${item.quantity + 1})" class="qty-btn">+</button>
+                    </div>
+                </td>
+                <td class="product-subtotal">$\${(item.price * item.quantity).toLocaleString()}</td>
+                <td class="product-actions">
+                    <button onclick="cartSystem.removeItem(\${item.id})" class="btn-danger btn-sm" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            \`;
+            tbody.appendChild(row);
+        });
+    },
+
+    // Actualizar resumen
+    updateSummary: function(totals) {
+        document.getElementById('summarySubtotal').textContent = \`$\${totals.subtotal.toLocaleString()}\`;
+        document.getElementById('summaryIVA').textContent = \`$\${totals.iva.toLocaleString()}\`;
+        document.getElementById('summaryDiscount').textContent = \`$\${totals.discount.toLocaleString()}\`;
+        document.getElementById('summaryTotal').textContent = \`$\${totals.total.toLocaleString()}\`;
+    },
+
+    // Aplicar descuento
+    applyDiscount: function(percent) {
+        this.discountPercent = percent;
+        this.updateDisplay();
+        showSuccessToast(\`✅ Descuento del \${percent}% aplicado\`);
+    }
+};
+
+// Función para cargar productos de ejemplo
+function loadSampleProducts() {
+    cartSystem.addItem(1, 1); // Laptop HP
+    cartSystem.addItem(2, 2); // Mouse Logitech x2
+    cartSystem.addItem(4, 1); // Monitor 24"
+    showSuccessToast('🎁 Productos de ejemplo cargados');
+}
+
+// Función para vaciar carrito
+function clearCart() {
+    if (confirm('¿Estás seguro de que quieres vaciar el carrito?')) {
+        cartSystem.clear();
+    }
+}
+
+// Función para guardar carrito
+function saveCart() {
+    const cartData = {
+        items: cartSystem.items,
+        discount: cartSystem.discountPercent,
+        timestamp: new Date().toISOString()
+    };
+    localStorage.setItem('digitSoftCart', JSON.stringify(cartData));
+    showSuccessToast('💾 Carrito guardado localmente');
+}
+
+// Función para cargar carrito guardado
+function loadSavedCart() {
+    const savedCart = localStorage.getItem('digitSoftCart');
+    if (savedCart) {
+        const cartData = JSON.parse(savedCart);
+        cartSystem.items = cartData.items || [];
+        cartSystem.discountPercent = cartData.discount || 0;
+        cartSystem.updateDisplay();
+        showSuccessToast('📁 Carrito cargado desde memoria local');
+    }
+}
+
+// Función para aplicar descuento por código
+function applyDiscount() {
+    const code = document.getElementById('discountCode').value.toUpperCase();
+    let discount = 0;
+
+    switch(code) {
+        case 'DIGIT10':
+            discount = 10;
+            break;
+        case 'SOFT15':
+            discount = 15;
+            break;
+        case 'PROMO20':
+            discount = 20;
+            break;
+        case 'VIP25':
+            discount = 25;
+            break;
+        default:
+            showErrorToast('❌ Código de descuento inválido');
+            return;
+    }
+
+    cartSystem.applyDiscount(discount);
+    document.getElementById('discountCode').value = '';
+}
+
+// Función para aplicar descuento preset
+function applyPresetDiscount(percent) {
+    cartSystem.applyDiscount(percent);
+}
+
+// Función para procesar checkout
+function processCheckout() {
+    if (cartSystem.items.length === 0) {
+        showErrorToast('❌ El carrito está vacío');
+        return;
+    }
+
+    const totals = cartSystem.calculateTotals();
+    const checkoutModal = document.createElement('div');
+    checkoutModal.className = 'modal';
+    checkoutModal.style.display = 'flex';
+    checkoutModal.innerHTML = \`
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-credit-card"></i> Procesar Compra</h2>
+                <span class="close" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="checkout-summary">
+                    <h4>Resumen de la Compra</h4>
+                    <div class="checkout-items">
+                        \${cartSystem.items.map(item => \`
+                            <div class="checkout-item">
+                                <img src="\${item.image}" alt="\${item.name}" class="checkout-image">
+                                <div class="checkout-info">
+                                    <div>\${item.name}</div>
+                                    <div>Cantidad: \${item.quantity} x $\${item.price.toLocaleString()}</div>
+                                </div>
+                                <div class="checkout-price">$\${(item.price * item.quantity).toLocaleString()}</div>
+                            </div>
+                        \`).join('')}
+                    </div>
+                    <div class="checkout-totals">
+                        <div>Subtotal: $\${totals.subtotal.toLocaleString()}</div>
+                        <div>Descuento: $\${totals.discount.toLocaleString()}</div>
+                        <div>IVA: $\${totals.iva.toLocaleString()}</div>
+                        <div><strong>Total: $\${totals.total.toLocaleString()}</strong></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="this.parentElement.parentElement.parentElement.remove()">Cancelar</button>
+                <button type="button" class="btn-success" onclick="confirmPurchase()">Confirmar Compra</button>
+            </div>
+        </div>
+    \`;
+    
+    document.body.appendChild(checkoutModal);
+}
+
+// Función para confirmar compra
+function confirmPurchase() {
+    // Simular procesamiento
+    showSuccessToast('🎉 Compra procesada exitosamente');
+    
+    // Aquí se integraría con el sistema de ventas
+    cartSystem.clear();
+    
+    // Cerrar modal
+    document.querySelector('.modal').remove();
+    
+    setTimeout(() => {
+        showSuccessToast('📧 Confirmación enviada por email');
+    }, 2000);
+}
+
+// Funciones de notificación (reutilizar las existentes)
+function showSuccessToast(message) {
+    const toast = document.createElement('div');
+    toast.style.cssText = \`
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        z-index: 10000;
+        font-weight: 600;
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        animation: slideInRight 0.3s ease;
+    \`;
+    toast.innerHTML = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 4000);
+}
+
+function showErrorToast(message) {
+    const toast = document.createElement('div');
+    toast.style.cssText = \`
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        z-index: 10000;
+        font-weight: 600;
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        animation: slideInRight 0.3s ease;
+    \`;
+    toast.innerHTML = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 4000);
+}
+
+// Función global para agregar al carrito (llamada desde otros módulos)
+function addToCart(productId, quantity = 1) {
+    return cartSystem.addItem(productId, quantity);
+}
+
+// Cargar carrito al inicializar
+document.addEventListener('DOMContentLoaded', function() {
+    loadSavedCart();
+    cartSystem.updateDisplay();
+});
+
+// Agregar estilos CSS específicos del carrito
+const cartStyles = document.createElement('style');
+cartStyles.textContent = \`
+    .empty-cart-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: var(--bg-primary);
+        border-radius: 15px;
+        border: 2px dashed var(--border-color);
+    }
+    
+    .empty-cart-icon {
+        font-size: 4rem;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+        opacity: 0.6;
+    }
+    
+    .empty-cart-actions {
+        margin-top: 30px;
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .cart-header {
+        background: var(--bg-secondary);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border-left: 4px solid var(--primary-color);
+    }
+    
+    .cart-actions {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .cart-table-container {
+        background: var(--bg-primary);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px var(--shadow);
+    }
+    
+    .cart-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .cart-table th {
+        background: var(--primary-color);
+        color: white;
+        padding: 15px;
+        font-weight: 600;
+        text-align: left;
+    }
+    
+    .cart-table td {
+        padding: 20px 15px;
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
+    }
+    
+    .cart-table tr:hover {
+        background: var(--hover-bg);
+    }
+    
+    .cart-product-image {
+        width: 80px;
+        height: 60px;
+        object-fit: contain;
+        border-radius: 8px;
+        border: 2px solid var(--border-color);
+        background: white;
+        padding: 5px;
+    }
+    
+    .product-info {
+        max-width: 300px;
+    }
+    
+    .product-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 5px;
+    }
+    
+    .product-category {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        margin-bottom: 5px;
+    }
+    
+    .product-description {
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        line-height: 1.3;
+    }
+    
+    .product-price {
+        font-weight: 600;
+        color: var(--primary-color);
+        font-size: 1.1rem;
+    }
+    
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .qty-btn {
+        width: 30px;
+        height: 30px;
+        border: 2px solid var(--primary-color);
+        background: var(--bg-primary);
+        color: var(--primary-color);
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    
+    .qty-btn:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+    
+    .qty-input {
+        width: 60px;
+        text-align: center;
+        padding: 6px;
+        border: 2px solid var(--border-color);
+        border-radius: 6px;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+    }
+    
+    .product-subtotal {
+        font-weight: 600;
+        color: var(--success-color);
+        font-size: 1.1rem;
+    }
+    
+    .cart-summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-top: 30px;
+    }
+    
+    @media (max-width: 768px) {
+        .cart-summary {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .summary-section,
+    .discount-section {
+        background: var(--bg-primary);
+        padding: 25px;
+        border-radius: 15px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 15px var(--shadow);
+    }
+    
+    .summary-section h4,
+    .discount-section h4 {
+        margin-bottom: 20px;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .summary-item.total {
+        border-top: 2px solid var(--primary-color);
+        border-bottom: none;
+        margin-top: 10px;
+        padding-top: 15px;
+        font-size: 1.2rem;
+        color: var(--primary-color);
+    }
+    
+    .discount-input {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .discount-input input {
+        flex: 1;
+    }
+    
+    .discount-presets {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .discount-preset {
+        padding: 8px 15px;
+        border: 2px solid var(--secondary-color);
+        background: var(--bg-secondary);
+        color: var(--secondary-color);
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    
+    .discount-preset:hover {
+        background: var(--secondary-color);
+        color: white;
+    }
+    
+    .checkout-summary {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .checkout-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .checkout-image {
+        width: 50px;
+        height: 40px;
+        object-fit: contain;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background: white;
+        padding: 3px;
+    }
+    
+    .checkout-info {
+        flex: 1;
+    }
+    
+    .checkout-price {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    .checkout-totals {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid var(--primary-color);
+    }
+    
+    .checkout-totals div {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+    
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+\`;
+document.head.appendChild(cartStyles);
+</script>
+{% endblock %}

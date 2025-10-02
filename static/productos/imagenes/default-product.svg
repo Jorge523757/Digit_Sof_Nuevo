@@ -1,0 +1,24 @@
+<!-- Imagen por defecto para productos sin imagen -->
+<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="defaultGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#95a5a6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7f8c8d;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="300" height="200" fill="url(#defaultGradient)"/>
+  
+  <!-- Product icon -->
+  <circle cx="150" cy="100" r="50" fill="#ecf0f1" opacity="0.8"/>
+  <rect x="125" y="75" width="50" height="50" fill="#bdc3c7" rx="8"/>
+  
+  <!-- Product lines -->
+  <rect x="135" y="85" width="30" height="4" fill="#95a5a6" rx="2"/>
+  <rect x="135" y="95" width="20" height="4" fill="#95a5a6" rx="2"/>
+  <rect x="135" y="105" width="25" height="4" fill="#95a5a6" rx="2"/>
+  
+  <!-- Text -->
+  <text x="150" y="170" font-family="Arial, sans-serif" font-size="14" fill="#34495e" text-anchor="middle">Sin Imagen</text>
+</svg>
