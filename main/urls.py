@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 app_name = 'main'
@@ -35,26 +35,17 @@ urlpatterns = [
     path('api/login/', views.login_form, name='login_form'),
     
     # URLs de los módulos de gestión
-    path('admin-panel/', views.admin_panel, name='admin_panel'),
-    path('gestion-clientes/', views.gestion_clientes, name='gestion_clientes'),
-    path('gestion-productos/', views.gestion_productos, name='gestion_productos'),
-    path('gestion-proveedores/', views.gestion_proveedores, name='gestion_proveedores'),
-    path('gestion-compras/', views.gestion_compras, name='gestion_compras'),
-    path('gestion-ventas/', views.gestion_ventas, name='gestion_ventas'),
-    path('carrito/', views.carrito, name='carrito'),
-    path('gestion-tecnicos/', views.gestion_tecnicos, name='gestion_tecnicos'),
-    path('servicio-tecnico/', views.servicio_tecnico, name='servicio_tecnico'),
-    path('orden-servicio/', views.orden_servicio, name='orden_servicio'),
-    path('gestion-garantias/', views.gestion_garantias, name='gestion_garantias'),
-    
-    # URLs del sistema de productos y e-commerce
-    path('productos/', views.products_view, name='products'),
-    path('productos/categoria/<slug:category_slug>/', views.category_products_view, name='category_products'),
-    path('producto/<int:product_id>/', views.product_detail_view, name='product_detail'),
-    path('api/cart/add/', views.add_to_cart_view, name='add_to_cart'),
-    path('api/cart/remove/', views.remove_from_cart_view, name='remove_from_cart'),
-    path('carrito-compras/', views.cart_view, name='cart'),
-    path('checkout/', views.checkout_view, name='checkout'),
-    path('factura/<int:invoice_id>/', views.invoice_detail_view, name='invoice_detail'),
-    path('factura/<int:invoice_id>/pdf/', views.invoice_pdf_view, name='invoice_pdf'),
+    path('admin-panel/', include('main.admin_panel.urls')),
+    path('gestion-clientes/', include('main.gestion_clientes.urls')),
+    path('gestion-productos/', include('main.gestion_productos.urls')),
+    path('gestion-proveedores/', include('main.gestion_proveedores.urls')),
+    path('gestion-compras/', include('main.gestion_compras.urls')),
+    path('gestion-ventas/', include('main.gestion_ventas.urls')),
+    path('carrito/', include('main.carrito.urls')),
+    path('gestion-tecnicos/', include('main.gestion_tecnicos.urls')),
+    path('servicio-tecnico/', include('main.servicio_tecnico.urls')),
+    path('orden-servicio/', include('main.orden_servicio.urls')),
+    path('gestion-garantias/', include('main.gestion_garantias.urls')),
+    path('facturacion/', include('main.facturacion.urls')),
+    path('productos/', include('main.productos.urls')),
 ]

@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from .models import UserProfile
+from .models import UserProfile, Equipo, Cliente, Proveedor
 import re
 
 class CustomUserCreationForm(UserCreationForm):
@@ -598,3 +598,20 @@ class RoleSelectionForm(forms.Form):
         label='Tipo de cuenta',
         required=True
     )
+
+class EquipoForm(forms.ModelForm):
+    class Meta:
+        model = Equipo
+        fields = ['modelo', 'clave', 'cliente', 'marca']
+
+
+class ClienteForm(forms.ModelForm):
+    class Meta:
+        model = Cliente
+        fields = ['nombre', 'numero_documento', 'numero_telefonico', 'correo_electronico', 'direccion']
+
+
+class ProveedorForm(forms.ModelForm):
+    class Meta:
+        model = Proveedor
+        fields = ['nit_proveedor', 'nombre', 'cedula', 'direccion', 'telefono']

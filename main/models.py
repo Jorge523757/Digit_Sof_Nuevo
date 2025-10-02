@@ -79,14 +79,13 @@ class Cliente(models.Model):
     """Modelo para gestión de clientes"""
     id_cliente = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=70)
-    numero_documento = models.CharField(max_length=20, unique=True)
-    numero_telefono = models.CharField(max_length=20)
-    correoElectronico = models.EmailField(max_length=70)
+    numero_documento = models.CharField(max_length=15)
+    numero_telefonico = models.CharField(max_length=20)
+    correo_electronico = models.CharField(max_length=70)
     direccion = models.CharField(max_length=70)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.nombre} - {self.numero_documento}"
+        return self.nombre
 
     class Meta:
         verbose_name = "Cliente"
@@ -146,9 +145,10 @@ class Administrador(models.Model):
 
 class Marca(models.Model):
     """Modelo para marcas de productos"""
-    id_marca = models.AutoField(primary_key=True)
-    marca = models.CharField(max_length=25)
-    descripcion = models.CharField(max_length=255)
+    id = models.AutoField(primary_key=True)
+    color = models.CharField(max_length=25)
+    marca = models.CharField(max_length=40)
+    descripcion = models.CharField(max_length=80)
 
     def __str__(self):
         return self.marca
@@ -179,13 +179,13 @@ class Producto(models.Model):
 class Equipo(models.Model):
     """Modelo para equipos"""
     id_equipo = models.AutoField(primary_key=True)
-    modelo = models.CharField(max_length=20)
-    clave = models.CharField(max_length=25)
-    serie = models.CharField(max_length=30)
-    marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
+    modelo = models.CharField(max_length=35)
+    clave = models.CharField(max_length=35)
+    cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE)
+    marca = models.ForeignKey('Marca', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.modelo} - {self.serie}"
+        return f"{self.modelo} ({self.clave})"
 
     class Meta:
         verbose_name = "Equipo"
