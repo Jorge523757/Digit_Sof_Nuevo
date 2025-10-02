@@ -1,0 +1,159 @@
+{% load static %}
+<header>
+    <div class="container">
+        <div class="logo">
+            <h1><span>Digit</span>Soft</h1>
+            <p>{{ company_slogan|default:"Soluciones Tecnológicas" }}</p>
+        </div>
+        <nav>
+            <ul id="navMenu">
+                <li><a href="#" id="menuToggle"><i class="fas fa-bars"></i> Menú</a></li>
+                <li title="Inicio"><a href="{% url 'main:home' %}#inicio">Inicio</a></li>
+                <li title="Servicios"><a href="{% url 'main:home' %}#servicios">Servicios</a></li>
+                <li class="dropdown">
+                    <a href="{% url 'main:products' %}" class="dropbtn">
+                        <i class="fas fa-shopping-bag"></i> Productos
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-content">
+                        <a href="{% url 'main:products' %}">
+                            <i class="fas fa-th-large"></i> Ver Todos
+                        </a>
+                        <a href="{% url 'main:category_products' 'laptops' %}">
+                            <i class="fas fa-laptop"></i> Laptops
+                        </a>
+                        <a href="{% url 'main:category_products' 'escritorio' %}">
+                            <i class="fas fa-desktop"></i> Escritorio
+                        </a>
+                        <a href="{% url 'main:category_products' 'accesorios' %}">
+                            <i class="fas fa-keyboard"></i> Accesorios
+                        </a>
+                        <a href="{% url 'main:category_products' 'motos_electricas' %}">
+                            <i class="fas fa-motorcycle"></i> Motos Eléctricas
+                        </a>
+                        <a href="{% url 'main:category_products' 'scooters' %}">
+                            <i class="fas fa-bicycle"></i> Scooters
+                        </a>
+                    </div>
+                </li>
+                <li><a href="{% url 'main:home' %}#nosotros">Nosotros</a></li>
+                <li><a href="{% url 'main:home' %}#contacto">Contacto</a></li>
+                {% if user.is_authenticated %}
+                    <!-- Usuario autenticado -->
+                    <li class="user-menu">
+                        <a href="#" class="user-profile" id="userMenuToggle">
+                            {% if user.is_superuser %}
+                                <i class="fas fa-crown"></i>
+                                Super Admin
+                            {% elif user.profile and user.profile.role == 'administrador' %}
+                                <i class="fas fa-user-shield"></i>
+                                Administrador
+                            {% elif user.profile and user.profile.role == 'proveedor' %}
+                                <i class="fas fa-truck"></i>
+                                {{ user.first_name|default:user.username }}
+                            {% elif user.profile and user.profile.role == 'cliente' %}
+                                <i class="fas fa-user"></i>
+                                {{ user.first_name|default:user.username }}
+                            {% else %}
+                                <i class="fas fa-user-circle"></i>
+                                {{ user.first_name|default:user.username }}
+                            {% endif %}
+                            <i class="fas fa-chevron-down"></i>
+                        </a>
+                        <ul class="dropdown-menu" id="userDropdown">
+                            {% if user.is_superuser %}
+                                <li><a href="{% url 'main:admin_panel' %}" title="Acceder al panel de administración">
+                                    <i class="fas fa-tachometer-alt"></i> 
+                                    <span>Panel de Administración</span>
+                                </a></li>
+                                <li><div class="divider"></div></li>
+                            {% elif user.profile and user.profile.role == 'administrador' %}
+                                <li><a href="{% url 'main:admin_panel' %}" title="Acceder al panel de administración">
+                                    <i class="fas fa-tachometer-alt"></i> 
+                                    <span>Panel de Administración</span>
+                                </a></li>
+                                <li><div class="divider"></div></li>
+                            {% endif %}
+                            
+                            {% if user.profile and user.profile.role == 'proveedor' %}
+                                <li><a href="#" title="Gestionar mis productos">
+                                    <i class="fas fa-boxes"></i> 
+                                    <span>Mis Productos</span>
+                                </a></li>
+                                <li><a href="#" title="Ver mis ventas">
+                                    <i class="fas fa-chart-line"></i> 
+                                    <span>Mis Ventas</span>
+                                </a></li>
+                                <li><div class="divider"></div></li>
+                            {% endif %}
+                            <li><a href="{% url 'main:profile' %}" title="Ver mi perfil de usuario">
+                                <i class="fas fa-user"></i> 
+                                <span>Mi Perfil</span>
+                            </a></li>
+                            <li><a href="#" onclick="DigitSoftCart.toggleCart(); return false;" title="Ver carrito de compras">
+                                <i class="fas fa-shopping-cart"></i> 
+                                <span>Carrito</span>
+                                <span class="cart-count" id="cart-count" style="display: none;">0</span>
+                            </a></li>
+                            <li><a href="{% url 'main:history' %}" title="Ver historial de compras">
+                                <i class="fas fa-history"></i> 
+                                <span>Historial</span>
+                            </a></li>
+                            <li><div class="divider"></div></li>
+                            <li><a href="{% url 'main:logout' %}" title="Cerrar sesión actual">
+                                <i class="fas fa-sign-out-alt"></i> 
+                                <span>Cerrar Sesión</span>
+                            </a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <!-- Usuario no autenticado -->
+                    <li><a href="{% url 'main:login' %}" class="login-btn">Iniciar Sesión</a></li>
+                    <li><a href="{% url 'main:register' %}" class="register-btn">Registrarse</a></li>
+                {% endif %}
+            </ul>
+            <div class="menu-toggle" id="mobileMenu">
+                <i class="fas fa-bars"></i>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<!-- Modal de Inicio de Sesión -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="login-left">
+            <img src="{% static 'imagenes/logo.jpg' %}" alt="Logo Digit Soft">
+        </div>
+        <div class="login-right">
+            <h2>Iniciar Sesión</h2>
+            <form id="login-form">
+                {% csrf_token %}
+                <label for="username">Correo Electrónico</label>
+                <input type="email" id="username" required placeholder="ejemplo@correo.com">
+
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" required placeholder="Mínimo 8 caracteres">
+
+                <label>Tipo de Usuario</label>
+                <div class="role-selector">
+                    <label class="role-option" id="client-option">
+                        <input type="radio" name="role" value="client" checked>
+                        Cliente
+                    </label>
+                    <label class="role-option" id="admin-option">
+                        <input type="radio" name="role" value="admin">
+                        Administrador
+                    </label>
+                    <label class="role-option" id="tech-option">
+                        <input type="radio" name="role" value="technician">
+                        Técnico
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-login">Ingresar</button>
+            </form>
+        </div>
+    </div>
+</div>

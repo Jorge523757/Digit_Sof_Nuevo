@@ -1,0 +1,135 @@
+{% extends 'main/gestion/base_gestion.html' %}
+
+{% block header_icon %}<i class="fas fa-tools"></i>{% endblock %}
+
+{% block stats_section %}
+<div class="stats-cards">
+    <div class="stat-card">
+        <div class="stat-number">{{ total_tecnicos }}</div>
+        <div class="stat-label">Total Técnicos</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ tecnicos_data|length }}</div>
+        <div class="stat-label">Técnicos en esta página</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block table_icon %}<i class="fas fa-tools"></i>{% endblock %}
+{% block table_title %}Lista de Técnicos Especializados{% endblock %}
+
+{% block table_content %}
+{% if tecnicos_data %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Técnico</th>
+            <th>Documento</th>
+            <th>Contacto</th>
+            <th>Especialidad</th>
+            <th>Tipo</th>
+            <th>Órdenes</th>
+            <th>Servicios</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in tecnicos_data %}
+        <tr data-id="{{ item.tecnico.id_tecnico }}">
+            <td><strong>#{{ item.tecnico.id_tecnico }}</strong></td>
+            <td>
+                <strong>{{ item.tecnico.nombre_completo }}</strong>
+                <br>
+                <small class="text-muted">{{ item.tecnico.direccion }}</small>
+            </td>
+            <td>{{ item.tecnico.numero_documento }}</td>
+            <td>
+                <i class="fas fa-envelope"></i> {{ item.tecnico.correo }}
+            </td>
+            <td>
+                <span class="badge badge-info">{{ item.tecnico.especialidad }}</span>
+            </td>
+            <td>
+                <span class="badge {% if item.tecnico.tipo_tecnico == 'Senior' %}badge-success{% else %}badge-warning{% endif %}">
+                    {{ item.tecnico.tipo_tecnico }}
+                </span>
+            </td>
+            <td>
+                <span class="badge badge-primary">{{ item.ordenes_count }} órdenes</span>
+                <br>
+                <small class="text-muted">{{ item.ordenes_activas }} activas</small>
+                {% if item.ordenes %}
+                <div class="related-data">
+                    <strong>Órdenes recientes:</strong>
+                    {% for orden in item.ordenes %}
+                    <div class="related-item">
+                        <span>Orden #{{ orden.id_ordenServicio }}</span>
+                        <span class="badge {% if orden.estado == 'Pendiente' %}badge-warning{% else %}badge-success{% endif %}">
+                            {{ orden.estado }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </td>
+            <td>
+                <span class="badge badge-success">{{ item.servicios_count }} servicios</span>
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn-sm btn-primary" onclick="viewDetails('{{ item.tecnico.id_tecnico }}', 'tecnico')" title="Ver detalles">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-sm btn-warning" onclick="editRecord('{{ item.tecnico.id_tecnico }}', 'tecnico')" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-sm btn-danger" onclick="deleteRecord('{{ item.tecnico.id_tecnico }}', 'tecnico')" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn-sm btn-success" title="Asignar orden">
+                        <i class="fas fa-clipboard-list"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-tools"></i>
+    <h3>No hay técnicos registrados</h3>
+    <p>Registra técnicos para asignar órdenes de servicio.</p>
+    <button class="btn-sm btn-primary">
+        <i class="fas fa-plus"></i> Agregar Técnico
+    </button>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block pagination %}
+{% if tecnicos_data.has_other_pages %}
+<div class="pagination-container">
+    <ul class="pagination">
+        {% if tecnicos_data.has_previous %}
+            <li><a href="?page=1">&laquo; Primera</a></li>
+            <li><a href="?page={{ tecnicos_data.previous_page_number }}">Anterior</a></li>
+        {% endif %}
+        
+        {% for num in tecnicos_data.paginator.page_range %}
+            {% if tecnicos_data.number == num %}
+                <li class="current">{{ num }}</li>
+            {% elif num > tecnicos_data.number|add:'-3' and num < tecnicos_data.number|add:'3' %}
+                <li><a href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if tecnicos_data.has_next %}
+            <li><a href="?page={{ tecnicos_data.next_page_number }}">Siguiente</a></li>
+            <li><a href="?page={{ tecnicos_data.paginator.num_pages }}">Última &raquo;</a></li>
+        {% endif %}
+    </ul>
+</div>
+{% endif %}
+{% endblock %}

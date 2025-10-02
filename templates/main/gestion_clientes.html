@@ -1,0 +1,137 @@
+{% extends 'main/gestion/base_gestion.html' %}
+
+{% block header_icon %}<i class="fas fa-users"></i>{% endblock %}
+
+{% block stats_section %}
+<div class="stats-cards">
+    <div class="stat-card">
+        <div class="stat-number">{{ total_clientes }}</div>
+        <div class="stat-label">Total Clientes</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ clientes_data|length }}</div>
+        <div class="stat-label">Clientes en esta página</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block table_icon %}<i class="fas fa-users"></i>{% endblock %}
+{% block table_title %}Lista de Clientes con Datos Relacionados{% endblock %}
+
+{% block table_content %}
+{% if clientes_data %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Documento</th>
+            <th>Contacto</th>
+            <th>Órdenes</th>
+            <th>Ventas</th>
+            <th>Servicios</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in clientes_data %}
+        <tr data-id="{{ item.cliente.id_cliente }}">
+            <td><strong>#{{ item.cliente.id_cliente }}</strong></td>
+            <td>
+                <strong>{{ item.cliente.nombre }}</strong>
+                <br>
+                <small class="text-muted">{{ item.cliente.direccion }}</small>
+            </td>
+            <td>{{ item.cliente.numero_documento }}</td>
+            <td>
+                <i class="fas fa-phone"></i> {{ item.cliente.numero_telefono }}
+                <br>
+                <i class="fas fa-envelope"></i> {{ item.cliente.correoElectronico }}
+            </td>
+            <td>
+                <span class="badge badge-primary">{{ item.ordenes_count }} órdenes</span>
+                {% if item.ordenes %}
+                <div class="related-data">
+                    <strong>Últimas órdenes:</strong>
+                    {% for orden in item.ordenes %}
+                    <div class="related-item">
+                        <span>Orden #{{ orden.id_ordenServicio }}</span>
+                        <span class="badge {% if orden.estado == 'Pendiente' %}badge-warning{% else %}badge-success{% endif %}">
+                            {{ orden.estado }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </td>
+            <td>
+                <span class="badge badge-info">{{ item.ventas_count }} ventas</span>
+                {% if item.ventas %}
+                <div class="related-data">
+                    <strong>Últimas ventas:</strong>
+                    {% for venta in item.ventas %}
+                    <div class="related-item">
+                        <span>{{ venta.producto.nombreProducto }}</span>
+                        <span>${{ venta.valor_venta }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </td>
+            <td>
+                <span class="badge badge-success">{{ item.servicios_count }} servicios</span>
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn-sm btn-primary" onclick="viewDetails('{{ item.cliente.id_cliente }}', 'cliente')" title="Ver detalles">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-sm btn-warning" onclick="editRecord('{{ item.cliente.id_cliente }}', 'cliente')" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-sm btn-danger" onclick="deleteRecord('{{ item.cliente.id_cliente }}', 'cliente')" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-users"></i>
+    <h3>No hay clientes registrados</h3>
+    <p>Comienza agregando tu primer cliente al sistema.</p>
+    <button class="btn-sm btn-primary">
+        <i class="fas fa-plus"></i> Agregar Cliente
+    </button>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block pagination %}
+{% if clientes_data.has_other_pages %}
+<div class="pagination-container">
+    <ul class="pagination">
+        {% if clientes_data.has_previous %}
+            <li><a href="?page=1">&laquo; Primera</a></li>
+            <li><a href="?page={{ clientes_data.previous_page_number }}">Anterior</a></li>
+        {% endif %}
+        
+        {% for num in clientes_data.paginator.page_range %}
+            {% if clientes_data.number == num %}
+                <li class="current">{{ num }}</li>
+            {% elif num > clientes_data.number|add:'-3' and num < clientes_data.number|add:'3' %}
+                <li><a href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if clientes_data.has_next %}
+            <li><a href="?page={{ clientes_data.next_page_number }}">Siguiente</a></li>
+            <li><a href="?page={{ clientes_data.paginator.num_pages }}">Última &raquo;</a></li>
+        {% endif %}
+    </ul>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,116 @@
+/* Estilos del menú lateral */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100%;
+    background: #049cee;
+    color: rgb(240, 222, 222);
+    transition: left 0.3s;
+    z-index: 999;
+    overflow-y: auto;
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar-header {
+    padding: 20px;
+    background: #1a252f;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h3 {
+    color: white;
+    margin: 0;
+}
+
+.close-sidebar {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-menu li {
+    border-bottom: 1px solid #34495e;
+}
+
+.sidebar-menu li a {
+    display: block;
+    padding: 15px 20px;
+    color: #ecf0f1;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.sidebar-menu li a:hover {
+    background: #34495e;
+}
+
+.sidebar-menu li a i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.submenu {
+    list-style: none;
+    padding-left: 20px;
+    display: none;
+    background: #1a252f;
+}
+
+.submenu li a {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+}
+
+.menu-item.with-submenu::after {
+    content: '\f078';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    float: right;
+    transition: transform 0.3s;
+}
+
+.menu-item.with-submenu.open::after {
+    transform: rotate(180deg);
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    display: none;
+}
+
+.sidebar-overlay.open {
+    display: block;
+}
+
+/* Responsive para sidebar */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 80%;
+        left: -80%;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+}

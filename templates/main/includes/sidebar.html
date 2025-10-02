@@ -1,0 +1,109 @@
+{% load static %}
+<!-- Menú lateral -->
+<div class="sidebar-overlay"></div>
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h3>Menú de Gestión</h3>
+        <button class="close-sidebar">&times;</button>
+    </div>
+    <ul class="sidebar-menu">
+        <li class="administrador">
+            <a href="{% url 'main:admin_panel' %}">
+                <i class="fas fa-user-shield"></i> 
+                Panel de Administración
+            </a>
+        </li>
+
+        <li class="gestion-clientes">
+            <a href="{% url 'main:gestion_clientes' %}">
+                <i class="fas fa-users"></i> 
+                Gestión de Clientes
+            </a>
+        </li>
+
+        <li class="gestion-productos">
+            <a href="{% url 'main:gestion_productos' %}">
+                <i class="fas fa-box"></i> 
+                Gestión de Productos
+            </a>
+        </li>
+
+        <li class="gestion-equipos">
+            <a href="{% url 'main:gestion_equipos' %}">
+                <i class="fas fa-desktop"></i> 
+                Gestión de Equipos
+            </a>
+        </li>
+
+        <li class="gestion-proveedores">
+            <a href="{% url 'main:gestion_proveedores' %}">
+                <i class="fas fa-truck"></i> 
+                Gestión de Proveedores
+            </a>
+        </li>
+
+        <li class="gestion-compras">
+            <a href="{% url 'main:gestion_compras' %}">
+                <i class="fas fa-shopping-cart"></i> 
+                Gestión de Compras
+            </a>
+        </li>
+
+        <li class="gestion-ventas">
+            <a href="{% url 'main:gestion_ventas' %}">
+                <i class="fas fa-chart-line"></i> 
+                Gestión de Ventas
+            </a>
+        </li>
+
+        <li class="carrito">
+            <a href="{% url 'main:carrito' %}">
+                <i class="fas fa-shopping-basket"></i> 
+                Carrito de Compras
+                <span class="cart-counter-badge" id="sidebarCartCounter">0</span>
+            </a>
+        </li>
+
+        <li class="gestion-tecnicos">
+            <a href="{% url 'main:gestion_tecnicos' %}">
+                <i class="fas fa-tools"></i> 
+                Gestión de Técnicos
+            </a>
+        </li>
+
+        <li class="orden-servicio">
+            <a href="{% url 'main:orden_servicio' %}">
+                <i class="fas fa-clipboard-list"></i> 
+                Órdenes de Servicio
+            </a>
+        </li>
+
+        <li class="servicio-tecnico">
+            <a href="{% url 'main:servicio_tecnico' %}">
+                <i class="fas fa-wrench"></i> 
+                Servicio Técnico
+            </a>
+        </li>
+
+        <li class="gestion-equipos">
+            <a href="{% url 'main:gestion_equipos' %}">
+                <i class="fas fa-desktop"></i> 
+                Gestión de Equipos
+            </a>
+        </li>
+
+        <li class="gestion-garantias">
+            <a href="{% url 'main:gestion_garantias' %}">
+                <i class="fas fa-certificate"></i> 
+                Gestión de Garantías
+            </a>
+        </li>
+
+        <li class="facturacion">
+            <a href="{% url 'main:facturacion' %}">
+                <i class="fas fa-file-invoice-dollar"></i> 
+                Facturación
+            </a>
+        </li>
+    </ul>
+</div>

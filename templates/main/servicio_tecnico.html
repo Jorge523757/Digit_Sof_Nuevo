@@ -1,0 +1,121 @@
+{% extends 'main/gestion/base_gestion.html' %}
+
+{% block header_icon %}<i class="fas fa-wrench"></i>{% endblock %}
+
+{% block stats_section %}
+<div class="stats-cards">
+    <div class="stat-card">
+        <div class="stat-number">{{ total_servicios }}</div>
+        <div class="stat-label">Total Servicios</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ servicios|length }}</div>
+        <div class="stat-label">Servicios en esta página</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block table_icon %}<i class="fas fa-wrench"></i>{% endblock %}
+{% block table_title %}Servicios Técnicos Realizados{% endblock %}
+
+{% block table_content %}
+{% if servicios %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>ID Servicio</th>
+            <th>Cliente</th>
+            <th>Técnico Asignado</th>
+            <th>Orden de Servicio</th>
+            <th>Estado de Orden</th>
+            <th>Contacto Cliente</th>
+            <th>Especialidad</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for servicio in servicios %}
+        <tr>
+            <td><strong>#{{ servicio.id_servicio_tecnico }}</strong></td>
+            <td>
+                <strong>{{ servicio.cliente.nombre }}</strong>
+                <br>
+                <small class="text-muted">{{ servicio.cliente.numero_documento }}</small>
+            </td>
+            <td>
+                <strong>{{ servicio.tecnico.nombre_completo }}</strong>
+                <br>
+                <small class="text-muted">{{ servicio.tecnico.tipo_tecnico }}</small>
+            </td>
+            <td>
+                <strong>Orden #{{ servicio.orden_servicio.id_ordenServicio }}</strong>
+                <br>
+                <small class="text-muted">{{ servicio.orden_servicio.descripcion_orden|truncatechars:40 }}</small>
+            </td>
+            <td>
+                <span class="badge {% if servicio.orden_servicio.estado == 'Pendiente' %}badge-warning{% else %}badge-success{% endif %}">
+                    {{ servicio.orden_servicio.estado }}
+                </span>
+            </td>
+            <td>
+                <i class="fas fa-phone"></i> {{ servicio.cliente.numero_telefono }}
+                <br>
+                <i class="fas fa-envelope"></i> {{ servicio.cliente.correoElectronico }}
+            </td>
+            <td>
+                <span class="badge badge-info">{{ servicio.tecnico.especialidad }}</span>
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn-sm btn-primary" title="Ver detalles">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-sm btn-success" title="Completar servicio">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button class="btn-sm btn-warning" title="Actualizar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-wrench"></i>
+    <h3>No hay servicios técnicos registrados</h3>
+    <p>Los servicios técnicos aparecerán aquí.</p>
+    <button class="btn-sm btn-primary">
+        <i class="fas fa-plus"></i> Nuevo Servicio
+    </button>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block pagination %}
+{% if servicios.has_other_pages %}
+<div class="pagination-container">
+    <ul class="pagination">
+        {% if servicios.has_previous %}
+            <li><a href="?page=1">&laquo; Primera</a></li>
+            <li><a href="?page={{ servicios.previous_page_number }}">Anterior</a></li>
+        {% endif %}
+        
+        {% for num in servicios.paginator.page_range %}
+            {% if servicios.number == num %}
+                <li class="current">{{ num }}</li>
+            {% elif num > servicios.number|add:'-3' and num < servicios.number|add:'3' %}
+                <li><a href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if servicios.has_next %}
+            <li><a href="?page={{ servicios.next_page_number }}">Siguiente</a></li>
+            <li><a href="?page={{ servicios.paginator.num_pages }}">Última &raquo;</a></li>
+        {% endif %}
+    </ul>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.invoice-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.invoice-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.invoice-body {
+    padding: 2rem;
+}
+
+.invoice-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+}
+
+.invoice-table th,
+.invoice-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    text-align: left;
+}
+
+.invoice-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.invoice-total {
+    text-align: right;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+}
+
+.btn-download {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: bold;
+}
+
+.status-pending { background-color: #fff3cd; color: #856404; }
+.status-confirmed { background-color: #d1ecf1; color: #0c5460; }
+.status-delivered { background-color: #d4edda; color: #155724; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="invoice-container">
+        <!-- Header -->
+        <div class="invoice-header">
+            <h1><i class="fas fa-file-invoice me-2"></i>FACTURA</h1>
+            <p class="mb-0">Digit Soft - Soluciones Tecnológicas</p>
+        </div>
+
+        <!-- Body -->
+        <div class="invoice-body">
+            <!-- Información de la factura -->
+            <div class="invoice-info">
+                <div>
+                    <h4>Información de la Factura</h4>
+                    <p><strong>Número:</strong> {{ invoice.invoice_number }}</p>
+                    <p><strong>Fecha:</strong> {{ invoice.invoice_date|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Estado:</strong> 
+                        <span class="status-badge status-{{ invoice.order.status }}">
+                            {{ invoice.order.get_status_display }}
+                        </span>
+                    </p>
+                </div>
+                <div>
+                    <h4>Cliente</h4>
+                    <p><strong>{{ invoice.order.user.get_full_name }}</strong></p>
+                    <p>{{ invoice.order.user.email }}</p>
+                    {% if invoice.order.shipping_address %}
+                        <p><strong>Dirección de Envío:</strong><br>
+                        {{ invoice.order.shipping_address }}<br>
+                        {{ invoice.order.shipping_city }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Productos -->
+            <h4>Productos Facturados</h4>
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in invoice.order.items.all %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.product.name }}</strong>
+                            {% if item.product.brand %}
+                                <br><small class="text-muted">{{ item.product.brand }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ item.price|floatformat:0 }}</td>
+                        <td><strong>${{ item.total_price|floatformat:0 }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Totales -->
+            <div class="invoice-total">
+                <div class="row">
+                    <div class="col-md-6 ms-auto">
+                        {% if invoice.order.subtotal != invoice.order.total_amount %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span>${{ invoice.order.subtotal|floatformat:0 }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if invoice.order.shipping_cost > 0 %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Envío:</span>
+                            <span>${{ invoice.order.shipping_cost|floatformat:0 }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if invoice.order.tax_amount > 0 %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>IVA:</span>
+                            <span>${{ invoice.order.tax_amount|floatformat:0 }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <h4>TOTAL:</h4>
+                            <h4 class="text-success">${{ invoice.order.total_amount|floatformat:0 }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="text-center mt-4">
+                <a href="{% url 'main:invoice_pdf' invoice.pk %}" class="btn-download">
+                    <i class="fas fa-download"></i>
+                    Descargar Factura
+                </a>
+                <a href="{% url 'main:products' %}" class="btn btn-outline-primary ms-2">
+                    <i class="fas fa-shopping-bag me-1"></i>
+                    Seguir Comprando
+                </a>
+            </div>
+
+            {% if invoice.order.notes %}
+            <div class="mt-4 p-3 bg-light rounded">
+                <h5>Notas del Pedido</h5>
+                <p class="mb-0">{{ invoice.order.notes }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
