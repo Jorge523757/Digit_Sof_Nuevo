@@ -1,0 +1,303 @@
+
+    .alert {
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: none;
+        padding: 15px;
+    }
+
+    .alert-danger {
+        background-color: #fee;
+        color: #c33;
+    }
+
+    .back-link {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .back-link a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    .back-link a:hover {
+        text-decoration: underline;
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #ecf0f1;
+    }
+
+    .login-link a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body_content %}
+<div class="registro-container">
+    <div class="registro-card">
+        <div class="registro-header">
+            <div class="logo">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h2>Crear Cuenta</h2>
+            <p>Regístrate para acceder al sistema</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.first_name.id_for_label }}">
+                        <i class="fas fa-user"></i> {{ form.first_name.label }}
+                    </label>
+                    {{ form.first_name }}
+                    {{ form.first_name.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.last_name.id_for_label }}">
+                        <i class="fas fa-user"></i> {{ form.last_name.label }}
+                    </label>
+                    {{ form.last_name }}
+                    {{ form.last_name.errors }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.username.id_for_label }}">
+                    <i class="fas fa-at"></i> {{ form.username.label }}
+                </label>
+                {{ form.username }}
+                <small class="form-text">Elige un nombre de usuario único</small>
+                {{ form.username.errors }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.email.id_for_label }}">
+                    <i class="fas fa-envelope"></i> {{ form.email.label }}
+                </label>
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.documento.id_for_label }}">
+                        <i class="fas fa-id-card"></i> {{ form.documento.label }}
+                    </label>
+                    {{ form.documento }}
+                    {{ form.documento.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.telefono.id_for_label }}">
+                        <i class="fas fa-phone"></i> {{ form.telefono.label }}
+                    </label>
+                    {{ form.telefono }}
+                    {{ form.telefono.errors }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.direccion.id_for_label }}">
+                    <i class="fas fa-map-marker-alt"></i> {{ form.direccion.label }}
+                </label>
+                {{ form.direccion }}
+                {{ form.direccion.errors }}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.password1.id_for_label }}">
+                        <i class="fas fa-lock"></i> {{ form.password1.label }}
+                    </label>
+                    {{ form.password1 }}
+                    <small class="form-text">Mínimo 8 caracteres</small>
+                    {{ form.password1.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.password2.id_for_label }}">
+                        <i class="fas fa-lock"></i> {{ form.password2.label }}
+                    </label>
+                    {{ form.password2 }}
+                    {{ form.password2.errors }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-registro">
+                <i class="fas fa-user-plus"></i> Registrarme
+            </button>
+
+            <div class="login-link">
+                ¿Ya tienes cuenta?
+                <a href="{% url 'usuarios:login' %}">
+                    <i class="fas fa-sign-in-alt"></i> Inicia Sesión
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="back-link">
+        <a href="{% url 'core:home' %}">
+            <i class="fas fa-arrow-left"></i> Volver al inicio
+        </a>
+    </div>
+</div>
+{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}Registro de Cliente - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 0;
+    }
+
+    .registro-container {
+        width: 100%;
+        max-width: 600px;
+        padding: 20px;
+    }
+
+    .registro-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .registro-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .registro-header .logo {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 2rem;
+        color: white;
+    }
+
+    .registro-header h2 {
+        color: #2c3e50;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .registro-header p {
+        color: #7f8c8d;
+        margin: 0;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        color: #2c3e50;
+        font-weight: 500;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control {
+        border: 2px solid #ecf0f1;
+        border-radius: 10px;
+        padding: 12px 15px;
+        font-size: 1rem;
+        transition: all 0.3s;
+        width: 100%;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        outline: none;
+    }
+
+    .form-text {
+        color: #7f8c8d;
+        font-size: 0.875rem;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 5px 0 0 0;
+    }
+
+    .errorlist li {
+        color: #e74c3c;
+        font-size: 0.875rem;
+        margin-bottom: 3px;
+    }
+
+    .btn-registro {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s;
+        margin-top: 20px;
+        cursor: pointer;
+    }
+
+    .btn-registro:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+

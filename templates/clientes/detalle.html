@@ -1,0 +1,171 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Detalles del Cliente{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Encabezado -->
+            <div class="mb-4">
+                <a href="{% url 'clientes:lista' %}" class="btn btn-outline-secondary mb-3">
+                    <i class="fas fa-arrow-left"></i> Volver al listado
+                </a>
+                <h2>
+                    <i class="fas fa-user-circle"></i>
+                    Detalles del Cliente
+                </h2>
+                <p class="text-muted">Información completa del cliente</p>
+            </div>
+
+            <!-- Información del Cliente -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-id-card"></i> Información Personal
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">NOMBRES</label>
+                            <h5><i class="fas fa-user text-primary"></i> {{ cliente.nombres }}</h5>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">APELLIDOS</label>
+                            <h5><i class="fas fa-user text-primary"></i> {{ cliente.apellidos }}</h5>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">NÚMERO DE DOCUMENTO</label>
+                            <h5><i class="fas fa-id-card text-info"></i> {{ cliente.numero_documento }}</h5>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">ESTADO</label>
+                            <h5>
+                                {% if cliente.activo %}
+                                <span class="badge bg-success fs-6">
+                                    <i class="fas fa-check-circle"></i> Cliente Activo
+                                </span>
+                                {% else %}
+                                <span class="badge bg-secondary fs-6">
+                                    <i class="fas fa-ban"></i> Cliente Inactivo
+                                </span>
+                                {% endif %}
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de Contacto -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-address-book"></i> Información de Contacto
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">TELÉFONO</label>
+                            <h5>
+                                <i class="fas fa-phone text-success"></i>
+                                <a href="tel:{{ cliente.telefono }}" class="text-decoration-none">
+                                    {{ cliente.telefono }}
+                                </a>
+                            </h5>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">CORREO ELECTRÓNICO</label>
+                            <h5>
+                                <i class="fas fa-envelope text-info"></i>
+                                <a href="mailto:{{ cliente.correo }}" class="text-decoration-none">
+                                    {{ cliente.correo }}
+                                </a>
+                            </h5>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-muted small">DIRECCIÓN</label>
+                        <h5><i class="fas fa-map-marker-alt text-danger"></i> {{ cliente.direccion }}</h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de Sistema -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock"></i> Información del Sistema
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="text-muted small">FECHA DE REGISTRO</label>
+                            <p class="mb-0">
+                                <i class="fas fa-calendar-plus text-success"></i>
+                                {{ cliente.fecha_registro|date:"d/m/Y H:i:s" }}
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="text-muted small">ÚLTIMA ACTUALIZACIÓN</label>
+                            <p class="mb-0">
+                                <i class="fas fa-calendar-check text-warning"></i>
+                                {{ cliente.fecha_actualizacion|date:"d/m/Y H:i:s" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tools"></i> Acciones Disponibles
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{% url 'clientes:editar' cliente.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Editar Cliente
+                        </a>
+                        <a href="{% url 'clientes:eliminar' cliente.pk %}" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Eliminar Cliente
+                        </a>
+                        <a href="{% url 'clientes:lista' %}" class="btn btn-secondary">
+                            <i class="fas fa-list"></i> Ver Todos los Clientes
+                        </a>
+                        <a href="{% url 'clientes:crear' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Registrar Nuevo Cliente
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+    }
+
+    label.small {
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    h5 {
+        color: #2c3e50;
+    }
+</style>
+{% endblock %}
+

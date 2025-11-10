@@ -1,0 +1,260 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Garantía #{{ garantia.id }} - DIGT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-2">
+                        <i class="fas fa-shield-alt"></i> Garantía #{{ garantia.id }}
+                    </h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'garantias:lista' %}">Garantías</a></li>
+                            <li class="breadcrumb-item active">#{{ garantia.id }}</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div>
+                    <a href="{% url 'garantias:editar' garantia.pk %}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a href="{% url 'garantias:lista' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Información Principal -->
+        <div class="col-lg-8">
+            <!-- Información del Comprador -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-user"></i> Información del Comprador</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">Nombre</h6>
+                            <p class="h5">{{ garantia.nombre_comprador }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">Cédula</h6>
+                            <p class="h5">{{ garantia.cedula }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">Teléfono</h6>
+                            <p><i class="fas fa-phone"></i> {{ garantia.telefono }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">Correo Electrónico</h6>
+                            <p><i class="fas fa-envelope"></i> {{ garantia.correo_electronico }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información del Producto -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-box"></i> Información del Producto</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <h6 class="text-muted">Producto</h6>
+                            <p class="h5">{{ garantia.nombre_producto }}</p>
+                        </div>
+                        {% if garantia.numero_serie %}
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">Número de Serie</h6>
+                            <p>{{ garantia.numero_serie }}</p>
+                        </div>
+                        {% endif %}
+                        {% if garantia.modelo %}
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-muted">Modelo</h6>
+                            <p>{{ garantia.modelo }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de Compra -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-shopping-cart"></i> Información de Compra</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <h6 class="text-muted">Fecha de Compra</h6>
+                            <p>{{ garantia.fecha_compra|date:"d/m/Y" }}</p>
+                        </div>
+                        {% if garantia.factura_compra %}
+                        <div class="col-md-4 mb-3">
+                            <h6 class="text-muted">Factura</h6>
+                            <p>{{ garantia.factura_compra }}</p>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-4 mb-3">
+                            <h6 class="text-muted">Lugar de Compra</h6>
+                            <p>{{ garantia.lugar_compra }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reclamación -->
+            {% if garantia.motivo_reclamacion or garantia.descripcion_problema %}
+            <div class="card mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-circle"></i> Reclamación</h5>
+                </div>
+                <div class="card-body">
+                    {% if garantia.motivo_reclamacion %}
+                    <div class="mb-3">
+                        <h6 class="text-muted">Motivo</h6>
+                        <p>{{ garantia.motivo_reclamacion }}</p>
+                    </div>
+                    {% endif %}
+                    {% if garantia.descripcion_problema %}
+                    <div class="mb-3">
+                        <h6 class="text-muted">Descripción del Problema</h6>
+                        <p>{{ garantia.descripcion_problema }}</p>
+                    </div>
+                    {% endif %}
+                    {% if garantia.solucion %}
+                    <div class="mb-3">
+                        <h6 class="text-muted">Solución</h6>
+                        <p>{{ garantia.solucion }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Panel Derecho -->
+        <div class="col-lg-4">
+            <!-- Estado de la Garantía -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Estado</h5>
+                </div>
+                <div class="card-body text-center">
+                    <h3>
+                        {% if garantia.estado == 'ACTIVA' %}
+                            {% if garantia.esta_vigente %}
+                                <span class="badge bg-success">Activa</span>
+                            {% else %}
+                                <span class="badge bg-danger">Vencida</span>
+                            {% endif %}
+                        {% elif garantia.estado == 'EN_REVISION' %}
+                            <span class="badge bg-warning">En Revisión</span>
+                        {% elif garantia.estado == 'APROBADA' %}
+                            <span class="badge bg-info">Aprobada</span>
+                        {% elif garantia.estado == 'RECHAZADA' %}
+                            <span class="badge bg-danger">Rechazada</span>
+                        {% elif garantia.estado == 'FINALIZADA' %}
+                            <span class="badge bg-secondary">Finalizada</span>
+                        {% endif %}
+                    </h3>
+
+                    <div class="mt-4">
+                        {% if garantia.esta_vigente %}
+                        <div class="mb-3">
+                            <h2 class="{% if garantia.dias_restantes < 30 %}text-warning{% else %}text-success{% endif %}">
+                                {{ garantia.dias_restantes }}
+                            </h2>
+                            <p class="text-muted">Días restantes</p>
+                        </div>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar {% if garantia.porcentaje_usado > 80 %}bg-danger{% elif garantia.porcentaje_usado > 60 %}bg-warning{% else %}bg-success{% endif %}"
+                                 role="progressbar"
+                                 style="width: {{ garantia.porcentaje_usado }}%">
+                                {{ garantia.porcentaje_usado|floatformat:0 }}%
+                            </div>
+                        </div>
+                        <small class="text-muted">Tiempo usado de garantía</small>
+                        {% else %}
+                        <p class="text-danger">Garantía vencida</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fechas -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-calendar"></i> Fechas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Inicio:</span>
+                        <strong>{{ garantia.fecha_inicio|date:"d/m/Y" }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Vencimiento:</span>
+                        <strong>{{ garantia.fecha_vencimiento|date:"d/m/Y" }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Duración:</span>
+                        <strong>{{ garantia.meses_garantia }} meses</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seguimiento -->
+    {% if seguimientos %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Historial de Seguimiento</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        {% for seguimiento in seguimientos %}
+                        <div class="timeline-item mb-3">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <div class="timeline-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                        <i class="fas fa-circle-notch"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="mb-1">
+                                            {{ seguimiento.estado_anterior }} → {{ seguimiento.estado_nuevo }}
+                                        </h6>
+                                        <small class="text-muted">{{ seguimiento.fecha_seguimiento|date:"d/m/Y H:i" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ seguimiento.comentarios }}</p>
+                                    {% if seguimiento.usuario %}
+                                    <small class="text-muted">Por: {{ seguimiento.usuario }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

@@ -1,0 +1,249 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }} - DIGT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h2 mb-2">
+                        <i class="fas fa-box"></i> {{ titulo }}
+                    </h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'productos:lista' %}">Productos</a></li>
+                            <li class="breadcrumb-item active">{{ accion }}</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div>
+                    <a href="{% url 'productos:lista' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+
+            <!-- Formulario -->
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="form-producto">
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Error:</strong> Por favor corrige los errores a continuación.
+                        </div>
+                        {% endif %}
+
+                        <!-- Información Básica -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información Básica</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8 mb-3">
+                                        <label class="form-label">Nombre del Producto *</label>
+                                        {{ form.nombre_producto }}
+                                        {% if form.nombre_producto.errors %}
+                                            <div class="text-danger small">{{ form.nombre_producto.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Código SKU *</label>
+                                        {{ form.codigo_sku }}
+                                        {% if form.codigo_sku.errors %}
+                                            <div class="text-danger small">{{ form.codigo_sku.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">Categoría</label>
+                                        {{ form.categoria }}
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">Descripción *</label>
+                                        {{ form.descripcion }}
+                                        {% if form.descripcion.errors %}
+                                            <div class="text-danger small">{{ form.descripcion.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Especificaciones Técnicas -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="fas fa-microchip"></i> Especificaciones Técnicas</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Marca</label>
+                                        {{ form.marca }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Modelo</label>
+                                        {{ form.modelo_equipo }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Procesador</label>
+                                        {{ form.procesador }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Memoria RAM</label>
+                                        {{ form.memoria_ram }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Almacenamiento</label>
+                                        {{ form.memoria_rom }}
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">Especificaciones Adicionales</label>
+                                        {{ form.especificaciones }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Precios -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Precios</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Precio de Compra *</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            {{ form.precio_compra }}
+                                        </div>
+                                        {% if form.precio_compra.errors %}
+                                            <div class="text-danger small">{{ form.precio_compra.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Precio de Venta *</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            {{ form.precio_venta }}
+                                        </div>
+                                        {% if form.precio_venta.errors %}
+                                            <div class="text-danger small">{{ form.precio_venta.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Precio Mayorista</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            {{ form.precio_mayorista }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Inventario -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0"><i class="fas fa-warehouse"></i> Inventario</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Stock Actual *</label>
+                                        {{ form.stock_actual }}
+                                        {% if form.stock_actual.errors %}
+                                            <div class="text-danger small">{{ form.stock_actual.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Stock Mínimo *</label>
+                                        {{ form.stock_minimo }}
+                                        {% if form.stock_minimo.errors %}
+                                            <div class="text-danger small">{{ form.stock_minimo.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Stock Máximo *</label>
+                                        {{ form.stock_maximo }}
+                                        {% if form.stock_maximo.errors %}
+                                            <div class="text-danger small">{{ form.stock_maximo.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Imagen y Configuración -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0"><i class="fas fa-cog"></i> Configuración</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">Imagen del Producto</label>
+                                        {{ form.imagen }}
+                                        {% if producto.imagen %}
+                                            <div class="mt-2">
+                                                <img src="{{ producto.imagen.url }}" alt="Imagen actual" style="max-width: 200px;">
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="form-check">
+                                            {{ form.disponible_web }}
+                                            <label class="form-check-label">Disponible en Web</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="form-check">
+                                            {{ form.destacado }}
+                                            <label class="form-check-label">Producto Destacado</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="form-check">
+                                            {{ form.activo }}
+                                            <label class="form-check-label">Activo</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check">
+                                            {{ form.tiene_garantia }}
+                                            <label class="form-check-label">Tiene Garantía</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Meses de Garantía</label>
+                                        {{ form.meses_garantia }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'productos:lista' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> {{ accion }} Producto
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,82 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Eliminar Técnico - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/tecnicos.css' %}">
+<link rel="stylesheet" href="{% static 'css/theme-switcher.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="tecnicos-container">
+    <!-- Encabezado -->
+    <div class="tecnicos-header">
+        <div class="header-left">
+            <h1><i class="fas fa-exclamation-triangle"></i> Eliminar Técnico</h1>
+            <p class="text-muted">Confirme la eliminación del técnico</p>
+        </div>
+        <div class="header-right">
+            <a href="{% url 'tecnicos:lista' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <!-- Confirmación de Eliminación -->
+    <div class="delete-container">
+        <div class="delete-card">
+            <div class="delete-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+
+            <h2>¿Está seguro que desea eliminar este técnico?</h2>
+
+            <div class="delete-info">
+                <div class="info-row">
+                    <span class="info-label">Nombre Completo:</span>
+                    <span class="info-value">{{ tecnico.nombre_completo }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Documento:</span>
+                    <span class="info-value">{{ tecnico.numero_documento }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Teléfono:</span>
+                    <span class="info-value">{{ tecnico.telefono }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Correo:</span>
+                    <span class="info-value">{{ tecnico.correo }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Profesión:</span>
+                    <span class="info-value">{{ tecnico.profesion }}</span>
+                </div>
+            </div>
+
+            <div class="delete-warning">
+                <i class="fas fa-info-circle"></i>
+                <p><strong>Advertencia:</strong> Esta acción no se puede deshacer. Se eliminará permanentemente el técnico del sistema.</p>
+            </div>
+
+            <form method="post" class="delete-form">
+                {% csrf_token %}
+                <div class="delete-actions">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Sí, Eliminar Técnico
+                    </button>
+                    <a href="{% url 'tecnicos:lista' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> No, Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/theme-switcher.js' %}"></script>
+{% endblock %}
+

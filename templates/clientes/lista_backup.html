@@ -1,0 +1,367 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Gestión de Clientes{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2><i class="fas fa-users"></i> Gestión de Clientes</h2>
+                    <p class="text-muted">RF1-RF4: Registrar, Buscar, Modificar y Eliminar Clientes</p>
+                </div>
+                <a href="{% url 'clientes:crear' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Registrar Nuevo Cliente
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Búsqueda Dinámica -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="get" id="searchForm" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="searchQuery" class="form-label">
+                                <i class="fas fa-search"></i> Búsqueda General
+                            </label>
+                            <input type="text"
+                                   id="searchQuery"
+                                   name="q"
+                                   class="form-control"
+                                   placeholder="Nombres, apellidos, documento..."
+                                   value="{{ query }}"
+                                   autocomplete="off">
+                            <small class="text-muted">Busca en todos los campos</small>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="searchDocumento" class="form-label">
+                                <i class="fas fa-id-card"></i> Documento
+                            </label>
+                            <input type="text"
+                                   id="searchDocumento"
+                                   name="documento"
+                                   class="form-control"
+                                   placeholder="Número de documento"
+                                   value="{{ documento }}"
+                                   pattern="[0-9]*"
+                                   maxlength="20">
+                            <small class="text-muted">Solo números</small>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="searchEstado" class="form-label">
+                                <i class="fas fa-filter"></i> Estado
+                            </label>
+                            <select id="searchEstado" name="estado" class="form-select">
+                                <option value="">Todos</option>
+                                <option value="activo" {% if estado == 'activo' %}selected{% endif %}>Activos</option>
+                                <option value="inactivo" {% if estado == 'inactivo' %}selected{% endif %}>Inactivos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-primary flex-fill">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                            <button type="button" id="btnLimpiar" class="btn btn-secondary">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <div id="searchStatus" class="mt-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Clientes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list"></i> Listado de Clientes
+                        <span class="badge bg-light text-dark ms-2">{{ clientes.count }} registros</span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if clientes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombres y Apellidos</th>
+                                    <th>Nº Documento</th>
+                                    <th>Teléfono</th>
+                                    <th>Correo Electrónico</th>
+                                    <th>Dirección</th>
+                                    <th>Estado</th>
+                                    <th>Fecha Registro</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cliente in clientes %}
+                                <tr>
+                                    <td><strong>#{{ cliente.id }}</strong></td>
+                                    <td>
+                                        <i class="fas fa-user text-primary"></i>
+                                        {{ cliente.nombre_completo }}
+                                    </td>
+                                    <td>{{ cliente.numero_documento }}</td>
+                                    <td>
+                                        <i class="fas fa-phone text-success"></i>
+                                        {{ cliente.telefono }}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-envelope text-info"></i>
+                                        {{ cliente.correo }}
+                                    </td>
+                                    <td>{{ cliente.direccion|truncatewords:5 }}</td>
+                                    <td>
+                                        {% if cliente.activo %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle"></i> Activo
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-ban"></i> Inactivo
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ cliente.fecha_registro|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'clientes:detalle' cliente.pk %}"
+                                               class="btn btn-sm btn-info"
+                                               title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'clientes:editar' cliente.pk %}"
+                                               class="btn btn-sm btn-warning"
+                                               title="Editar cliente">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'clientes:eliminar' cliente.pk %}"
+                                               class="btn btn-sm btn-danger"
+                                               title="Eliminar cliente">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No se encontraron clientes</h5>
+                        {% if query %}
+                        <p>No hay resultados para "{{ query }}"</p>
+                        <a href="{% url 'clientes:lista' %}" class="btn btn-primary">Ver todos los clientes</a>
+                        {% else %}
+                        <p>Registra tu primer cliente para comenzar</p>
+                        <a href="{% url 'clientes:crear' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Registrar Cliente
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+    }
+
+    .table th {
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .loading-indicator {
+        display: none;
+        color: #0d6efd;
+    }
+
+    .loading-indicator.active {
+        display: inline-block;
+    }
+
+    .search-result-highlight {
+        background-color: #fff3cd;
+        animation: fadeIn 0.5s;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Referencias a elementos
+    const searchForm = document.getElementById('searchForm');
+    const searchQuery = document.getElementById('searchQuery');
+    const searchDocumento = document.getElementById('searchDocumento');
+    const searchEstado = document.getElementById('searchEstado');
+    const btnLimpiar = document.getElementById('btnLimpiar');
+    const searchStatus = document.getElementById('searchStatus');
+
+    // Búsqueda dinámica con debounce
+    let searchTimeout;
+    const searchInputs = [searchQuery, searchDocumento, searchEstado];
+
+    searchInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                if (this.value.length >= 2 || this.value.length === 0) {
+                    showSearchIndicator('Buscando...');
+                    searchForm.submit();
+                }
+            }, 500); // Espera 500ms después de que el usuario deja de escribir
+        });
+    });
+
+    // Validación de documento (solo números)
+    searchDocumento.addEventListener('input', function(e) {
+        // Remover cualquier caracter que no sea número
+        this.value = this.value.replace(/[^0-9]/g, '');
+
+        if (this.value && !/^[0-9]+$/.test(this.value)) {
+            this.classList.add('is-invalid');
+            showError(this, 'Solo se permiten números');
+        } else {
+            this.classList.remove('is-invalid');
+            removeError(this);
+        }
+    });
+
+    // Validación de longitud mínima para búsqueda general
+    searchQuery.addEventListener('input', function(e) {
+        if (this.value.length > 0 && this.value.length < 2) {
+            this.classList.add('is-invalid');
+            showError(this, 'Mínimo 2 caracteres');
+        } else {
+            this.classList.remove('is-invalid');
+            removeError(this);
+        }
+    });
+
+    // Limpiar búsqueda
+    btnLimpiar.addEventListener('click', function() {
+        searchQuery.value = '';
+        searchDocumento.value = '';
+        searchEstado.value = '';
+        searchQuery.classList.remove('is-invalid');
+        searchDocumento.classList.remove('is-invalid');
+        removeError(searchQuery);
+        removeError(searchDocumento);
+        searchStatus.innerHTML = '';
+        window.location.href = '{% url "clientes:lista" %}';
+    });
+
+    // Prevenir envío si hay errores
+    searchForm.addEventListener('submit', function(e) {
+        const invalidInputs = searchForm.querySelectorAll('.is-invalid');
+        if (invalidInputs.length > 0) {
+            e.preventDefault();
+            showSearchIndicator('Por favor, corrija los errores antes de buscar', 'danger');
+            return false;
+        }
+    });
+
+    // Funciones auxiliares
+    function showError(input, message) {
+        removeError(input);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'invalid-feedback d-block';
+        errorDiv.textContent = message;
+        input.parentNode.appendChild(errorDiv);
+    }
+
+    function removeError(input) {
+        const errorDiv = input.parentNode.querySelector('.invalid-feedback');
+        if (errorDiv) {
+            errorDiv.remove();
+        }
+    }
+
+    function showSearchIndicator(message, type = 'info') {
+        const alertClass = type === 'danger' ? 'alert-danger' : 'alert-info';
+        searchStatus.innerHTML = `
+            <div class="alert ${alertClass} alert-dismissible fade show py-2" role="alert">
+                <i class="fas fa-${type === 'danger' ? 'exclamation-triangle' : 'info-circle'}"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+    }
+
+    // Resaltar resultados de búsqueda
+    {% if query or documento %}
+    const tableRows = document.querySelectorAll('tbody tr');
+    tableRows.forEach(row => {
+        row.classList.add('search-result-highlight');
+        setTimeout(() => {
+            row.classList.remove('search-result-highlight');
+        }, 2000);
+    });
+    {% endif %}
+
+    // Atajos de teclado
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+F para enfocar búsqueda
+        if (e.ctrlKey && e.key === 'f') {
+            e.preventDefault();
+            searchQuery.focus();
+        }
+        // Escape para limpiar
+        if (e.key === 'Escape') {
+            btnLimpiar.click();
+        }
+    });
+
+    // Contador de caracteres en tiempo real
+    searchQuery.addEventListener('input', function() {
+        const charCount = this.value.length;
+        if (charCount > 0) {
+            const countBadge = document.createElement('small');
+            countBadge.className = 'text-muted ms-2';
+            countBadge.textContent = `(${charCount} caracteres)`;
+            // Actualizar o crear badge
+            const existingBadge = this.parentNode.querySelector('.char-count');
+            if (existingBadge) {
+                existingBadge.remove();
+            }
+            countBadge.classList.add('char-count');
+            this.parentNode.appendChild(countBadge);
+        }
+    });
+});
+</script>
+{% endblock %}
+

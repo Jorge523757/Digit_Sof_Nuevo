@@ -1,0 +1,388 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{% if accion == 'Registrar' %}Registrar Cliente{% else %}Editar Cliente{% endif %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/clientes-enhanced.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container clientes-container animate-fade-in">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Encabezado -->
+            <div class="mb-4 animate-slide-in">
+                <a href="{% url 'clientes:lista' %}" class="btn btn-secondary-enhanced btn-enhanced mb-3">
+                    <i class="fas fa-arrow-left"></i> Volver al listado
+                </a>
+                <div class="module-header">
+                    <h2>
+                        <i class="fas fa-{% if accion == 'Registrar' %}user-plus{% else %}user-edit{% endif %}"></i>
+                        {{ accion }} Cliente
+                    </h2>
+                    <p>
+                        {% if accion == 'Registrar' %}
+                        RF1: Complete los datos para registrar un nuevo cliente
+                        {% else %}
+                        RF3: Modifique los datos del cliente
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Formulario -->
+            <div class="card card-enhanced animate-slide-in">
+                <div class="card-header card-header-enhanced">
+                    <i class="fas fa-clipboard-list"></i> Datos del Cliente
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" novalidate id="clienteForm">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <!-- Nombres -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_nombres" class="form-label">
+                                    <i class="fas fa-user"></i> {{ form.nombres.label }}
+                                </label>
+                                {{ form.nombres }}
+                                {% if form.nombres.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.nombres.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Apellidos -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_apellidos" class="form-label">
+                                    <i class="fas fa-user"></i> {{ form.apellidos.label }}
+                                </label>
+                                {{ form.apellidos }}
+                                {% if form.apellidos.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.apellidos.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Número de Documento -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_numero_documento" class="form-label">
+                                    <i class="fas fa-id-card"></i> {{ form.numero_documento.label }}
+                                </label>
+                                {{ form.numero_documento }}
+                                {% if form.numero_documento.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.numero_documento.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Teléfono -->
+                            <div class="col-md-6 mb-3">
+                                <label for="id_telefono" class="form-label">
+                                    <i class="fas fa-phone"></i> {{ form.telefono.label }}
+                                </label>
+                                {{ form.telefono }}
+                                {% if form.telefono.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.telefono.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Correo Electrónico -->
+                        <div class="mb-3">
+                            <label for="id_correo" class="form-label">
+                                <i class="fas fa-envelope"></i> {{ form.correo.label }}
+                            </label>
+                            {{ form.correo }}
+                            {% if form.correo.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.correo.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Dirección -->
+                        <div class="mb-3">
+                            <label for="id_direccion" class="form-label">
+                                <i class="fas fa-map-marker-alt"></i> {{ form.direccion.label }}
+                            </label>
+                            {{ form.direccion }}
+                            {% if form.direccion.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.direccion.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Cliente Activo -->
+                        <div class="mb-4 form-check">
+                            {{ form.activo }}
+                            <label for="id_activo" class="form-check-label">
+                                <i class="fas fa-toggle-on"></i> {{ form.activo.label }}
+                            </label>
+                            {% if form.activo.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.activo.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Errores generales -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger-enhanced alert-enhanced">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <div>{{ form.non_field_errors }}</div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Botones -->
+                        <div class="d-flex gap-3 justify-content-end mt-4">
+                            <a href="{% url 'clientes:lista' %}" class="btn btn-secondary-enhanced btn-enhanced">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary-enhanced btn-enhanced">
+                                <i class="fas fa-save"></i> {{ accion }} Cliente
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="alert alert-info-enhanced alert-enhanced mt-4 animate-slide-in">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Información:</strong> Todos los campos marcados con (*) son obligatorios.
+                    Los datos serán validados automáticamente mientras escribes.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('clienteForm');
+    const nombresInput = document.getElementById('id_nombres');
+    const apellidosInput = document.getElementById('id_apellidos');
+    const documentoInput = document.getElementById('id_numero_documento');
+    const telefonoInput = document.getElementById('id_telefono');
+    const correoInput = document.getElementById('id_correo');
+    const direccionInput = document.getElementById('id_direccion');
+
+    // Agregar clases enhanced a los inputs
+    const inputs = form.querySelectorAll('input[type="text"], input[type="email"], textarea, select');
+    inputs.forEach(input => {
+        if (!input.classList.contains('form-check-input')) {
+            input.classList.add('form-control-enhanced');
+        }
+    });
+
+    // Validación de nombres y apellidos (solo letras y espacios)
+    function validateNombreApellido(input, fieldName) {
+        const value = input.value.trim();
+        const regex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/;
+
+        if (!value) {
+            showError(input, `${fieldName} es obligatorio`);
+            return false;
+        } else if (value.length < 2) {
+            showError(input, `${fieldName} debe tener al menos 2 caracteres`);
+            return false;
+        } else if (!regex.test(value)) {
+            showError(input, `${fieldName} solo puede contener letras y espacios`);
+            return false;
+        } else {
+            showSuccess(input, `${fieldName} válido ✓`);
+            return true;
+        }
+    }
+
+    // Validación de documento (solo números)
+    function validateDocumento(input) {
+        const value = input.value.trim();
+
+        if (!value) {
+            showError(input, 'Documento es obligatorio');
+            return false;
+        } else if (!/^\d+$/.test(value)) {
+            showError(input, 'El documento debe contener solo números');
+            return false;
+        } else if (value.length < 5 || value.length > 20) {
+            showError(input, 'El documento debe tener entre 5 y 20 dígitos');
+            return false;
+        } else {
+            showSuccess(input, 'Documento válido ✓');
+            return true;
+        }
+    }
+
+    // Validación de teléfono
+    function validateTelefono(input) {
+        const value = input.value.trim();
+        const numeros = value.replace(/[^\d]/g, '');
+
+        if (!value) {
+            showError(input, 'Teléfono es obligatorio');
+            return false;
+        } else if (numeros.length < 7) {
+            showError(input, 'El teléfono debe tener al menos 7 dígitos');
+            return false;
+        } else if (numeros.length > 15) {
+            showError(input, 'El teléfono no puede tener más de 15 dígitos');
+            return false;
+        } else {
+            showSuccess(input, 'Teléfono válido ✓');
+            return true;
+        }
+    }
+
+    // Validación de correo
+    function validateCorreo(input) {
+        const value = input.value.trim();
+        const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (!value) {
+            showError(input, 'Correo es obligatorio');
+            return false;
+        } else if (!regex.test(value)) {
+            showError(input, 'Ingrese un correo electrónico válido');
+            return false;
+        } else {
+            showSuccess(input, 'Correo válido ✓');
+            return true;
+        }
+    }
+
+    // Validación de dirección
+    function validateDireccion(input) {
+        const value = input.value.trim();
+
+        if (!value) {
+            showError(input, 'Dirección es obligatoria');
+            return false;
+        } else if (value.length < 10) {
+            showError(input, `Dirección muy corta (${value.length}/10 caracteres mínimos)`);
+            return false;
+        } else if (value.length > 300) {
+            showError(input, `Dirección muy larga (${value.length}/300 caracteres máximo)`);
+            return false;
+        } else {
+            showSuccess(input, 'Dirección válida ✓');
+            return true;
+        }
+    }
+
+    // Mostrar error
+    function showError(input, message) {
+        input.classList.remove('is-valid');
+        input.classList.add('is-invalid');
+
+        let errorDiv = input.parentNode.querySelector('.validation-message');
+        if (!errorDiv) {
+            errorDiv = document.createElement('div');
+            errorDiv.className = 'validation-message';
+            input.parentNode.appendChild(errorDiv);
+        }
+        errorDiv.className = 'validation-message text-danger small mt-1';
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+    }
+
+    // Mostrar éxito
+    function showSuccess(input, message) {
+        input.classList.remove('is-invalid');
+        input.classList.add('is-valid');
+
+        let successDiv = input.parentNode.querySelector('.validation-message');
+        if (successDiv) {
+            successDiv.remove();
+        }
+    }
+
+    // Event listeners para validación en tiempo real
+    if (nombresInput) {
+        nombresInput.addEventListener('input', function() {
+            validateNombreApellido(this, 'Nombres');
+        });
+        nombresInput.addEventListener('blur', function() {
+            this.value = this.value.trim().split(' ').map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            ).join(' ');
+            validateNombreApellido(this, 'Nombres');
+        });
+    }
+
+    if (apellidosInput) {
+        apellidosInput.addEventListener('input', function() {
+            validateNombreApellido(this, 'Apellidos');
+        });
+        apellidosInput.addEventListener('blur', function() {
+            this.value = this.value.trim().split(' ').map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            ).join(' ');
+            validateNombreApellido(this, 'Apellidos');
+        });
+    }
+
+    if (documentoInput) {
+        documentoInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^\d]/g, '');
+            validateDocumento(this);
+        });
+    }
+
+    if (telefonoInput) {
+        telefonoInput.addEventListener('input', function() {
+            validateTelefono(this);
+        });
+    }
+
+    if (correoInput) {
+        correoInput.addEventListener('input', function() {
+            validateCorreo(this);
+        });
+        correoInput.addEventListener('blur', function() {
+            this.value = this.value.trim().toLowerCase();
+            validateCorreo(this);
+        });
+    }
+
+    if (direccionInput) {
+        direccionInput.addEventListener('input', function() {
+            validateDireccion(this);
+        });
+    }
+
+    // Validación al enviar el formulario
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+
+        if (nombresInput) isValid = validateNombreApellido(nombresInput, 'Nombres') && isValid;
+        if (apellidosInput) isValid = validateNombreApellido(apellidosInput, 'Apellidos') && isValid;
+        if (documentoInput) isValid = validateDocumento(documentoInput) && isValid;
+        if (telefonoInput) isValid = validateTelefono(telefonoInput) && isValid;
+        if (correoInput) isValid = validateCorreo(correoInput) && isValid;
+        if (direccionInput) isValid = validateDireccion(direccionInput) && isValid;
+
+        if (!isValid) {
+            e.preventDefault();
+            alert('Por favor, corrija los errores en el formulario antes de continuar.');
+            const firstError = form.querySelector('.is-invalid');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError.focus();
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+

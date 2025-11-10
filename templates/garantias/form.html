@@ -1,0 +1,175 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}{{ titulo }} - DIGT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-shield-alt"></i> {{ titulo }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="form-garantia">
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Error:</strong> Por favor corrige los errores a continuación.
+                        </div>
+                        {% endif %}
+
+                        <!-- Información del Comprador -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="mb-0"><i class="fas fa-user"></i> Información del Comprador</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Nombre Completo *</label>
+                                        {{ form.nombre_comprador }}
+                                        {% if form.nombre_comprador.errors %}
+                                            <div class="text-danger small">{{ form.nombre_comprador.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Cédula *</label>
+                                        {{ form.cedula }}
+                                        {% if form.cedula.errors %}
+                                            <div class="text-danger small">{{ form.cedula.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Teléfono *</label>
+                                        {{ form.telefono }}
+                                        {% if form.telefono.errors %}
+                                            <div class="text-danger small">{{ form.telefono.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Correo Electrónico *</label>
+                                        {{ form.correo_electronico }}
+                                        {% if form.correo_electronico.errors %}
+                                            <div class="text-danger small">{{ form.correo_electronico.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información del Producto -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0"><i class="fas fa-box"></i> Información del Producto</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Producto *</label>
+                                        {{ form.producto }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Nombre del Producto *</label>
+                                        {{ form.nombre_producto }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Número de Serie</label>
+                                        {{ form.numero_serie }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Modelo</label>
+                                        {{ form.modelo }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información de Compra -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-warning text-dark">
+                                <h6 class="mb-0"><i class="fas fa-shopping-cart"></i> Información de Compra</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Fecha de Compra *</label>
+                                        {{ form.fecha_compra }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Número de Factura</label>
+                                        {{ form.factura_compra }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Lugar de Compra *</label>
+                                        {{ form.lugar_compra }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detalles de la Garantía -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0"><i class="fas fa-shield-alt"></i> Detalles de la Garantía</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Fecha de Inicio *</label>
+                                        {{ form.fecha_inicio }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Fecha de Vencimiento *</label>
+                                        {{ form.fecha_vencimiento }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Meses de Garantía *</label>
+                                        {{ form.meses_garantia }}
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">Estado</label>
+                                        {{ form.estado }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reclamación (Opcional) -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-danger text-white">
+                                <h6 class="mb-0"><i class="fas fa-exclamation-circle"></i> Reclamación (Opcional)</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">Motivo de Reclamación</label>
+                                        {{ form.motivo_reclamacion }}
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">Descripción del Problema</label>
+                                        {{ form.descripcion_problema }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'garantias:lista' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> {{ accion }} Garantía
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

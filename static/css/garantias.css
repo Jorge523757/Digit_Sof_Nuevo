@@ -1,0 +1,164 @@
+/* ========================================
+   DIGT SOFT - Estilos del Módulo de Garantías
+   Tema Claro/Oscuro con transiciones suaves
+   ======================================== */
+
+/* Variables heredadas de productos.css */
+:root {
+    --card-bg: #ffffff;
+    --card-shadow: rgba(0, 0, 0, 0.1);
+    --text-primary: #2c3e50;
+    --text-secondary: #6c757d;
+    --border-color: #dee2e6;
+    --hover-bg: #f8f9fa;
+}
+
+[data-theme="dark"] {
+    --card-bg: #16213e;
+    --card-shadow: rgba(0, 0, 0, 0.3);
+    --text-primary: #eaeaea;
+    --text-secondary: #b0b0b0;
+    --border-color: #2d3748;
+    --hover-bg: #1a2332;
+}
+
+/* Tabla de garantías */
+.table {
+    color: var(--text-primary);
+}
+
+.table-hover tbody tr:hover {
+    background: var(--hover-bg);
+}
+
+.table thead th {
+    background: var(--hover-bg);
+    border-bottom: 2px solid var(--border-color);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.table td, .table th {
+    border-color: var(--border-color);
+    padding: 12px;
+    vertical-align: middle;
+}
+
+/* Timeline de seguimiento */
+.timeline {
+    position: relative;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 0;
+}
+
+.timeline-icon {
+    position: relative;
+    z-index: 2;
+}
+
+.timeline-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 40px;
+    bottom: -20px;
+    width: 2px;
+    background: var(--border-color);
+}
+
+/* Badges personalizados */
+.badge {
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+/* Progress bar de garantía */
+.progress {
+    background: var(--hover-bg);
+    border-radius: 10px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+
+/* Estados de garantía con colores */
+.badge.bg-activa {
+    background-color: #28a745 !important;
+}
+
+.badge.bg-en_revision {
+    background-color: #ffc107 !important;
+}
+
+.badge.bg-aprobada {
+    background-color: #17a2b8 !important;
+}
+
+.badge.bg-rechazada, .badge.bg-vencida {
+    background-color: #dc3545 !important;
+}
+
+.badge.bg-finalizada {
+    background-color: #6c757d !important;
+}
+
+/* Cards de información */
+.card-header h5, .card-header h6 {
+    margin: 0;
+    font-weight: 600;
+}
+
+/* Botones de acción */
+.btn-group-sm .btn {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+/* Responsive para tabla */
+@media (max-width: 768px) {
+    .table-responsive {
+        border: none;
+    }
+
+    .table {
+        font-size: 14px;
+    }
+
+    .table td, .table th {
+        padding: 8px;
+    }
+
+    .btn-group-sm .btn {
+        padding: 3px 6px;
+        font-size: 11px;
+    }
+}
+
+/* Animaciones */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.timeline-item {
+    animation: slideIn 0.5s ease-out;
+}
+
+/* Transiciones suaves */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+

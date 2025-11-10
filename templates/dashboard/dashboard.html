@@ -1,0 +1,122 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard-content.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Welcome Banner -->
+<div class="welcome-banner">
+    <h2>¡Bienvenido, {{ user.get_full_name|default:user.username }}!</h2>
+    <p>Aquí está el resumen de tu sistema. Puedes acceder a todas las funcionalidades desde el menú lateral.</p>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-row">
+    <div class="stat-card primary">
+        <div class="stat-icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-number">{{ total_clientes|default:0 }}</div>
+        <div class="stat-label">Total Clientes</div>
+        <div class="stat-trend up">
+            <i class="fas fa-arrow-up"></i> Activos
+        </div>
+    </div>
+
+    <div class="stat-card warning">
+        <div class="stat-icon">
+            <i class="fas fa-clipboard-list"></i>
+        </div>
+        <div class="stat-number">{{ ordenes_pendientes|default:0 }}</div>
+        <div class="stat-label">Órdenes Pendientes</div>
+        <div class="stat-trend">
+            <i class="fas fa-clock"></i> En proceso
+        </div>
+    </div>
+
+    <div class="stat-card success">
+        <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-number">{{ ordenes_hoy|default:0 }}</div>
+        <div class="stat-label">Órdenes Hoy</div>
+        <div class="stat-trend up">
+            <i class="fas fa-arrow-up"></i> Nuevas
+        </div>
+    </div>
+
+    <div class="stat-card danger">
+        <div class="stat-icon">
+            <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stat-number">${{ ingresos_mes|default:0|floatformat:2 }}</div>
+        <div class="stat-label">Ingresos del Mes</div>
+        <div class="stat-trend up">
+            <i class="fas fa-arrow-up"></i> +12%
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="content-card">
+    <h5>
+        <i class="fas fa-bolt"></i> Acciones Rápidas
+    </h5>
+    <div class="quick-actions">
+        <a href="{% url 'clientes:crear' %}" class="quick-action">
+            <i class="fas fa-user-plus"></i>
+            <span>Nuevo Cliente</span>
+        </a>
+        <a href="{% url 'ordenes:crear' %}" class="quick-action">
+            <i class="fas fa-plus-circle"></i>
+            <span>Nueva Orden</span>
+        </a>
+        <a href="{% url 'productos:crear' %}" class="quick-action">
+            <i class="fas fa-box"></i>
+            <span>Nuevo Producto</span>
+        </a>
+        <a href="{% url 'facturacion:crear' %}" class="quick-action">
+            <i class="fas fa-file-invoice"></i>
+            <span>Nueva Factura</span>
+        </a>
+    </div>
+</div>
+
+<!-- Activity & Tasks -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="content-card">
+            <h5>
+                <i class="fas fa-chart-line"></i> Actividad Reciente
+            </h5>
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Sistema Activo</strong>
+                    <p class="mb-0">Aquí se mostrarán las actividades más recientes del sistema.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="content-card">
+            <h5>
+                <i class="fas fa-tasks"></i> Tareas Pendientes
+            </h5>
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>Sin tareas</strong>
+                    <p class="mb-0">No hay tareas pendientes por el momento.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
