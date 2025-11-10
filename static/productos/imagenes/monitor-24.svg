@@ -1,0 +1,39 @@
+<!-- Placeholder para imagen de Monitor 24" -->
+<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="monitorGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2c3e50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#27ae60;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Monitor stand base -->
+  <ellipse cx="150" cy="180" rx="60" ry="8" fill="#34495e"/>
+  
+  <!-- Monitor stand -->
+  <rect x="145" y="140" width="10" height="40" fill="#34495e"/>
+  
+  <!-- Monitor frame -->
+  <rect x="40" y="30" width="220" height="140" fill="url(#monitorGradient)" rx="8"/>
+  
+  <!-- Monitor screen -->
+  <rect x="50" y="40" width="200" height="120" fill="#000" rx="4"/>
+  
+  <!-- Screen content -->
+  <rect x="60" y="50" width="180" height="25" fill="#3498db"/>
+  <text x="150" y="68" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">DIGIT SOFT</text>
+  
+  <!-- Desktop icons -->
+  <rect x="70" y="80" width="15" height="15" fill="#e74c3c" rx="2"/>
+  <rect x="90" y="80" width="15" height="15" fill="#f39c12" rx="2"/>
+  <rect x="110" y="80" width="15" height="15" fill="#2ecc71" rx="2"/>
+  
+  <!-- Taskbar -->
+  <rect x="60" y="140" width="180" height="15" fill="#34495e"/>
+  
+  <!-- Power button -->
+  <circle cx="230" cy="160" r="4" fill="#27ae60"/>
+  
+  <!-- Size indicator -->
+  <text x="150" y="195" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#27ae60" text-anchor="middle">24" FULL HD</text>
+</svg>

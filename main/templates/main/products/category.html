@@ -1,0 +1,241 @@
+{% extends 'main/products/catalog.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header de la categoría -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'main:home' %}">Inicio</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'main:products' %}">Productos</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {{ current_category.name }}
+                    </li>
+                </ol>
+            </nav>
+            
+            <div class="text-center">
+                <h1 class="mb-2">
+                    <i class="fas fa-{{ current_category.icon|default:'laptop' }} text-primary me-3"></i>
+                    {{ current_category.name }}
+                </h1>
+                <p class="text-muted">{{ current_category.description|default:"Explora nuestra selección de productos" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navegación por categorías -->
+    <div class="category-nav">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg">
+                <div class="navbar-nav flex-wrap justify-content-center w-100">
+                    <a class="nav-link" href="{% url 'main:products' %}">
+                        <i class="fas fa-th-large me-1"></i> Todos
+                    </a>
+                    {% for category in categories %}
+                    <a class="nav-link {% if current_category.slug == category.slug %}active{% endif %}" 
+                       href="{% url 'main:category_products' category.slug %}">
+                        <i class="fas fa-{{ category.icon|default:'laptop' }} me-1"></i> 
+                        {{ category.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Sección de búsqueda -->
+    <div class="search-section">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-8">
+                <label for="search" class="form-label">Buscar en {{ current_category.name }}</label>
+                <input type="text" class="form-control" id="search" name="search" 
+                       value="{{ search_query }}" placeholder="Buscar productos...">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search me-2"></i>Buscar
+                </button>
+            </div>
+        </form>
+        
+        {% if search_query %}
+        <div class="mt-2">
+            <small class="text-muted">
+                Mostrando resultados para "<strong>{{ search_query }}</strong>" en {{ current_category.name }}
+            </small>
+            <a href="{% url 'main:category_products' current_category.slug %}" class="btn btn-sm btn-outline-secondary ms-2">
+                <i class="fas fa-times me-1"></i>Limpiar
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Productos -->
+    {% if products %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <p class="text-muted">
+                <i class="fas fa-cube me-1"></i>
+                Mostrando {{ products|length }} de {{ products.paginator.count }} productos
+                {% if search_query %}
+                    que coinciden con "{{ search_query }}"
+                {% endif %}
+            </p>
+        </div>
+    </div>
+    
+    <div class="row">
+        {% for product in products %}
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="card product-card h-100">
+                <div class="product-image">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid">
+                    {% else %}
+                        <i class="fas fa-image placeholder-icon"></i>
+                    {% endif %}
+                    {% if product.discount_percentage %}
+                        <div class="product-badge">-{{ product.discount_percentage }}%</div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-muted small">{{ product.description|truncatewords:15 }}</p>
+                    
+                    {% if product.specifications %}
+                    <div class="mb-2">
+                        <small class="text-muted">
+                            <i class="fas fa-cog me-1"></i>
+                            {{ product.specifications|truncatewords:10 }}
+                        </small>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mt-auto">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div>
+                                {% if product.discount_percentage %}
+                                    <span class="product-old-price">${{ product.original_price|floatformat:0 }}</span>
+                                {% endif %}
+                                <div class="product-price">${{ product.price|floatformat:0 }}</div>
+                            </div>
+                            <small class="text-muted">Stock: {{ product.stock }}</small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-add-cart" 
+                                    onclick="addToCart({{ product.id }})"
+                                    {% if product.stock <= 0 %}disabled{% endif %}>
+                                <i class="fas fa-shopping-cart me-2"></i>
+                                {% if product.stock > 0 %}
+                                    Añadir al Carrito
+                                {% else %}
+                                    Sin Stock
+                                {% endif %}
+                            </button>
+                            <a href="{% url 'main:product_detail' product.id %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-eye me-1"></i>Ver Detalles
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    {% if products.has_other_pages %}
+    <nav aria-label="Navegación de productos">
+        <ul class="pagination">
+            {% if products.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ products.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for page_num in products.paginator.page_range %}
+                {% if page_num == products.number %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_num }}</span>
+                    </li>
+                {% elif page_num > products.number|add:'-3' and page_num < products.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ page_num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if products.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ products.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ products.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- Sin productos -->
+    <div class="text-center py-5">
+        <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+        <h3 class="text-muted">No hay productos disponibles</h3>
+        <p class="text-muted">
+            {% if search_query %}
+                No se encontraron productos que coincidan con "{{ search_query }}" en {{ current_category.name }}
+            {% else %}
+                Aún no tenemos productos en la categoría {{ current_category.name }}
+            {% endif %}
+        </p>
+        <div class="d-flex justify-content-center gap-2">
+            {% if search_query %}
+            <a href="{% url 'main:category_products' current_category.slug %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Ver todos en {{ current_category.name }}
+            </a>
+            {% endif %}
+            <a href="{% url 'main:products' %}" class="btn btn-primary">
+                <i class="fas fa-th-large me-2"></i>Ver Todas las Categorías
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Toast para notificaciones -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="cartToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i class="fas fa-shopping-cart text-success me-2"></i>
+            <strong class="me-auto">Carrito</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+</div>
+{% endblock %}
