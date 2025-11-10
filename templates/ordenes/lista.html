@@ -1,0 +1,425 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Órdenes de Servicio - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ordenes-header {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 15px;
+        padding: 30px;
+        color: white;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3);
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 15px;
+        transition: all 0.3s;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+
+    .icon-wrapper {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .search-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        margin-bottom: 25px;
+    }
+
+    .table-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .table-modern {
+        margin: 0;
+    }
+
+    .table-modern thead {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+
+    .table-modern thead th {
+        border: none;
+        padding: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table-modern tbody tr {
+        transition: all 0.3s;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .table-modern tbody tr:hover {
+        background-color: #fff5f7;
+        transform: scale(1.01);
+    }
+
+    .table-modern tbody td {
+        padding: 15px;
+        vertical-align: middle;
+    }
+
+    .orden-numero {
+        font-weight: 700;
+        color: #f5576c;
+        font-size: 1.1rem;
+    }
+
+    .cliente-info {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 3px;
+    }
+
+    .equipo-info {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+    }
+
+    .badge-custom {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .estado-pendiente {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .estado-proceso {
+        background-color: #cfe2ff;
+        color: #084298;
+    }
+
+    .estado-reparada {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .estado-entregada {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .prioridad-alta {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .btn-action {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 2px;
+        transition: all 0.3s;
+        border: none;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 10px 15px;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #f093fb;
+        box-shadow: 0 0 0 0.2rem rgba(240, 147, 251, 0.25);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 10px 25px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(240, 147, 251, 0.3);
+    }
+
+    .fecha-info {
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header Moderno -->
+    <div class="ordenes-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-2">
+                    <i class="fas fa-wrench"></i> Gestión de Órdenes de Servicio
+                </h1>
+                <p class="mb-0 opacity-75">Administra las órdenes de servicio técnico</p>
+            </div>
+            <div>
+                <a href="{% url 'ordenes:crear' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus"></i> Nueva Orden
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Órdenes</h6>
+                            <h2 class="mb-0">{{ ordenes|length }}</h2>
+                        </div>
+                        <div class="icon-wrapper" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Pendientes</h6>
+                            <h2 class="mb-0 text-warning">0</h2>
+                        </div>
+                        <div class="icon-wrapper bg-warning">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">En Proceso</h6>
+                            <h2 class="mb-0 text-info">0</h2>
+                        </div>
+                        <div class="icon-wrapper bg-info">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Completadas</h6>
+                            <h2 class="mb-0 text-success">0</h2>
+                        </div>
+                        <div class="icon-wrapper bg-success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros de Búsqueda -->
+    <div class="card search-card">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label"><i class="fas fa-search"></i> Búsqueda</label>
+                    <input type="text" name="q" class="form-control"
+                           placeholder="Número orden, cliente, equipo..." value="{{ query }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><i class="fas fa-list"></i> Estado</label>
+                    <select name="estado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="PENDIENTE">Pendiente</option>
+                        <option value="EN_PROCESO">En Proceso</option>
+                        <option value="DIAGNOSTICADA">Diagnosticada</option>
+                        <option value="REPARADA">Reparada</option>
+                        <option value="ENTREGADA">Entregada</option>
+                        <option value="CANCELADA">Cancelada</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label"><i class="fas fa-flag"></i> Prioridad</label>
+                    <select name="prioridad" class="form-select">
+                        <option value="">Todas</option>
+                        <option value="BAJA">Baja</option>
+                        <option value="MEDIA">Media</option>
+                        <option value="ALTA">Alta</option>
+                        <option value="URGENTE">Urgente</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de Órdenes -->
+    <div class="card table-card">
+        <div class="table-responsive">
+            <table class="table table-modern table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th width="100">Nº Orden</th>
+                        <th>Cliente</th>
+                        <th>Equipo</th>
+                        <th>Técnico</th>
+                        <th width="120">Fecha Ingreso</th>
+                        <th width="120" class="text-center">Estado</th>
+                        <th width="150" class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for orden in ordenes %}
+                    <tr>
+                        <td>
+                            <div class="orden-numero">{{ orden.numero_orden }}</div>
+                        </td>
+                        <td>
+                            <div class="cliente-info">{{ orden.cliente.nombre_completo }}</div>
+                            <div class="equipo-info">
+                                <i class="fas fa-phone"></i> {{ orden.cliente.telefono }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="cliente-info">{{ orden.tipo_equipo }}</div>
+                            <div class="equipo-info">
+                                {{ orden.marca }} {{ orden.modelo }}
+                            </div>
+                        </td>
+                        <td>
+                            {% if orden.tecnico_asignado %}
+                                <span class="badge badge-custom bg-primary text-white">
+                                    {{ orden.tecnico_asignado.nombre_completo }}
+                                </span>
+                            {% else %}
+                                <span class="text-muted">Sin asignar</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="fecha-info">
+                                <i class="fas fa-calendar"></i> {{ orden.fecha_ingreso|date:"d/m/Y" }}
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            {% if orden.estado == 'PENDIENTE' %}
+                                <span class="badge badge-custom estado-pendiente">
+                                    <i class="fas fa-clock"></i> Pendiente
+                                </span>
+                            {% elif orden.estado == 'EN_PROCESO' %}
+                                <span class="badge badge-custom estado-proceso">
+                                    <i class="fas fa-tools"></i> En Proceso
+                                </span>
+                            {% elif orden.estado == 'REPARADA' %}
+                                <span class="badge badge-custom estado-reparada">
+                                    <i class="fas fa-check"></i> Reparada
+                                </span>
+                            {% elif orden.estado == 'ENTREGADA' %}
+                                <span class="badge badge-custom estado-entregada">
+                                    <i class="fas fa-handshake"></i> Entregada
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'ordenes:detalle' orden.pk %}"
+                               class="btn btn-info btn-action"
+                               title="Ver detalle"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'ordenes:editar' orden.pk %}"
+                               class="btn btn-warning btn-action"
+                               title="Editar"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'ordenes:eliminar' orden.pk %}"
+                               class="btn btn-danger btn-action"
+                               title="Eliminar"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fas fa-clipboard-list fa-3x mb-3 d-block"></i>
+                                <h5>No se encontraron órdenes de servicio</h5>
+                                <p>No hay órdenes registradas con los criterios de búsqueda.</p>
+                                <a href="{% url 'ordenes:crear' %}" class="btn btn-primary mt-2">
+                                    <i class="fas fa-plus"></i> Crear Primera Orden
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+</script>
+{% endblock %}
+

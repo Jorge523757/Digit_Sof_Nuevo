@@ -1,0 +1,132 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Detalle de Factura - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .factura-header {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        border-radius: 15px;
+        padding: 30px;
+        color: white;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(250, 112, 154, 0.3);
+    }
+
+    .info-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        font-size: 1.1rem;
+        color: #2c3e50;
+    }
+
+    .btn-action {
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="factura-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-2">
+                    <i class="fas fa-file-invoice-dollar"></i> Detalle de Factura
+                </h1>
+                <p class="mb-0 opacity-75">Información completa de la factura</p>
+            </div>
+            <div>
+                <a href="{% url 'facturacion:lista' %}" class="btn btn-light">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información de la Factura -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card info-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-info-circle text-primary"></i> Información de la Factura
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="info-label">N° Factura:</div>
+                            <div class="info-value"><strong>FACT-2025-001</strong></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="info-label">Fecha:</div>
+                            <div class="info-value">10/11/2025</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="info-label">Cliente:</div>
+                            <div class="info-value">Cliente Ejemplo</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="info-label">Estado:</div>
+                            <div class="info-value">
+                                <span class="badge bg-success">Pagada</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card info-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-dollar-sign text-primary"></i> Totales
+                    </h5>
+                    <div class="mb-3">
+                        <div class="info-label">Subtotal:</div>
+                        <div class="info-value">$0.00</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="info-label">IVA (15%):</div>
+                        <div class="info-value">$0.00</div>
+                    </div>
+                    <hr>
+                    <div>
+                        <div class="info-label">Total:</div>
+                        <h3 class="text-primary mb-0">$0.00</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="mt-4 d-flex gap-2">
+        <a href="{% url 'facturacion:editar' 1 %}" class="btn btn-warning btn-action">
+            <i class="fas fa-edit"></i> Editar
+        </a>
+        <a href="{% url 'facturacion:eliminar' 1 %}" class="btn btn-danger btn-action">
+            <i class="fas fa-trash"></i> Eliminar
+        </a>
+        <a href="{% url 'facturacion:lista' %}" class="btn btn-secondary btn-action">
+            <i class="fas fa-list"></i> Volver al Listado
+        </a>
+    </div>
+</div>
+{% endblock %}
+

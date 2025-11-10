@@ -1,50 +1,44 @@
 """
-DIGT SOFT - Módulo de Compras
-Models - Gestión de Compras a Proveedores
+DIGT SOFT - Módulo de Ventas
+Models - Gestión de Ventas y Pedidos
 """
 
 from django.db import models
 from django.core.validators import MinValueValidator
 from decimal import Decimal
-from proveedores.models import Proveedor
+from clientes.models import Cliente
 from productos.models import Producto
 
 
-class Compra(models.Model):
-    """Modelo principal de Compras"""
+class Venta(models.Model):
+    """Modelo principal de Ventas"""
 
     ESTADO_CHOICES = [
         ('BORRADOR', 'Borrador'),
-        ('SOLICITADA', 'Solicitada'),
-        ('APROBADA', 'Aprobada'),
-        ('RECIBIDA', 'Recibida'),
+        ('CONFIRMADA', 'Confirmada'),
+        ('PAGADA', 'Pagada'),
+        ('ENTREGADA', 'Entregada'),
         ('CANCELADA', 'Cancelada'),
     ]
 
     METODO_PAGO_CHOICES = [
         ('EFECTIVO', 'Efectivo'),
+        ('TARJETA', 'Tarjeta'),
         ('TRANSFERENCIA', 'Transferencia'),
-        ('CHEQUE', 'Cheque'),
         ('CREDITO', 'Crédito'),
     ]
 
     # Información básica
-    numero_compra = models.CharField(max_length=50, unique=True, verbose_name="Número de Compra")
-    fecha_compra = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Compra")
-    fecha_recepcion = models.DateField(null=True, blank=True, verbose_name="Fecha de Recepción")
-
-    # Relación con proveedor
-    proveedor = models.ForeignKey(
-        Proveedor,
+    numero_venta = models.CharField(max_length=50, unique=True, verbose_name="Número de Venta")
+    fecha_venta = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Venta")
+    cliente = models.ForeignKey(
+        Cliente,
         on_delete=models.PROTECT,
-        related_name='compras',
-        verbose_name="Proveedor"
+        related_name='ventas',
+        verbose_name="Cliente"
     )
 
-    # Documentación
-    factura_proveedor = models.CharField(max_length=100, blank=True, verbose_name="Factura del Proveedor")
-
-    # Detalles de la compra
+    # Detalles de la venta
     subtotal = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -74,7 +68,7 @@ class Compra(models.Model):
     metodo_pago = models.CharField(
         max_length=20,
         choices=METODO_PAGO_CHOICES,
-        default='TRANSFERENCIA',
+        default='EFECTIVO',
         verbose_name="Método de Pago"
     )
     estado = models.CharField(
@@ -89,29 +83,29 @@ class Compra(models.Model):
     fecha_actualizacion = models.DateTimeField(auto_now=True, verbose_name="Última Actualización")
 
     class Meta:
-        verbose_name = "Compra"
-        verbose_name_plural = "Compras"
-        ordering = ['-fecha_compra']
+        verbose_name = "Venta"
+        verbose_name_plural = "Ventas"
+        ordering = ['-fecha_venta']
 
     def __str__(self):
-        return f"Compra {self.numero_compra} - {self.proveedor.razon_social}"
+        return f"Venta {self.numero_venta} - {self.cliente.nombre_completo}"
 
     def calcular_totales(self):
-        """Calcula los totales de la compra"""
+        """Calcula los totales de la venta"""
         self.subtotal = sum(item.subtotal for item in self.items.all())
         self.impuesto = self.subtotal * Decimal('0.19')  # IVA 19%
         self.total = self.subtotal + self.impuesto - self.descuento
         self.save()
 
 
-class ItemCompra(models.Model):
-    """Detalle de productos en una compra"""
+class ItemVenta(models.Model):
+    """Detalle de productos en una venta"""
 
-    compra = models.ForeignKey(
-        Compra,
+    venta = models.ForeignKey(
+        Venta,
         on_delete=models.CASCADE,
         related_name='items',
-        verbose_name="Compra"
+        verbose_name="Venta"
     )
     producto = models.ForeignKey(
         Producto,
@@ -134,8 +128,8 @@ class ItemCompra(models.Model):
     )
 
     class Meta:
-        verbose_name = "Item de Compra"
-        verbose_name_plural = "Items de Compra"
+        verbose_name = "Item de Venta"
+        verbose_name_plural = "Items de Venta"
 
     def __str__(self):
         return f"{self.producto.nombre_producto} x{self.cantidad}"
@@ -143,5 +137,4 @@ class ItemCompra(models.Model):
     def save(self, *args, **kwargs):
         self.subtotal = self.cantidad * self.precio_unitario
         super().save(*args, **kwargs)
-
 

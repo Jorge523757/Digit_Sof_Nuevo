@@ -1,0 +1,100 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Eliminar Compra - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-header {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        border-radius: 15px;
+        padding: 30px;
+        color: white;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(220, 53, 69, 0.3);
+    }
+
+    .delete-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    .warning-icon {
+        font-size: 4rem;
+        color: #dc3545;
+        margin-bottom: 20px;
+    }
+
+    .btn-danger {
+        border-radius: 10px;
+        padding: 12px 30px;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="delete-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-2">
+                    <i class="fas fa-trash"></i> Eliminar Compra
+                </h1>
+                <p class="mb-0 opacity-75">Confirma la eliminación de la compra</p>
+            </div>
+            <div>
+                <a href="{% url 'compras:lista' %}" class="btn btn-light">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmación -->
+    <div class="card delete-card">
+        <div class="card-body text-center p-5">
+            <i class="fas fa-exclamation-triangle warning-icon"></i>
+            <h3 class="mb-4">¿Estás seguro de eliminar esta compra?</h3>
+
+            <div class="alert alert-warning mb-4">
+                <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+            </div>
+
+            <div class="bg-light p-4 rounded mb-4">
+                <h5 class="mb-3">Información de la Compra:</h5>
+                <div class="row text-start">
+                    <div class="col-md-6 mb-2">
+                        <strong>Número:</strong> {{ compra.numero_compra }}
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>Proveedor:</strong> {{ compra.proveedor.razon_social }}
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>Fecha:</strong> {{ compra.fecha_compra|date:"d/m/Y" }}
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>Total:</strong> ${{ compra.total|floatformat:2 }}
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>Estado:</strong> {{ compra.get_estado_display }}
+                    </div>
+                </div>
+            </div>
+
+            <form method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-lg me-2">
+                    <i class="fas fa-trash"></i> Sí, Eliminar
+                </button>
+                <a href="{% url 'compras:detalle' compra.pk %}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

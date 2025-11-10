@@ -1,0 +1,454 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Equipos - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .equipos-header {
+        background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        border-radius: 15px;
+        padding: 30px;
+        color: white;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(48, 207, 208, 0.3);
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 15px;
+        transition: all 0.3s;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+
+    .icon-wrapper {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .search-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        margin-bottom: 25px;
+    }
+
+    .table-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .table-modern {
+        margin: 0;
+    }
+
+    .table-modern thead {
+        background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        color: white;
+    }
+
+    .table-modern thead th {
+        border: none;
+        padding: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table-modern tbody tr {
+        transition: all 0.3s;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .table-modern tbody tr:hover {
+        background-color: #f0f8ff;
+        transform: scale(1.01);
+    }
+
+    .table-modern tbody td {
+        padding: 15px;
+        vertical-align: middle;
+    }
+
+    .equipo-nombre {
+        font-weight: 700;
+        color: #30cfd0;
+        font-size: 1.1rem;
+    }
+
+    .cliente-info {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 3px;
+    }
+
+    .detalle-info {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+    }
+
+    .badge-custom {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .tipo-laptop {
+        background-color: #cfe2ff;
+        color: #084298;
+    }
+
+    .tipo-desktop {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .tipo-tablet {
+        background-color: #e2e3e5;
+        color: #383d41;
+    }
+
+    .tipo-celular {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .btn-action {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 2px;
+        transition: all 0.3s;
+        border: none;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 10px 15px;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #30cfd0;
+        box-shadow: 0 0 0 0.2rem rgba(48, 207, 208, 0.25);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 10px 25px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(48, 207, 208, 0.3);
+    }
+
+    .pagination .page-link {
+        border-radius: 8px;
+        margin: 0 3px;
+        border: 2px solid #e9ecef;
+        color: #30cfd0;
+        font-weight: 500;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #30cfd0;
+        color: white;
+        border-color: #30cfd0;
+    }
+
+    .pagination .active .page-link {
+        background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        border-color: #30cfd0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header Moderno -->
+    <div class="equipos-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-2">
+                    <i class="fas fa-laptop"></i> Gestión de Equipos
+                </h1>
+                <p class="mb-0 opacity-75">Administra los equipos de los clientes</p>
+            </div>
+            <div>
+                <a href="{% url 'equipos:crear' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus"></i> Nuevo Equipo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Equipos</h6>
+                            <h2 class="mb-0">{{ equipos|length }}</h2>
+                        </div>
+                        <div class="icon-wrapper" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+                            <i class="fas fa-server"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Activos</h6>
+                            <h2 class="mb-0 text-success">{{ equipos|length }}</h2>
+                        </div>
+                        <div class="icon-wrapper bg-success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">En Reparación</h6>
+                            <h2 class="mb-0 text-warning">0</h2>
+                        </div>
+                        <div class="icon-wrapper bg-warning">
+                            <i class="fas fa-wrench"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Inactivos</h6>
+                            <h2 class="mb-0 text-secondary">0</h2>
+                        </div>
+                        <div class="icon-wrapper bg-secondary">
+                            <i class="fas fa-power-off"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros de Búsqueda -->
+    <div class="card search-card">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label"><i class="fas fa-search"></i> Búsqueda</label>
+                    <input type="text" name="q" class="form-control"
+                           placeholder="Serie, marca, modelo, cliente..." value="{{ query }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><i class="fas fa-laptop"></i> Tipo</label>
+                    <select name="tipo" class="form-select">
+                        <option value="">Todos los tipos</option>
+                        <option value="LAPTOP">Laptop</option>
+                        <option value="DESKTOP">PC Escritorio</option>
+                        <option value="TABLET">Tablet</option>
+                        <option value="CELULAR">Celular</option>
+                        <option value="IMPRESORA">Impresora</option>
+                        <option value="OTRO">Otro</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><i class="fas fa-list"></i> Estado</label>
+                    <select name="estado" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="ACTIVO">Activo</option>
+                        <option value="EN_REPARACION">En Reparación</option>
+                        <option value="INACTIVO">Inactivo</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de Equipos -->
+    <div class="card table-card">
+        <div class="table-responsive">
+            <table class="table table-modern table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th width="120">Tipo</th>
+                        <th>Equipo</th>
+                        <th>Número Serie</th>
+                        <th>Cliente</th>
+                        <th>Especificaciones</th>
+                        <th width="120" class="text-center">Estado</th>
+                        <th width="150" class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for equipo in equipos %}
+                    <tr>
+                        <td>
+                            {% if equipo.tipo_equipo == 'LAPTOP' %}
+                                <span class="badge badge-custom tipo-laptop">
+                                    <i class="fas fa-laptop"></i> Laptop
+                                </span>
+                            {% elif equipo.tipo_equipo == 'DESKTOP' %}
+                                <span class="badge badge-custom tipo-desktop">
+                                    <i class="fas fa-desktop"></i> Desktop
+                                </span>
+                            {% elif equipo.tipo_equipo == 'TABLET' %}
+                                <span class="badge badge-custom tipo-tablet">
+                                    <i class="fas fa-tablet-alt"></i> Tablet
+                                </span>
+                            {% elif equipo.tipo_equipo == 'CELULAR' %}
+                                <span class="badge badge-custom tipo-celular">
+                                    <i class="fas fa-mobile-alt"></i> Celular
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="cliente-info">{{ equipo.marca }} {{ equipo.modelo }}</div>
+                        </td>
+                        <td>
+                            <div class="detalle-info">
+                                <i class="fas fa-hashtag"></i> {{ equipo.numero_serie }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="cliente-info">{{ equipo.cliente.nombre_completo }}</div>
+                            <div class="detalle-info">
+                                <i class="fas fa-phone"></i> {{ equipo.cliente.telefono }}
+                            </div>
+                        </td>
+                        <td>
+                            {% if equipo.procesador %}
+                                <div class="detalle-info">
+                                    <i class="fas fa-microchip"></i> {{ equipo.procesador }}
+                                </div>
+                            {% endif %}
+                            {% if equipo.memoria_ram %}
+                                <div class="detalle-info">
+                                    <i class="fas fa-memory"></i> {{ equipo.memoria_ram }}
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if equipo.estado == 'ACTIVO' %}
+                                <span class="badge bg-success badge-custom">
+                                    <i class="fas fa-check-circle"></i> Activo
+                                </span>
+                            {% elif equipo.estado == 'EN_REPARACION' %}
+                                <span class="badge bg-warning badge-custom">
+                                    <i class="fas fa-wrench"></i> En Reparación
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary badge-custom">
+                                    <i class="fas fa-power-off"></i> Inactivo
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'equipos:detalle' equipo.pk %}"
+                               class="btn btn-info btn-action"
+                               title="Ver detalle"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="#"
+                               class="btn btn-warning btn-action"
+                               title="Editar"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="#"
+                               class="btn btn-danger btn-action"
+                               title="Eliminar"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fas fa-laptop fa-3x mb-3 d-block"></i>
+                                <h5>No se encontraron equipos</h5>
+                                <p>No hay equipos registrados con los criterios de búsqueda.</p>
+                                <a href="{% url 'equipos:crear' %}" class="btn btn-primary mt-2">
+                                    <i class="fas fa-plus"></i> Registrar Primer Equipo
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+
+    document.querySelectorAll('.btn-danger').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (!confirm('¿Estás seguro de que deseas eliminar este equipo?')) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+{% endblock %}
+

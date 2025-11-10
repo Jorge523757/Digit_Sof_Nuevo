@@ -1,0 +1,112 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Eliminar Proveedor - DIGT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h3><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <h5><i class="fas fa-exclamation-circle"></i> ¿Está seguro?</h5>
+                <p>Está a punto de eliminar el siguiente proveedor:</p>
+                <ul>
+                    <li><strong>Razón Social:</strong> {{ proveedor.razon_social }}</li>
+                    <li><strong>Documento:</strong> {{ proveedor.numero_documento }}</li>
+                    <li><strong>Contacto:</strong> {{ proveedor.telefono }}</li>
+                </ul>
+                <p class="mb-0">Esta acción no se puede deshacer.</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Sí, Eliminar
+                </button>
+                <a href="{% url 'proveedores:lista' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Detalle Proveedor - DIGT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3><i class="fas fa-truck"></i> Detalle del Proveedor</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Información General</h5>
+                    <table class="table">
+                        <tr>
+                            <th>Razón Social:</th>
+                            <td>{{ proveedor.razon_social }}</td>
+                        </tr>
+                        {% if proveedor.nombre_comercial %}
+                        <tr>
+                            <th>Nombre Comercial:</th>
+                            <td>{{ proveedor.nombre_comercial }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th>{{ proveedor.get_tipo_documento_display }}:</th>
+                            <td>{{ proveedor.numero_documento }}</td>
+                        </tr>
+                        <tr>
+                            <th>Estado:</th>
+                            <td>
+                                {% if proveedor.activo %}
+                                    <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactivo</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h5>Información de Contacto</h5>
+                    <table class="table">
+                        <tr>
+                            <th>Teléfono:</th>
+                            <td>{{ proveedor.telefono }}</td>
+                        </tr>
+                        <tr>
+                            <th>Correo:</th>
+                            <td>{{ proveedor.correo }}</td>
+                        </tr>
+                        <tr>
+                            <th>Ciudad:</th>
+                            <td>{{ proveedor.ciudad }}</td>
+                        </tr>
+                        <tr>
+                            <th>País:</th>
+                            <td>{{ proveedor.pais }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{% url 'proveedores:lista' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+                <a href="{% url 'proveedores:editar' proveedor.pk %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

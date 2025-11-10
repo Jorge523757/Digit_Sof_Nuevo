@@ -1,0 +1,491 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Garantías - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .garantias-header {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        border-radius: 15px;
+        padding: 30px;
+        color: white;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(17, 153, 142, 0.3);
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 15px;
+        transition: all 0.3s;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+
+    .icon-wrapper {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .search-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        margin-bottom: 25px;
+    }
+
+    .table-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .table-modern {
+        margin: 0;
+    }
+
+    .table-modern thead {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+    }
+
+    .table-modern thead th {
+        border: none;
+        padding: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table-modern tbody tr {
+        transition: all 0.3s;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .table-modern tbody tr:hover {
+        background-color: #f0fff4;
+        transform: scale(1.01);
+    }
+
+    .table-modern tbody td {
+        padding: 15px;
+        vertical-align: middle;
+    }
+
+    .garantia-id {
+        font-weight: 700;
+        color: #11998e;
+        font-size: 1.1rem;
+    }
+
+    .cliente-info {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 3px;
+    }
+
+    .documento-info {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+    }
+
+    .badge-custom {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .estado-vigente {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .estado-vencida {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .estado-cancelada {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .fecha-info {
+        font-size: 0.9rem;
+    }
+
+    .btn-action {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 2px;
+        transition: all 0.3s;
+        border: none;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 10px 15px;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #11998e;
+        box-shadow: 0 0 0 0.2rem rgba(17, 153, 142, 0.25);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 10px 25px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
+    }
+
+    .pagination {
+        margin-top: 30px;
+    }
+
+    .pagination .page-link {
+        border-radius: 8px;
+        margin: 0 3px;
+        border: 2px solid #e9ecef;
+        color: #11998e;
+        font-weight: 500;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #11998e;
+        color: white;
+        border-color: #11998e;
+    }
+
+    .pagination .active .page-link {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        border-color: #11998e;
+    }
+
+    .producto-nombre {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .serie-info {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header Moderno -->
+    <div class="garantias-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-2">
+                    <i class="fas fa-shield-alt"></i> Gestión de Garantías
+                </h1>
+                <p class="mb-0 opacity-75">Administra las garantías de productos de manera eficiente</p>
+            </div>
+            <div>
+                <a href="{% url 'garantias:crear' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus"></i> Nueva Garantía
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Garantías</h6>
+                            <h2 class="mb-0">{{ total_garantias }}</h2>
+                        </div>
+                        <div class="icon-wrapper" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                            <i class="fas fa-file-contract"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Vigentes</h6>
+                            <h2 class="mb-0 text-success">{{ activas }}</h2>
+                        </div>
+                        <div class="icon-wrapper bg-success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">En Revisión</h6>
+                            <h2 class="mb-0 text-warning">{{ en_revision }}</h2>
+                        </div>
+                        <div class="icon-wrapper bg-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Vencidas</h6>
+                            <h2 class="mb-0 text-danger">{{ vencidas }}</h2>
+                        </div>
+                        <div class="icon-wrapper bg-danger">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros de Búsqueda -->
+    <div class="card search-card">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label"><i class="fas fa-search"></i> Búsqueda</label>
+                    {{ form.busqueda }}
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><i class="fas fa-list"></i> Estado</label>
+                    {{ form.estado }}
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label"><i class="fas fa-calendar"></i> Vigencia</label>
+                    {{ form.vigencia }}
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de Garantías -->
+    <div class="card table-card">
+        <div class="table-responsive">
+            <table class="table table-modern table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th width="100">ID</th>
+                        <th>Producto</th>
+                        <th>Cliente</th>
+                        <th width="150">Fecha Compra</th>
+                        <th width="150">Fecha Vencimiento</th>
+                        <th width="120" class="text-center">Estado</th>
+                        <th width="180" class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for garantia in page_obj %}
+                    <tr>
+                        <td>
+                            <div class="garantia-id">#{{ garantia.id }}</div>
+                        </td>
+                        <td>
+                            <div class="producto-nombre">{{ garantia.nombre_producto }}</div>
+                            {% if garantia.numero_serie %}
+                                <div class="serie-info">
+                                    <i class="fas fa-hashtag"></i> {{ garantia.numero_serie }}
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="cliente-info">{{ garantia.nombre_comprador }}</div>
+                            <div class="documento-info">
+                                <i class="fas fa-id-card"></i> {{ garantia.cedula }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fecha-info">
+                                <i class="fas fa-calendar"></i> {{ garantia.fecha_compra|date:"d/m/Y" }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fecha-info">
+                                <i class="fas fa-calendar-check"></i> {{ garantia.fecha_vencimiento|date:"d/m/Y" }}
+                            </div>
+                            {% if garantia.dias_restantes > 0 %}
+                                <small class="text-muted">{{ garantia.dias_restantes }} días</small>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if garantia.estado == 'ACTIVA' %}
+                                {% if garantia.esta_vigente %}
+                                    <span class="badge badge-custom estado-vigente">
+                                        <i class="fas fa-check-circle"></i> Vigente
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge-custom estado-vencida">
+                                        <i class="fas fa-times-circle"></i> Vencida
+                                    </span>
+                                {% endif %}
+                            {% elif garantia.estado == 'USADA' %}
+                                <span class="badge badge-custom bg-info text-white">
+                                    <i class="fas fa-tools"></i> Usada
+                                </span>
+                            {% elif garantia.estado == 'CANCELADA' %}
+                                <span class="badge badge-custom estado-cancelada">
+                                    <i class="fas fa-ban"></i> Cancelada
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'garantias:detalle' garantia.pk %}"
+                               class="btn btn-info btn-action"
+                               title="Ver detalle"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'garantias:editar' garantia.pk %}"
+                               class="btn btn-warning btn-action"
+                               title="Editar"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'garantias:seguimiento' garantia.pk %}"
+                               class="btn btn-success btn-action"
+                               title="Seguimiento"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-history"></i>
+                            </a>
+                            <a href="{% url 'garantias:eliminar' garantia.pk %}"
+                               class="btn btn-danger btn-action"
+                               title="Eliminar"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fas fa-shield-alt fa-3x mb-3 d-block"></i>
+                                <h5>No se encontraron garantías</h5>
+                                <p>No hay garantías registradas con los criterios de búsqueda.</p>
+                                <a href="{% url 'garantias:crear' %}" class="btn btn-primary mt-2">
+                                    <i class="fas fa-plus"></i> Crear Primera Garantía
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Paginación -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Paginación de garantías">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                </li>
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link">
+                    {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                </span>
+            </li>
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Inicializar tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+
+    // Confirmación de eliminación
+    document.querySelectorAll('.btn-danger').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (!confirm('¿Estás seguro de que deseas eliminar esta garantía?')) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+{% endblock %}
+

@@ -1,0 +1,119 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}{{ orden.pk|default:"Nueva" }} Orden - DIGT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3>
+                <i class="fas fa-wrench"></i>
+                {% if orden %}Editar{% else %}Nueva{% endif %} Orden de Servicio
+            </h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                <h5 class="mb-3">Información del Cliente</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Cliente *</label>
+                        <select name="cliente" class="form-select" required>
+                            <option value="">Seleccione un cliente</option>
+                            {% for cliente in clientes %}
+                            <option value="{{ cliente.pk }}"
+                                    {% if orden.cliente_id == cliente.pk %}selected{% endif %}>
+                                {{ cliente.nombre_completo }} - {{ cliente.numero_documento }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <h5 class="mb-3 mt-4">Información del Equipo</h5>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Tipo Equipo *</label>
+                        <input type="text" name="tipo_equipo" class="form-control"
+                               value="{{ orden.tipo_equipo|default:'' }}" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Marca *</label>
+                        <input type="text" name="marca" class="form-control"
+                               value="{{ orden.marca|default:'' }}" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Modelo</label>
+                        <input type="text" name="modelo" class="form-control"
+                               value="{{ orden.modelo|default:'' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Número Serie</label>
+                        <input type="text" name="numero_serie" class="form-control"
+                               value="{{ orden.numero_serie|default:'' }}">
+                    </div>
+                </div>
+
+                <h5 class="mb-3 mt-4">Detalles del Servicio</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Estado *</label>
+                        <select name="estado" class="form-select" required>
+                            <option value="PENDIENTE" {% if orden.estado == 'PENDIENTE' %}selected{% endif %}>Pendiente</option>
+                            <option value="EN_PROCESO" {% if orden.estado == 'EN_PROCESO' %}selected{% endif %}>En Proceso</option>
+                            <option value="DIAGNOSTICADA" {% if orden.estado == 'DIAGNOSTICADA' %}selected{% endif %}>Diagnosticada</option>
+                            <option value="REPARADA" {% if orden.estado == 'REPARADA' %}selected{% endif %}>Reparada</option>
+                            <option value="ENTREGADA" {% if orden.estado == 'ENTREGADA' %}selected{% endif %}>Entregada</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Prioridad *</label>
+                        <select name="prioridad" class="form-select" required>
+                            <option value="BAJA" {% if orden.prioridad == 'BAJA' %}selected{% endif %}>Baja</option>
+                            <option value="MEDIA" {% if orden.prioridad == 'MEDIA' %}selected{% endif %}>Media</option>
+                            <option value="ALTA" {% if orden.prioridad == 'ALTA' %}selected{% endif %}>Alta</option>
+                            <option value="URGENTE" {% if orden.prioridad == 'URGENTE' %}selected{% endif %}>Urgente</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Técnico Asignado</label>
+                        <select name="tecnico_asignado" class="form-select">
+                            <option value="">Sin asignar</option>
+                            {% for tecnico in tecnicos %}
+                            <option value="{{ tecnico.pk }}"
+                                    {% if orden.tecnico_asignado_id == tecnico.pk %}selected{% endif %}>
+                                {{ tecnico.nombre_completo }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Problema Reportado *</label>
+                    <textarea name="problema_reportado" class="form-control" rows="3" required>{{ orden.problema_reportado|default:'' }}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Diagnóstico</label>
+                    <textarea name="diagnostico" class="form-control" rows="3">{{ orden.diagnostico|default:'' }}</textarea>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <a href="{% url 'ordenes:lista' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

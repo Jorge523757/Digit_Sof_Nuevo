@@ -1,0 +1,389 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Proveedores - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .proveedores-header {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        border-radius: 15px;
+        padding: 30px;
+        color: white;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 15px;
+        transition: all 0.3s;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+
+    .icon-wrapper {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .search-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        margin-bottom: 25px;
+    }
+
+    .table-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .table-modern {
+        margin: 0;
+    }
+
+    .table-modern thead {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+    }
+
+    .table-modern thead th {
+        border: none;
+        padding: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table-modern tbody tr {
+        transition: all 0.3s;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .table-modern tbody tr:hover {
+        background-color: #f0faff;
+        transform: scale(1.01);
+    }
+
+    .table-modern tbody td {
+        padding: 15px;
+        vertical-align: middle;
+    }
+
+    .proveedor-nombre {
+        font-weight: 700;
+        color: #00f2fe;
+        font-size: 1.05rem;
+    }
+
+    .contacto-info {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 3px;
+    }
+
+    .detalle-info {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+    }
+
+    .badge-custom {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .btn-action {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 2px;
+        transition: all 0.3s;
+        border: none;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 10px 15px;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #4facfe;
+        box-shadow: 0 0 0 0.2rem rgba(79, 172, 254, 0.25);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 10px 25px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+    }
+
+    .pagination .page-link {
+        border-radius: 8px;
+        margin: 0 3px;
+        border: 2px solid #e9ecef;
+        color: #4facfe;
+        font-weight: 500;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #4facfe;
+        color: white;
+        border-color: #4facfe;
+    }
+
+    .pagination .active .page-link {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        border-color: #4facfe;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header Moderno -->
+    <div class="proveedores-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-2">
+                    <i class="fas fa-truck"></i> Gestión de Proveedores
+                </h1>
+                <p class="mb-0 opacity-75">Administra tus proveedores y empresas colaboradoras</p>
+            </div>
+            <div>
+                <a href="{% url 'proveedores:crear' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus"></i> Nuevo Proveedor
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Proveedores</h6>
+                            <h2 class="mb-0">{{ proveedores|length }}</h2>
+                        </div>
+                        <div class="icon-wrapper" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <i class="fas fa-industry"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Activos</h6>
+                            <h2 class="mb-0 text-success">{{ proveedores|length }}</h2>
+                        </div>
+                        <div class="icon-wrapper bg-success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Compras Mes</h6>
+                            <h2 class="mb-0 text-info">0</h2>
+                        </div>
+                        <div class="icon-wrapper bg-info">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Inactivos</h6>
+                            <h2 class="mb-0 text-secondary">0</h2>
+                        </div>
+                        <div class="icon-wrapper bg-secondary">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros de Búsqueda -->
+    <div class="card search-card">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label"><i class="fas fa-search"></i> Búsqueda</label>
+                    <input type="text" name="q" class="form-control"
+                           placeholder="Razón social, NIT, contacto..." value="{{ query }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><i class="fas fa-list"></i> Estado</label>
+                    <select name="estado" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="activo">Activos</option>
+                        <option value="inactivo">Inactivos</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de Proveedores -->
+    <div class="card table-card">
+        <div class="table-responsive">
+            <table class="table table-modern table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Razón Social</th>
+                        <th>Documento</th>
+                        <th>Contacto</th>
+                        <th>Ubicación</th>
+                        <th width="120" class="text-center">Estado</th>
+                        <th width="150" class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for proveedor in proveedores %}
+                    <tr>
+                        <td>
+                            <div class="contacto-info">{{ proveedor.razon_social }}</div>
+                            {% if proveedor.nombre_comercial %}
+                                <div class="detalle-info">{{ proveedor.nombre_comercial }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="detalle-info">
+                                <i class="fas fa-id-card"></i> {{ proveedor.get_tipo_documento_display }}
+                            </div>
+                            <div class="contacto-info">{{ proveedor.numero_documento }}</div>
+                        </td>
+                        <td>
+                            <div class="detalle-info">
+                                <i class="fas fa-phone"></i> {{ proveedor.telefono }}
+                            </div>
+                            <div class="detalle-info">
+                                <i class="fas fa-envelope"></i> {{ proveedor.correo }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="detalle-info">
+                                <i class="fas fa-map-marker-alt"></i> {{ proveedor.ciudad }}
+                            </div>
+                            <div class="detalle-info">{{ proveedor.pais }}</div>
+                        </td>
+                        <td class="text-center">
+                            {% if proveedor.activo %}
+                                <span class="badge bg-success badge-custom">
+                                    <i class="fas fa-check-circle"></i> Activo
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary badge-custom">
+                                    <i class="fas fa-times-circle"></i> Inactivo
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'proveedores:detalle' proveedor.pk %}"
+                               class="btn btn-info btn-action"
+                               title="Ver detalle"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'proveedores:editar' proveedor.pk %}"
+                               class="btn btn-warning btn-action"
+                               title="Editar"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'proveedores:eliminar' proveedor.pk %}"
+                               class="btn btn-danger btn-action"
+                               title="Eliminar"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fas fa-truck fa-3x mb-3 d-block"></i>
+                                <h5>No se encontraron proveedores</h5>
+                                <p>No hay proveedores registrados con los criterios de búsqueda.</p>
+                                <a href="{% url 'proveedores:crear' %}" class="btn btn-primary mt-2">
+                                    <i class="fas fa-plus"></i> Crear Primer Proveedor
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+</script>
+{% endblock %}
+

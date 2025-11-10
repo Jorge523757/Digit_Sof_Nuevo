@@ -1,0 +1,162 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{% if factura %}Editar{% else %}Nueva{% endif %} Factura - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-header {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        border-radius: 15px;
+        padding: 30px;
+        color: white;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(250, 112, 154, 0.3);
+    }
+
+    .form-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 12px 15px;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #fa709a;
+        box-shadow: 0 0 0 0.2rem rgba(250, 112, 154, 0.25);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(250, 112, 154, 0.3);
+    }
+
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #fa709a;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="form-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-2">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    Nueva Factura
+                </h1>
+                <p class="mb-0 opacity-75">Completa la información de la factura</p>
+            </div>
+            <div>
+                <a href="{% url 'facturacion:lista' %}" class="btn btn-light">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Información General -->
+        <div class="card form-card">
+            <div class="card-body">
+                <h5 class="section-title">
+                    <i class="fas fa-info-circle"></i> Información de la Factura
+                </h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-hashtag"></i> Número de Factura *</label>
+                        <input type="text" name="numero" class="form-control"
+                               placeholder="Ej: FACT-2025-001" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-calendar"></i> Fecha *</label>
+                        <input type="date" name="fecha" class="form-control" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-user"></i> Cliente *</label>
+                        <input type="text" name="cliente" class="form-control"
+                               placeholder="Nombre del cliente" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-flag"></i> Estado *</label>
+                        <select name="estado" class="form-select" required>
+                            <option value="PENDIENTE">Pendiente</option>
+                            <option value="PAGADA">Pagada</option>
+                            <option value="ANULADA">Anulada</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Montos -->
+        <div class="card form-card">
+            <div class="card-body">
+                <h5 class="section-title">
+                    <i class="fas fa-dollar-sign"></i> Detalles Financieros
+                </h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label"><i class="fas fa-dollar-sign"></i> Subtotal *</label>
+                        <input type="number" step="0.01" name="subtotal" class="form-control"
+                               placeholder="0.00" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label"><i class="fas fa-percentage"></i> IVA (15%)</label>
+                        <input type="number" step="0.01" name="iva" class="form-control"
+                               placeholder="0.00">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label"><i class="fas fa-dollar-sign"></i> Total *</label>
+                        <input type="number" step="0.01" name="total" class="form-control"
+                               placeholder="0.00" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Crear Factura
+            </button>
+            <a href="{% url 'facturacion:lista' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

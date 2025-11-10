@@ -1,0 +1,139 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Eliminar Orden - DIGT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h3><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <h5><i class="fas fa-exclamation-circle"></i> ¿Está seguro?</h5>
+                <p>Está a punto de eliminar la siguiente orden de servicio:</p>
+                <ul>
+                    <li><strong>Número Orden:</strong> {{ orden.numero_orden }}</li>
+                    <li><strong>Cliente:</strong> {{ orden.cliente.nombre_completo }}</li>
+                    <li><strong>Equipo:</strong> {{ orden.tipo_equipo }} - {{ orden.marca }} {{ orden.modelo }}</li>
+                    <li><strong>Estado:</strong> {{ orden.get_estado_display }}</li>
+                </ul>
+                <p class="mb-0">Esta acción no se puede deshacer.</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Sí, Eliminar
+                </button>
+                <a href="{% url 'ordenes:lista' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Detalle Orden - DIGT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3><i class="fas fa-wrench"></i> Orden de Servicio #{{ orden.numero_orden }}</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Información del Cliente</h5>
+                    <table class="table">
+                        <tr>
+                            <th>Cliente:</th>
+                            <td>{{ orden.cliente.nombre_completo }}</td>
+                        </tr>
+                        <tr>
+                            <th>Teléfono:</th>
+                            <td>{{ orden.cliente.telefono }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>{{ orden.cliente.correo }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h5>Información del Equipo</h5>
+                    <table class="table">
+                        <tr>
+                            <th>Tipo:</th>
+                            <td>{{ orden.tipo_equipo }}</td>
+                        </tr>
+                        <tr>
+                            <th>Marca:</th>
+                            <td>{{ orden.marca }}</td>
+                        </tr>
+                        <tr>
+                            <th>Modelo:</th>
+                            <td>{{ orden.modelo }}</td>
+                        </tr>
+                        {% if orden.numero_serie %}
+                        <tr>
+                            <th>Serie:</th>
+                            <td>{{ orden.numero_serie }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <h5>Detalles del Servicio</h5>
+                    <table class="table">
+                        <tr>
+                            <th>Fecha Ingreso:</th>
+                            <td>{{ orden.fecha_ingreso|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Estado:</th>
+                            <td><span class="badge bg-warning">{{ orden.get_estado_display }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Prioridad:</th>
+                            <td><span class="badge bg-danger">{{ orden.get_prioridad_display }}</span></td>
+                        </tr>
+                        {% if orden.tecnico_asignado %}
+                        <tr>
+                            <th>Técnico:</th>
+                            <td>{{ orden.tecnico_asignado.nombre_completo }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th>Problema Reportado:</th>
+                            <td>{{ orden.problema_reportado }}</td>
+                        </tr>
+                        {% if orden.diagnostico %}
+                        <tr>
+                            <th>Diagnóstico:</th>
+                            <td>{{ orden.diagnostico }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{% url 'ordenes:lista' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+                <a href="{% url 'ordenes:editar' orden.pk %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

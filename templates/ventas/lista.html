@@ -1,0 +1,447 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Ventas - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ventas-header {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        border-radius: 15px;
+        padding: 30px;
+        color: white;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(168, 237, 234, 0.3);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 15px;
+        transition: all 0.3s;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+
+    .icon-wrapper {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .search-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        margin-bottom: 25px;
+    }
+
+    .table-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .table-modern {
+        margin: 0;
+    }
+
+    .table-modern thead {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .table-modern thead th {
+        border: none;
+        padding: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table-modern tbody tr {
+        transition: all 0.3s;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .table-modern tbody tr:hover {
+        background-color: #f0fffe;
+        transform: scale(1.01);
+    }
+
+    .table-modern tbody td {
+        padding: 15px;
+        vertical-align: middle;
+    }
+
+    .venta-numero {
+        font-weight: 700;
+        color: #00d4aa;
+        font-size: 1.1rem;
+    }
+
+    .cliente-info {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 3px;
+    }
+
+    .detalle-info {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+    }
+
+    .total-display {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #00d4aa;
+    }
+
+    .badge-custom {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .estado-borrador {
+        background-color: #e2e3e5;
+        color: #383d41;
+    }
+
+    .estado-confirmada {
+        background-color: #cfe2ff;
+        color: #084298;
+    }
+
+    .estado-pagada {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .estado-entregada {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .btn-action {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 2px;
+        transition: all 0.3s;
+        border: none;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 10px 15px;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #a8edea;
+        box-shadow: 0 0 0 0.2rem rgba(168, 237, 234, 0.25);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 10px 25px;
+        font-weight: 600;
+        transition: all 0.3s;
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(168, 237, 234, 0.3);
+    }
+
+    .pagination .page-link {
+        border-radius: 8px;
+        margin: 0 3px;
+        border: 2px solid #e9ecef;
+        color: #00d4aa;
+        font-weight: 500;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #00d4aa;
+        color: white;
+        border-color: #00d4aa;
+    }
+
+    .pagination .active .page-link {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        border-color: #a8edea;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header Moderno -->
+    <div class="ventas-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-2">
+                    <i class="fas fa-cash-register"></i> Gestión de Ventas
+                </h1>
+                <p class="mb-0 opacity-75">Administra las ventas y pedidos de clientes</p>
+            </div>
+            <div>
+                <a href="{% url 'ventas:crear' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus"></i> Nueva Venta
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Ventas</h6>
+                            <h2 class="mb-0">{{ ventas|length }}</h2>
+                        </div>
+                        <div class="icon-wrapper" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Ventas Mes</h6>
+                            <h2 class="mb-0 text-info">0</h2>
+                        </div>
+                        <div class="icon-wrapper bg-info">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Pendientes</h6>
+                            <h2 class="mb-0 text-warning">0</h2>
+                        </div>
+                        <div class="icon-wrapper bg-warning">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Completadas</h6>
+                            <h2 class="mb-0 text-success">0</h2>
+                        </div>
+                        <div class="icon-wrapper bg-success">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros de Búsqueda -->
+    <div class="card search-card">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label"><i class="fas fa-search"></i> Búsqueda</label>
+                    <input type="text" name="q" class="form-control"
+                           placeholder="Número venta, cliente..." value="{{ query }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><i class="fas fa-list"></i> Estado</label>
+                    <select name="estado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="BORRADOR">Borrador</option>
+                        <option value="CONFIRMADA">Confirmada</option>
+                        <option value="PAGADA">Pagada</option>
+                        <option value="ENTREGADA">Entregada</option>
+                        <option value="CANCELADA">Cancelada</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label"><i class="fas fa-credit-card"></i> Pago</label>
+                    <select name="pago" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="EFECTIVO">Efectivo</option>
+                        <option value="TARJETA">Tarjeta</option>
+                        <option value="TRANSFERENCIA">Transferencia</option>
+                        <option value="CREDITO">Crédito</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de Ventas -->
+    <div class="card table-card">
+        <div class="table-responsive">
+            <table class="table table-modern table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th width="120">Nº Venta</th>
+                        <th>Cliente</th>
+                        <th width="120">Fecha</th>
+                        <th width="150" class="text-end">Total</th>
+                        <th width="120">Método Pago</th>
+                        <th width="120" class="text-center">Estado</th>
+                        <th width="150" class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venta in ventas %}
+                    <tr>
+                        <td>
+                            <div class="venta-numero">{{ venta.numero_venta }}</div>
+                        </td>
+                        <td>
+                            <div class="cliente-info">{{ venta.cliente.nombre_completo }}</div>
+                            <div class="detalle-info">
+                                <i class="fas fa-id-card"></i> {{ venta.cliente.numero_documento }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="detalle-info">
+                                <i class="fas fa-calendar"></i> {{ venta.fecha_venta|date:"d/m/Y" }}
+                            </div>
+                        </td>
+                        <td class="text-end">
+                            <div class="total-display">
+                                ${{ venta.total|floatformat:2 }}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-custom bg-secondary">
+                                {{ venta.get_metodo_pago_display }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            {% if venta.estado == 'BORRADOR' %}
+                                <span class="badge badge-custom estado-borrador">
+                                    <i class="fas fa-edit"></i> Borrador
+                                </span>
+                            {% elif venta.estado == 'CONFIRMADA' %}
+                                <span class="badge badge-custom estado-confirmada">
+                                    <i class="fas fa-check"></i> Confirmada
+                                </span>
+                            {% elif venta.estado == 'PAGADA' %}
+                                <span class="badge badge-custom estado-pagada">
+                                    <i class="fas fa-money-bill"></i> Pagada
+                                </span>
+                            {% elif venta.estado == 'ENTREGADA' %}
+                                <span class="badge badge-custom estado-entregada">
+                                    <i class="fas fa-truck"></i> Entregada
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'ventas:detalle' venta.pk %}"
+                               class="btn btn-info btn-action"
+                               title="Ver detalle"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="#"
+                               class="btn btn-warning btn-action"
+                               title="Editar"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="#"
+                               class="btn btn-danger btn-action"
+                               title="Eliminar"
+                               data-bs-toggle="tooltip">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fas fa-cash-register fa-3x mb-3 d-block"></i>
+                                <h5>No se encontraron ventas</h5>
+                                <p>No hay ventas registradas con los criterios de búsqueda.</p>
+                                <a href="{% url 'ventas:crear' %}" class="btn btn-primary mt-2">
+                                    <i class="fas fa-plus"></i> Crear Primera Venta
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+
+    document.querySelectorAll('.btn-danger').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (!confirm('¿Estás seguro de que deseas eliminar esta venta?')) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+{% endblock %}
+

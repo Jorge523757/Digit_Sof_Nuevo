@@ -1,0 +1,402 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Productos - E-commerce{% endblock %}
+
+{% block extra_css %}
+<style>
+    .products-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .stats-card .icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        color: white;
+        margin-bottom: 1rem;
+    }
+
+    .stats-card.primary .icon { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .stats-card.success .icon { background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); }
+    .stats-card.warning .icon { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .stats-card.danger .icon { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+
+    .stats-card h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        color: #2c3e50;
+    }
+
+    .stats-card p {
+        margin: 0;
+        color: #7f8c8d;
+        font-size: 0.95rem;
+    }
+
+    .filter-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    .btn-custom {
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s;
+        border: none;
+    }
+
+    .btn-custom-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-custom-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .badge-custom {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+
+    .product-image {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-buttons .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .stock-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stock-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    .stock-dot.success { background-color: #27ae60; }
+    .stock-dot.warning { background-color: #f39c12; }
+    .stock-dot.danger { background-color: #e74c3c; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="products-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-2">
+                    <i class="fas fa-store"></i> Gestión de Productos - E-commerce
+                </h1>
+                <p class="mb-0">Administra tu catálogo de productos e inventario</p>
+            </div>
+            <div>
+                <a href="{% url 'productos:crear' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus-circle"></i> Nuevo Producto
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stats-card primary">
+                <div class="icon">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <h3>{{ total_productos }}</h3>
+                <p>Total Productos</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card success">
+                <div class="icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>{{ productos_activos }}</h3>
+                <p>Productos Activos</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card warning">
+                <div class="icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>{{ bajo_stock }}</h3>
+                <p>Bajo Stock</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card danger">
+                <div class="icon">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <h3>{{ sin_stock }}</h3>
+                <p>Sin Stock</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filter-card">
+        <h5 class="mb-3"><i class="fas fa-filter"></i> Filtros de Búsqueda</h5>
+        <form method="get" id="filterForm">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">Buscar</label>
+                        {{ form.busqueda }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Categoría</label>
+                        {{ form.categoria }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Estado</label>
+                        {{ form.estado }}
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-custom btn-custom-primary">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla de Productos -->
+    <div class="table-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5><i class="fas fa-list"></i> Lista de Productos</h5>
+            <div>
+                <button class="btn btn-outline-success btn-sm" onclick="exportarTabla('excel')">
+                    <i class="fas fa-file-excel"></i> Excel
+                </button>
+                <button class="btn btn-outline-danger btn-sm" onclick="exportarTabla('pdf')">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="productosTable" class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Imagen</th>
+                        <th>SKU</th>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Marca</th>
+                        <th>Precio Venta</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in page_obj %}
+                    <tr>
+                        <td>
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre_producto }}" class="product-image">
+                            {% else %}
+                                <div class="product-image bg-light d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-image text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ producto.codigo_sku }}</strong></td>
+                        <td>
+                            <div>
+                                <strong>{{ producto.nombre_producto }}</strong>
+                                {% if producto.modelo_equipo %}
+                                    <br><small class="text-muted">{{ producto.modelo_equipo }}</small>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            {% if producto.categoria %}
+                                <span class="badge bg-info">{{ producto.categoria.nombre }}</span>
+                            {% else %}
+                                <span class="text-muted">Sin categoría</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ producto.marca|default:"-" }}</td>
+                        <td><strong class="text-success">${{ producto.precio_venta }}</strong></td>
+                        <td>
+                            <div class="stock-indicator">
+                                {% if producto.stock_actual == 0 %}
+                                    <span class="stock-dot danger"></span>
+                                    <span class="badge badge-custom bg-danger">Sin stock</span>
+                                {% elif producto.necesita_reposicion %}
+                                    <span class="stock-dot warning"></span>
+                                    <span class="badge badge-custom bg-warning text-dark">{{ producto.stock_actual }}</span>
+                                {% else %}
+                                    <span class="stock-dot success"></span>
+                                    <span class="badge badge-custom bg-success">{{ producto.stock_actual }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            {% if producto.activo %}
+                                <span class="badge badge-custom bg-success">Activo</span>
+                            {% else %}
+                                <span class="badge badge-custom bg-secondary">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'productos:detalle' producto.pk %}"
+                                   class="btn btn-sm btn-info"
+                                   title="Ver detalles">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'productos:editar' producto.pk %}"
+                                   class="btn btn-sm btn-warning"
+                                   title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button onclick="confirmarEliminacion('{% url 'productos:eliminar' producto.pk %}', '¿Eliminar el producto {{ producto.nombre_producto }}?')"
+                                        class="btn btn-sm btn-danger"
+                                        title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center py-5">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No se encontraron productos</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Paginación" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">Primera</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Inicializar DataTables
+        $('#productosTable').DataTable({
+            responsive: true,
+            order: [[2, 'asc']],
+            columnDefs: [
+                { orderable: false, targets: [0, 8] }
+            ]
+        });
+    });
+
+    // Función para exportar tabla
+    function exportarTabla(tipo) {
+        if (tipo === 'excel') {
+            window.location.href = '{% url "productos:exportar" %}?formato=excel';
+        } else if (tipo === 'pdf') {
+            window.location.href = '{% url "productos:exportar" %}?formato=pdf';
+        }
+    }
+</script>
+{% endblock %}
+
