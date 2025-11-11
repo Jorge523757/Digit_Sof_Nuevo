@@ -1,0 +1,28 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Detalle Capacitación{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <h2>Detalle de Capacitación: {{ capacitacion.codigo_capacitacion }}</h2>
+    <p>Nombre: {{ capacitacion.nombre }}</p>
+</div>
+{% endblock %}
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Detalle Venta - DIGT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h2><i class="fas fa-receipt"></i> Detalle de Venta</h2>
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5>Venta: {{ venta.numero_venta }}</h5>
+            <p><strong>Cliente:</strong> {{ venta.cliente.nombre_completo }}</p>
+            <p><strong>Fecha:</strong> {{ venta.fecha_venta|date:"d/m/Y H:i" }}</p>
+            <p><strong>Total:</strong> ${{ venta.total }}</p>
+            <p><strong>Estado:</strong> {{ venta.get_estado_display }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

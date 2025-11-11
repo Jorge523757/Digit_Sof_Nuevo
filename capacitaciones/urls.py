@@ -1,14 +1,12 @@
+"""DIGT SOFT - URLs Capacitaciones"""
 from django.urls import path
-from django.http import HttpResponse
+from . import views
 
 app_name = 'capacitaciones'
 
-def index(request):
-    return HttpResponse('Capacitaciones')
-
 urlpatterns = [
-    path('', index, name='lista'),
-    path('crear/', index, name='crear'),
+    path('', views.capacitaciones_lista, name='lista'),
+    path('<int:pk>/', views.capacitacion_detalle, name='detalle'),
 ]
 
 

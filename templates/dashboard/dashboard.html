@@ -67,19 +67,19 @@
         <i class="fas fa-bolt"></i> Acciones Rápidas
     </h5>
     <div class="quick-actions">
-        <a href="{% url 'clientes:crear' %}" class="quick-action">
+        <a href="{% url 'admin:clientes_cliente_add' %}" class="quick-action">
             <i class="fas fa-user-plus"></i>
             <span>Nuevo Cliente</span>
         </a>
-        <a href="{% url 'ordenes:crear' %}" class="quick-action">
+        <a href="{% url 'admin:ordenes_ordenservicio_add' %}" class="quick-action">
             <i class="fas fa-plus-circle"></i>
             <span>Nueva Orden</span>
         </a>
-        <a href="{% url 'productos:crear' %}" class="quick-action">
+        <a href="{% url 'admin:productos_producto_add' %}" class="quick-action">
             <i class="fas fa-box"></i>
             <span>Nuevo Producto</span>
         </a>
-        <a href="{% url 'facturacion:crear' %}" class="quick-action">
+        <a href="{% url 'admin:facturacion_factura_add' %}" class="quick-action">
             <i class="fas fa-file-invoice"></i>
             <span>Nueva Factura</span>
         </a>

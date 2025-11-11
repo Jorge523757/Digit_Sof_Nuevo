@@ -1,15 +1,11 @@
+"""DIGT SOFT - URLs Equipos"""
 from django.urls import path
-from django.http import HttpResponse
+from . import views
 
 app_name = 'equipos'
 
-def index(request):
-    return HttpResponse('Equipos')
-
 urlpatterns = [
-    path('', index, name='lista'),
-    path('crear/', index, name='crear'),
+    path('', views.equipos_lista, name='lista'),
+    path('<int:pk>/', views.equipo_detalle, name='detalle'),
 ]
-
-
 

@@ -1,0 +1,9 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Detalle Factura{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <h2>Detalle de Factura: {{ factura.numero_factura }}</h2>
+    <p>Cliente: {{ factura.cliente.nombre_completo }}</p>
+</div>
+{% endblock %}
+

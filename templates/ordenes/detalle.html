@@ -1,0 +1,20 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Detalle Orden - DIGT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h2><i class="fas fa-tools"></i> Detalle de Orden de Servicio</h2>
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5>Orden: {{ orden.numero_orden }}</h5>
+            <p><strong>Cliente:</strong> {{ orden.cliente.nombre_completo }}</p>
+            <p><strong>Equipo:</strong> {{ orden.marca }} {{ orden.modelo }}</p>
+            <p><strong>Estado:</strong> {{ orden.get_estado_display }}</p>
+            <p><strong>Técnico:</strong> {{ orden.tecnico_asignado.nombre_completo|default:"Sin asignar" }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
