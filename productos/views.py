@@ -5,12 +5,16 @@ CRUD Completo: Crear, Leer, Actualizar, Eliminar
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from .models import Producto, CategoriaProducto, MovimientoInventario
 from .forms import ProductoForm, BuscarProductoForm, MovimientoInventarioForm
+from usuarios.decorators import staff_required
 
 
+@login_required
+@staff_required
 def productos_lista(request):
     """RF2: Lista de productos con búsqueda y filtros"""
     form = BuscarProductoForm(request.GET or None)
@@ -66,6 +70,8 @@ def productos_lista(request):
     return render(request, 'productos/lista.html', context)
 
 
+@login_required
+@staff_required
 def producto_crear(request):
     """RF1: Crear nuevo producto"""
     if request.method == 'POST':
@@ -85,6 +91,8 @@ def producto_crear(request):
     return render(request, 'productos/form.html', context)
 
 
+@login_required
+@staff_required
 def producto_editar(request, pk):
     """RF3: Editar producto existente"""
     producto = get_object_or_404(Producto, pk=pk)
@@ -107,6 +115,8 @@ def producto_editar(request, pk):
     return render(request, 'productos/form.html', context)
 
 
+@login_required
+@staff_required
 def producto_detalle(request, pk):
     """Detalle completo de un producto"""
     producto = get_object_or_404(Producto, pk=pk)
@@ -119,6 +129,8 @@ def producto_detalle(request, pk):
     return render(request, 'productos/detalle.html', context)
 
 
+@login_required
+@staff_required
 def producto_eliminar(request, pk):
     """RF4: Eliminar producto"""
     producto = get_object_or_404(Producto, pk=pk)
@@ -135,6 +147,8 @@ def producto_eliminar(request, pk):
     return render(request, 'productos/eliminar.html', context)
 
 
+@login_required
+@staff_required
 def movimiento_inventario(request, pk):
     """Registrar movimiento de inventario"""
     producto = get_object_or_404(Producto, pk=pk)
@@ -167,6 +181,8 @@ def movimiento_inventario(request, pk):
     return render(request, 'productos/movimiento.html', context)
 
 
+@login_required
+@staff_required
 def productos_bajo_stock(request):
     """Lista de productos que necesitan reposición"""
     productos = [p for p in Producto.objects.filter(activo=True) if p.necesita_reposicion]
@@ -178,6 +194,8 @@ def productos_bajo_stock(request):
     return render(request, 'productos/bajo_stock.html', context)
 
 
+@login_required
+@staff_required
 def producto_toggle_estado(request, pk):
     """Activar/Desactivar producto"""
     producto = get_object_or_404(Producto, pk=pk)

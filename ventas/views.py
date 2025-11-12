@@ -5,11 +5,15 @@ Integrado con E-commerce y Productos
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum, Count
 from .models import Venta, DetalleVenta
+from usuarios.decorators import staff_required
 
 
+@login_required
+@staff_required
 def ventas_lista(request):
     """Lista de ventas con búsqueda y filtros"""
     ventas = Venta.objects.select_related('cliente').all()
@@ -46,12 +50,16 @@ def ventas_lista(request):
     return render(request, 'ventas/lista.html', context)
 
 
+@login_required
+@staff_required
 def venta_crear(request):
     """Crear nueva venta"""
     messages.info(request, 'Formulario de creación en desarrollo')
     return redirect('ventas:lista')
 
 
+@login_required
+@staff_required
 def venta_detalle(request, pk):
     """Ver detalle de una venta"""
     venta = get_object_or_404(Venta, pk=pk)
@@ -64,6 +72,8 @@ def venta_detalle(request, pk):
     return render(request, 'ventas/detalle.html', context)
 
 
+@login_required
+@staff_required
 def venta_editar(request, pk):
     """Editar venta existente"""
     venta = get_object_or_404(Venta, pk=pk)
@@ -71,6 +81,8 @@ def venta_editar(request, pk):
     return redirect('ventas:detalle', pk=pk)
 
 
+@login_required
+@staff_required
 def venta_cambiar_estado(request, pk):
     """Cambiar estado de una venta"""
     if request.method == 'POST':
@@ -81,6 +93,8 @@ def venta_cambiar_estado(request, pk):
     return redirect('ventas:lista')
 
 
+@login_required
+@staff_required
 def ventas_reportes(request):
     """Reportes y estadísticas de ventas"""
     from django.db.models.functions import TruncDate

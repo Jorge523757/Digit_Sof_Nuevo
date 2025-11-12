@@ -1,303 +1,478 @@
-
-    .alert {
-        border-radius: 10px;
-        margin-bottom: 20px;
-        border: none;
-        padding: 15px;
-    }
-
-    .alert-danger {
-        background-color: #fee;
-        color: #c33;
-    }
-
-    .back-link {
-        text-align: center;
-        margin-top: 20px;
-    }
-
-    .back-link a {
-        color: white;
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s;
-    }
-
-    .back-link a:hover {
-        text-decoration: underline;
-    }
-
-    .login-link {
-        text-align: center;
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 1px solid #ecf0f1;
-    }
-
-    .login-link a {
-        color: #667eea;
-        text-decoration: none;
-        font-weight: 500;
-    }
-
-    .login-link a:hover {
-        text-decoration: underline;
-    }
-
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-    }
-
-    @media (max-width: 768px) {
-        .form-row {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block body_content %}
-<div class="registro-container">
-    <div class="registro-card">
-        <div class="registro-header">
-            <div class="logo">
-                <i class="fas fa-user-plus"></i>
-            </div>
-            <h2>Crear Cuenta</h2>
-            <p>Regístrate para acceder al sistema</p>
-        </div>
-
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="post" novalidate>
-            {% csrf_token %}
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" for="{{ form.first_name.id_for_label }}">
-                        <i class="fas fa-user"></i> {{ form.first_name.label }}
-                    </label>
-                    {{ form.first_name }}
-                    {{ form.first_name.errors }}
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="{{ form.last_name.id_for_label }}">
-                        <i class="fas fa-user"></i> {{ form.last_name.label }}
-                    </label>
-                    {{ form.last_name }}
-                    {{ form.last_name.errors }}
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="{{ form.username.id_for_label }}">
-                    <i class="fas fa-at"></i> {{ form.username.label }}
-                </label>
-                {{ form.username }}
-                <small class="form-text">Elige un nombre de usuario único</small>
-                {{ form.username.errors }}
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="{{ form.email.id_for_label }}">
-                    <i class="fas fa-envelope"></i> {{ form.email.label }}
-                </label>
-                {{ form.email }}
-                {{ form.email.errors }}
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" for="{{ form.documento.id_for_label }}">
-                        <i class="fas fa-id-card"></i> {{ form.documento.label }}
-                    </label>
-                    {{ form.documento }}
-                    {{ form.documento.errors }}
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="{{ form.telefono.id_for_label }}">
-                        <i class="fas fa-phone"></i> {{ form.telefono.label }}
-                    </label>
-                    {{ form.telefono }}
-                    {{ form.telefono.errors }}
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="{{ form.direccion.id_for_label }}">
-                    <i class="fas fa-map-marker-alt"></i> {{ form.direccion.label }}
-                </label>
-                {{ form.direccion }}
-                {{ form.direccion.errors }}
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" for="{{ form.password1.id_for_label }}">
-                        <i class="fas fa-lock"></i> {{ form.password1.label }}
-                    </label>
-                    {{ form.password1 }}
-                    <small class="form-text">Mínimo 8 caracteres</small>
-                    {{ form.password1.errors }}
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="{{ form.password2.id_for_label }}">
-                        <i class="fas fa-lock"></i> {{ form.password2.label }}
-                    </label>
-                    {{ form.password2 }}
-                    {{ form.password2.errors }}
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-registro">
-                <i class="fas fa-user-plus"></i> Registrarme
-            </button>
-
-            <div class="login-link">
-                ¿Ya tienes cuenta?
-                <a href="{% url 'usuarios:login' %}">
-                    <i class="fas fa-sign-in-alt"></i> Inicia Sesión
-                </a>
-            </div>
-        </form>
-    </div>
-
-    <div class="back-link">
-        <a href="{% url 'core:home' %}">
-            <i class="fas fa-arrow-left"></i> Volver al inicio
-        </a>
-    </div>
-</div>
-{% endblock %}
 {% extends 'base.html' %}
 
 {% block title %}Registro de Cliente - DIGT SOFT{% endblock %}
 
 {% block extra_css %}
 <style>
+    /* Reset y configuración base - SOBRESCRIBIR TODO */
+    html, body {
+        height: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
     body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        background-color: #667eea !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 100vh !important;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+        padding: 40px 20px !important;
+        overflow-y: auto !important;
+    }
+
+    /* Resetear contenedores Bootstrap */
+    body > * {
+        margin: 0 !important;
+    }
+
+    .registro-wrapper {
+        width: 100%;
+        min-height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 40px 0;
+        flex-direction: column;
+        padding: 20px 0 !important;
     }
 
     .registro-container {
         width: 100%;
-        max-width: 600px;
-        padding: 20px;
+        max-width: 700px;
+        margin: 0 auto !important;
     }
 
     .registro-card {
         background: white;
-        border-radius: 20px;
-        padding: 40px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        border-radius: 25px;
+        padding: 50px 45px;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+        animation: fadeInUp 0.5s ease-out;
+        margin: 20px 0;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .registro-header {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 40px;
     }
 
-    .registro-header .logo {
-        width: 70px;
-        height: 70px;
+    .logo {
+        width: 90px;
+        height: 90px;
+        margin: 0 auto 25px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 20px;
-        font-size: 2rem;
+        font-size: 3rem;
         color: white;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
     }
 
     .registro-header h2 {
         color: #2c3e50;
-        font-weight: 700;
         margin-bottom: 10px;
+        font-size: 2rem;
+        font-weight: 700;
     }
 
     .registro-header p {
         color: #7f8c8d;
         margin: 0;
+        font-size: 1rem;
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
     .form-label {
-        color: #2c3e50;
-        font-weight: 500;
-        margin-bottom: 8px;
         display: block;
+        margin-bottom: 10px;
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 0.95rem;
     }
 
-    .form-control {
-        border: 2px solid #ecf0f1;
-        border-radius: 10px;
-        padding: 12px 15px;
+    .form-label i {
+        margin-right: 8px;
+        color: #667eea;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 15px 18px;
+        border: 2px solid #e8eef3;
+        border-radius: 12px;
         font-size: 1rem;
-        transition: all 0.3s;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+        background: #f8f9fa;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        background: white;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: #bdc3c7;
+    }
+
+    /* Wrapper para campos de contraseña con ojito */
+    .password-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .password-wrapper input {
+        padding-right: 50px !important;
         width: 100%;
     }
 
-    .form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        outline: none;
+    .password-wrapper .toggle-password {
+        position: absolute;
+        right: 18px;
+        color: #95a5a6;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: color 0.3s;
+        z-index: 10;
+    }
+
+    .password-wrapper .toggle-password:hover {
+        color: #667eea;
     }
 
     .form-text {
+        display: block;
+        margin-top: 8px;
         color: #7f8c8d;
         font-size: 0.875rem;
-        margin-top: 5px;
-        display: block;
     }
 
     .errorlist {
         list-style: none;
         padding: 0;
-        margin: 5px 0 0 0;
+        margin: 8px 0 0 0;
     }
 
     .errorlist li {
         color: #e74c3c;
         font-size: 0.875rem;
-        margin-bottom: 3px;
+        margin-top: 5px;
+        padding: 8px 12px;
+        background: #fee;
+        border-radius: 8px;
+        border-left: 3px solid #e74c3c;
     }
 
     .btn-registro {
         width: 100%;
-        padding: 14px;
+        padding: 16px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        border-radius: 10px;
         color: white;
-        font-weight: 600;
+        border: none;
+        border-radius: 12px;
         font-size: 1.1rem;
-        transition: all 0.3s;
-        margin-top: 20px;
+        font-weight: 700;
         cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .btn-registro:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
     }
+
+    .btn-registro:active {
+        transform: translateY(-1px);
+    }
+
+    .alert {
+        border-radius: 12px;
+        margin-bottom: 25px;
+        border: none;
+        padding: 15px 20px;
+    }
+
+    .alert-danger {
+        background-color: #fee;
+        color: #c33;
+        border-left: 4px solid #e74c3c;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border-left: 4px solid #28a745;
+    }
+
+    .back-link {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .back-link a {
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .back-link a:hover {
+        text-decoration: underline;
+        transform: translateX(-5px);
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 25px;
+        border-top: 2px solid #ecf0f1;
+    }
+
+    .login-link p {
+        margin: 0 0 10px 0;
+        color: #7f8c8d;
+        font-size: 0.95rem;
+    }
+
+    .login-link a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .login-link a:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .registro-card {
+            padding: 40px 30px;
+        }
+
+        body {
+            padding: 20px 15px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .registro-header h2 {
+            font-size: 1.75rem;
+        }
+
+        .logo {
+            width: 75px;
+            height: 75px;
+            font-size: 2.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body_content %}
+<div class="registro-wrapper">
+    <div class="registro-container">
+        <div class="registro-card">
+            <div class="registro-header">
+                <div class="logo">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h2>Crear Cuenta</h2>
+                <p>Regístrate para acceder al sistema</p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <i class="fas fa-info-circle"></i> {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.first_name.id_for_label }}">
+                            <i class="fas fa-user"></i> {{ form.first_name.label }}
+                        </label>
+                        {{ form.first_name }}
+                        {{ form.first_name.errors }}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.last_name.id_for_label }}">
+                            <i class="fas fa-user"></i> {{ form.last_name.label }}
+                        </label>
+                        {{ form.last_name }}
+                        {{ form.last_name.errors }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.username.id_for_label }}">
+                        <i class="fas fa-at"></i> {{ form.username.label }}
+                    </label>
+                    {{ form.username }}
+                    <small class="form-text">Elige un nombre de usuario único</small>
+                    {{ form.username.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.email.id_for_label }}">
+                        <i class="fas fa-envelope"></i> {{ form.email.label }}
+                    </label>
+                    {{ form.email }}
+                    {{ form.email.errors }}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.documento.id_for_label }}">
+                            <i class="fas fa-id-card"></i> {{ form.documento.label }}
+                        </label>
+                        {{ form.documento }}
+                        {{ form.documento.errors }}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.telefono.id_for_label }}">
+                            <i class="fas fa-phone"></i> {{ form.telefono.label }}
+                        </label>
+                        {{ form.telefono }}
+                        {{ form.telefono.errors }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.direccion.id_for_label }}">
+                        <i class="fas fa-map-marker-alt"></i> {{ form.direccion.label }}
+                    </label>
+                    {{ form.direccion }}
+                    {{ form.direccion.errors }}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.password1.id_for_label }}">
+                            <i class="fas fa-lock"></i> {{ form.password1.label }}
+                        </label>
+                        <div class="password-wrapper">
+                            {{ form.password1 }}
+                            <i class="fas fa-eye toggle-password" data-target="{{ form.password1.id_for_label }}"></i>
+                        </div>
+                        <small class="form-text">Mínimo 8 caracteres</small>
+                        {{ form.password1.errors }}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.password2.id_for_label }}">
+                            <i class="fas fa-lock"></i> {{ form.password2.label }}
+                        </label>
+                        <div class="password-wrapper">
+                            {{ form.password2 }}
+                            <i class="fas fa-eye toggle-password" data-target="{{ form.password2.id_for_label }}"></i>
+                        </div>
+                        {{ form.password2.errors }}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-registro">
+                    <i class="fas fa-user-plus"></i> Registrarme
+                </button>
+            </form>
+
+            <div class="login-link">
+                <p>¿Ya tienes cuenta?</p>
+                <a href="{% url 'usuarios:login' %}">
+                    <i class="fas fa-sign-in-alt"></i> Inicia Sesión
+                </a>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="{% url 'core:home' %}">
+                <i class="fas fa-arrow-left"></i> Volver al inicio
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Toggle mostrar/ocultar contraseñas
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleButtons = document.querySelectorAll('.toggle-password');
+
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+
+                if (passwordInput) {
+                    // Cambiar el tipo de input
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+
+                    // Cambiar el icono
+                    this.classList.toggle('fa-eye');
+                    this.classList.toggle('fa-eye-slash');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
 

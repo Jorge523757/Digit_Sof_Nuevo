@@ -9,9 +9,11 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from .models import Cliente
 from .forms import ClienteForm
+from usuarios.decorators import staff_required
 
 
 @login_required
+@staff_required
 def lista_clientes(request):
     """RF2: BUSCAR CLIENTES - Lista todos los clientes con búsqueda dinámica y filtros"""
     # Obtener parámetros de búsqueda
@@ -61,6 +63,7 @@ def lista_clientes(request):
     }
     return render(request, 'clientes/lista.html', context)
 
+@staff_required
 
 @login_required
 def crear_cliente(request):
@@ -84,6 +87,7 @@ def crear_cliente(request):
 
 
 @login_required
+@staff_required
 def editar_cliente(request, pk):
     """RF3: MODIFICAR DATOS DEL CLIENTE - Editar cliente existente"""
     cliente = get_object_or_404(Cliente, pk=pk)
@@ -108,6 +112,7 @@ def editar_cliente(request, pk):
 
 
 @login_required
+@staff_required
 def eliminar_cliente(request, pk):
     """RF4: ELIMINAR CLIENTE - Eliminar cliente de la base de datos"""
     cliente = get_object_or_404(Cliente, pk=pk)
@@ -125,6 +130,7 @@ def eliminar_cliente(request, pk):
 
 
 @login_required
+@staff_required
 def detalle_cliente(request, pk):
     """Ver detalles completos de un cliente"""
     cliente = get_object_or_404(Cliente, pk=pk)

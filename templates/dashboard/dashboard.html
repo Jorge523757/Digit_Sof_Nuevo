@@ -11,10 +11,15 @@
 <!-- Welcome Banner -->
 <div class="welcome-banner">
     <h2>¡Bienvenido, {{ user.get_full_name|default:user.username }}!</h2>
+    {% if es_staff %}
     <p>Aquí está el resumen de tu sistema. Puedes acceder a todas las funcionalidades desde el menú lateral.</p>
+    {% else %}
+    <p>Panel de cliente - Acceso limitado. Contacta al administrador para más información.</p>
+    {% endif %}
 </div>
 
-<!-- Stats Row -->
+{% if es_staff %}
+<!-- Stats Row - Solo para Staff -->
 <div class="stats-row">
     <div class="stat-card primary">
         <div class="stat-icon">
@@ -86,7 +91,42 @@
     </div>
 </div>
 
+{% else %}
+<!-- Contenido para Clientes -->
+<div class="content-card">
+    <h5>
+        <i class="fas fa-info-circle"></i> Información de Cuenta
+    </h5>
+    <div class="info-box">
+        <i class="fas fa-user-circle"></i>
+        <div>
+            <strong>Cuenta de Cliente</strong>
+            <p class="mb-0">Bienvenido a DIGIT SOFT. Tu cuenta tiene acceso limitado. Para realizar compras o solicitar servicios, por favor contacta con nuestro equipo de ventas.</p>
+        </div>
+    </div>
+    <div class="mt-4">
+        <h6><i class="fas fa-envelope"></i> Contacto:</h6>
+        <p>Email: ventas@digitsoft.com</p>
+        <p>Teléfono: +52 123 456 7890</p>
+    </div>
+</div>
+
+<div class="content-card mt-4">
+    <h5>
+        <i class="fas fa-lock"></i> Permisos de Acceso
+    </h5>
+    <div class="warning-box">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div>
+            <strong>Acceso Restringido</strong>
+            <p class="mb-0">Como cliente, tu acceso a módulos administrativos está restringido. Solo el personal autorizado puede gestionar clientes, productos, ventas y otros módulos del sistema.</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Activity & Tasks -->
+{% if es_staff %}
 <div class="row">
     <div class="col-lg-8">
         <div class="content-card">
@@ -118,5 +158,6 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endblock %}
 
