@@ -318,126 +318,33 @@ document.addEventListener('DOMContentLoaded', function () {
         clientOption.classList.add('selected');
     }
 
-    // ========== PRODUCT DATA ==========
-    const products = [
-        {
-            id: 1,
-            title: 'Laptop HP EliteBook',
-            price: 899.99,
-            category: 'laptop',
-            image: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
-        },
-        {
-            id: 2,
-            title: 'Computadora Dell OptiPlex',
-            price: 699.99,
-            category: 'desktop',
-            image: 'https://images.unsplash.com/photo-1551645120-d70bfe850c07?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
-        },
-        {
-            id: 3,
-            title: 'Teclado Mecánico RGB',
-            price: 89.99,
-            category: 'accesorio',
-            image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
-        },
-        {
-            id: 4,
-            title: 'Laptop Lenovo ThinkPad',
-            price: 1099.99,
-            category: 'laptop',
-            image: 'https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
-        },
-        {
-            id: 5,
-            title: 'Monitor 27" 4K',
-            price: 349.99,
-            category: 'accesorio',
-            image: 'https://images.unsplash.com/photo-1546538915-a9e2c8d1dc41?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
-        },
-        {
-            id: 6,
-            title: 'Computadora All-in-One',
-            price: 799.99,
-            category: 'desktop',
-            image: 'https://images.unsplash.com/photo-1586211082275-c412e00a1d3a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
-        },
-        {
-            id: 7,
-            title: 'Mouse Inalámbrico',
-            price: 29.99,
-            category: 'accesorio',
-            image: 'https://images.unsplash.com/photo-1527814050087-3793815479db?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
-        },
-        {
-            id: 8,
-            title: 'Laptop ASUS VivoBook',
-            price: 749.99,
-            category: 'laptop',
-            image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
-        }
-    ];
+    // ========== PRODUCT DATA - COMPLETAMENTE REMOVIDO ==========
+    // Los productos ahora provienen EXCLUSIVAMENTE de la base de datos Django
+    // No hay productos hardcodeados aquí
+    console.log('ℹ️ Productos hardcodeados eliminados - solo productos de Django');
 
-    // ========== DISPLAY PRODUCTS ==========
+    // ========== DISPLAY PRODUCTS - COMPLETAMENTE DESHABILITADO ==========
     const productsGrid = document.querySelector('.products-grid');
 
     function displayProducts(productsToDisplay) {
-        if (!productsGrid) return;
-
-        productsGrid.innerHTML = '';
-
-        if (productsToDisplay.length === 0) {
-            productsGrid.innerHTML = '<p class="no-products">No hay productos disponibles en esta categoría.</p>';
-            return;
-        }
-
-        productsToDisplay.forEach(product => {
-            const productCard = document.createElement('div');
-            productCard.className = 'product-card';
-            productCard.innerHTML = `
-                <div class="product-image">
-                    <img src="${product.image}" alt="${product.title}">
-                </div>
-                <div class="product-info">
-                    <span class="product-category">${getCategoryName(product.category)}</span>
-                    <h3 class="product-title">${product.title}</h3>
-                    <p class="product-price">$${product.price.toFixed(2)}</p>
-                    <a href="#contacto" class="product-btn">Consultar</a>
-                </div>
-            `;
-            productsGrid.appendChild(productCard);
-        });
+        // ⚠️ FUNCIÓN DESHABILITADA - NO VACIAR EL DOM
+        // Los productos ahora se renderizan desde Django en el servidor
+        console.log('⚠️ displayProducts() deshabilitado - productos desde Django DOM');
+        console.log('📦 Productos en el DOM:', document.querySelectorAll('.product-card').length);
+        return;
     }
 
     function getCategoryName(category) {
-        switch (category) {
-            case 'laptop': return 'Laptop';
-            case 'desktop': return 'Computadora';
-            case 'accesorio': return 'Accesorio';
-            default: return category;
-        }
+        // Función simplificada para compatibilidad
+        return category;
     }
 
-    // Display all products initially
-    displayProducts(products);
+    // ⚠️ NO EJECUTAR - productos ahora vienen del servidor Django
+    // displayProducts(products); // Comentado - ahora usa productos dinámicos
 
-    // ========== PRODUCT FILTER ==========
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', function () {
-            filterBtns.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-
-            const filter = this.dataset.filter;
-
-            if (filter === 'all') {
-                displayProducts(products);
-            } else {
-                const filteredProducts = products.filter(product => product.category === filter);
-                displayProducts(filteredProducts);
-            }
-        });
-    });
+    // ========== PRODUCT FILTER - DESHABILITADO ==========
+    // Los filtros ahora son manejados por productos-landing.js
+    console.log('⚠️ Filtros estáticos deshabilitados - usando sistema dinámico');
 
     // ========== COUNTER ANIMATION ==========
     const counters = document.querySelectorAll('.counter');

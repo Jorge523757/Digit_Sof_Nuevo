@@ -1,0 +1,448 @@
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    'producto_id': productoId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar localStorage
+                    const carrito = JSON.parse(localStorage.getItem('carrito') || '{}');
+                    delete carrito[productoId];
+                    localStorage.setItem('carrito', JSON.stringify(carrito));
+                    location.reload();
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al eliminar producto');
+            });
+        }
+
+        // Función para limpiar carrito completo
+        function limpiarCarritoCompleto() {
+            if (!confirm('¿Estás seguro de que quieres vaciar todo el carrito?')) return;
+
+            fetch('/tienda/carrito/limpiar/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Limpiar también el localStorage
+                    localStorage.removeItem('carrito');
+                    // Actualizar contadores inmediatamente
+                    actualizarContadorCarrito();
+                    location.reload();
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al limpiar carrito');
+            });
+        }
+
+        // Función para obtener cookie CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Función para actualizar contador del carrito
+        function actualizarContadorCarrito() {
+            const carrito = JSON.parse(localStorage.getItem('carrito') || '{}');
+            const totalItems = Object.values(carrito).reduce((sum, item) => sum + (item.cantidad || 0), 0);
+
+            // Buscar y actualizar todos los contadores del carrito
+            const contadores = document.querySelectorAll('[id*="carrito-count"], [id*="cart-count"], .cart-badge, .carrito-count');
+            contadores.forEach(contador => {
+                if (contador) {
+                    contador.textContent = totalItems;
+                    contador.classList.remove('bg-light', 'text-dark', 'bg-warning');
+                    if (totalItems > 0) {
+                        contador.classList.add('bg-warning', 'text-dark');
+                    } else {
+                        contador.classList.add('bg-light', 'text-dark');
+                    }
+                }
+            });
+
+            // También actualizar en el header si existe
+            const headerCount = document.getElementById('header-carrito-count');
+            if (headerCount) {
+                headerCount.textContent = totalItems;
+                if (totalItems > 0) {
+                    headerCount.classList.remove('bg-light', 'text-dark');
+                    headerCount.classList.add('bg-warning', 'text-dark');
+                } else {
+                    headerCount.classList.remove('bg-warning');
+                    headerCount.classList.add('bg-light', 'text-dark');
+                }
+            }
+        }
+
+        // Sincronizar carrito con localStorage al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Guardar productos actuales en localStorage para sincronización
+            const carritoActual = {};
+            {% for item in productos_carrito %}
+            carritoActual['{{ item.producto.id }}'] = {
+                'nombre': '{{ item.producto.nombre_producto|escapejs }}',
+                'precio': {{ item.producto.precio_venta }},
+                'cantidad': {{ item.cantidad }}
+            };
+            {% endfor %}
+
+            if (Object.keys(carritoActual).length > 0) {
+                localStorage.setItem('carrito', JSON.stringify(carritoActual));
+            }
+
+            // Actualizar contador inicial
+            actualizarContadorCarrito();
+
+            // Configurar listener para cambios en localStorage
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'carrito') {
+                    actualizarContadorCarrito();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+{% load math_filters %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras - DigitSoft</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        .header-ecommerce {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+        }
+
+        .cart-item {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .cart-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantity-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+        }
+
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0.25rem;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: #6c757d;
+        }
+
+        .cart-summary {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            position: sticky;
+            top: 20px;
+        }
+
+        .btn-checkout {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .btn-checkout:hover {
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header-ecommerce">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        Carrito de Compras
+                    </h1>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="{% url 'ecommerce:productos' %}" class="btn btn-light">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Continuar Comprando
+                    </a>
+                    <a href="{% url 'dashboard:index' %}" class="btn btn-outline-light ms-2">
+                        <i class="fas fa-tachometer-alt me-1"></i>
+                        Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container py-4">
+        {% if productos_carrito %}
+        <div class="row">
+            <!-- Items del Carrito -->
+            <div class="col-lg-8">
+                <h4 class="mb-3">
+                    <i class="fas fa-list me-2"></i>
+                    Productos en tu carrito ({{ cantidad_items }} item{{ cantidad_items|pluralize }})
+                </h4>
+
+                {% for item in productos_carrito %}
+                <div class="cart-item" data-producto-id="{{ item.producto.id }}">
+                    <div class="row align-items-center">
+                        <!-- Imagen del producto -->
+                        <div class="col-md-2">
+                            {% if item.producto.imagen %}
+                                <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre_producto }}" class="product-image">
+                            {% else %}
+                                <div class="product-image bg-light d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-box fa-2x text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Información del producto -->
+                        <div class="col-md-4">
+                            <h6 class="mb-1">{{ item.producto.nombre_producto }}</h6>
+                            <p class="text-muted small mb-1">
+                                <i class="fas fa-tag me-1"></i>
+                                {{ item.producto.codigo_sku }}
+                            </p>
+                            {% if item.producto.marca %}
+                            <p class="text-muted small mb-0">
+                                <i class="fas fa-industry me-1"></i>
+                                {{ item.producto.marca }}
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Controles de cantidad -->
+                        <div class="col-md-3">
+                            <label class="form-label small">Cantidad:</label>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="actualizarCantidad({{ item.producto.id }}, {{ item.cantidad }} - 1)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" class="quantity-input" value="{{ item.cantidad }}"
+                                       min="1" max="{{ item.producto.stock_actual }}"
+                                       onchange="actualizarCantidad({{ item.producto.id }}, this.value)">
+                                <button class="quantity-btn" onclick="actualizarCantidad({{ item.producto.id }}, {{ item.cantidad }} + 1)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">Stock: {{ item.producto.stock_actual }}</small>
+                        </div>
+
+                        <!-- Precio y acciones -->
+                        <div class="col-md-2">
+                            <p class="mb-1">
+                                <strong class="text-primary">${{ item.producto.precio_venta|floatformat:2 }}</strong>
+                            </p>
+                            <p class="text-muted small mb-2">
+                                Subtotal: <strong>${{ item.subtotal|floatformat:2 }}</strong>
+                            </p>
+                            <button class="btn btn-outline-danger btn-sm" onclick="eliminarDelCarrito({{ item.producto.id }})">
+                                <i class="fas fa-trash me-1"></i>
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- Acciones del carrito -->
+                <div class="d-flex justify-content-between mt-3">
+                    <button class="btn btn-outline-warning" onclick="limpiarCarritoCompleto()">
+                        <i class="fas fa-broom me-1"></i>
+                        Vaciar Carrito
+                    </button>
+                    <a href="{% url 'ecommerce:productos' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-plus me-1"></i>
+                        Agregar Más Productos
+                    </a>
+                </div>
+            </div>
+
+            <!-- Resumen del carrito -->
+            <div class="col-lg-4">
+                <div class="cart-summary">
+                    <h5 class="mb-3">
+                        <i class="fas fa-calculator me-2"></i>
+                        Resumen del Pedido
+                    </h5>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span>${{ total|floatformat:2 }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>IVA (19%):</span>
+                        <span>${{ total|mul:0.19|floatformat:2 }}</span>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total:</strong>
+                        <strong class="text-primary">${{ total|mul:1.19|floatformat:2 }}</strong>
+                    </div>
+
+                    <button class="btn-checkout">
+                        <i class="fas fa-credit-card me-2"></i>
+                        Proceder al Pago
+                    </button>
+
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            Compra 100% segura y protegida
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- Carrito vacío -->
+        <div class="empty-cart">
+            <i class="fas fa-shopping-cart fa-4x mb-3 text-muted"></i>
+            <h4>Tu carrito está vacío</h4>
+            <p class="mb-4">¡Explora nuestros productos y encuentra lo que necesitas!</p>
+            <a href="{% url 'ecommerce:productos' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-store me-2"></i>
+                Ir a la Tienda
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript del Carrito -->
+    <script>
+        // Función para actualizar cantidad
+        function actualizarCantidad(productoId, nuevaCantidad) {
+            if (nuevaCantidad <= 0) return;
+
+            fetch('/tienda/carrito/actualizar/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    'producto_id': productoId,
+                    'cantidad': parseInt(nuevaCantidad)
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar localStorage
+                    const carrito = JSON.parse(localStorage.getItem('carrito') || '{}');
+                    if (carrito[productoId]) {
+                        carrito[productoId].cantidad = parseInt(nuevaCantidad);
+                        localStorage.setItem('carrito', JSON.stringify(carrito));
+                    }
+                    location.reload(); // Recargar para actualizar totales
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al actualizar cantidad');
+            });
+        }
+
+        // Función para eliminar producto del carrito
+        function eliminarDelCarrito(productoId) {
+            if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
+
+            fetch('/tienda/carrito/eliminar/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+

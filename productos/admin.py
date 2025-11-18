@@ -3,7 +3,7 @@ DIGT SOFT - Admin del Módulo de Productos
 """
 
 from django.contrib import admin
-from .models import Producto, CategoriaProducto, MovimientoInventario
+from .models import Producto, CategoriaProducto, MovimientoInventario, ReaccionProducto
 
 
 @admin.register(CategoriaProducto)
@@ -78,4 +78,14 @@ class MovimientoInventarioAdmin(admin.ModelAdmin):
             'fields': ('observaciones', 'usuario', 'fecha_movimiento')
         }),
     )
+
+
+@admin.register(ReaccionProducto)
+class ReaccionProductoAdmin(admin.ModelAdmin):
+    list_display = ('producto', 'tipo', 'usuario', 'session_id', 'fecha_creacion')
+    list_filter = ('tipo', 'fecha_creacion')
+    search_fields = ('producto__nombre_producto', 'usuario__username')
+    readonly_fields = ('fecha_creacion',)
+    ordering = ('-fecha_creacion',)
+
 

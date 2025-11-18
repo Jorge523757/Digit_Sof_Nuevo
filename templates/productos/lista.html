@@ -25,6 +25,13 @@
                     </nav>
                 </div>
                 <div>
+                    <a href="{% url 'ecommerce:ver_carrito' %}" class="btn btn-success me-2">
+                        <i class="fas fa-shopping-cart"></i> Carrito
+                        <span class="badge bg-light text-dark ms-1" id="carrito-count">0</span>
+                    </a>
+                    <a href="{% url 'ecommerce:productos' %}" class="btn btn-info me-2">
+                        <i class="fas fa-store"></i> Ver Tienda
+                    </a>
                     <a href="{% url 'productos:crear' %}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Nuevo Producto
                     </a>
@@ -101,6 +108,7 @@
     <div class="card mb-4">
         <div class="card-body">
             <form method="get" class="row g-3">
+                {% csrf_token %}
                 <div class="col-md-5">
                     {{ form.busqueda }}
                 </div>
@@ -183,27 +191,39 @@
                     </div>
 
                     <!-- Acciones -->
-                    <div class="btn-group w-100" role="group">
-                        <a href="{% url 'productos:detalle' producto.pk %}"
-                           class="btn btn-sm btn-info"
-                           title="Ver detalle">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <a href="{% url 'productos:editar' producto.pk %}"
-                           class="btn btn-sm btn-warning"
-                           title="Editar">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a href="{% url 'productos:movimiento' producto.pk %}"
-                           class="btn btn-sm btn-success"
-                           title="Inventario">
-                            <i class="fas fa-exchange-alt"></i>
-                        </a>
-                        <a href="{% url 'productos:eliminar' producto.pk %}"
-                           class="btn btn-sm btn-danger"
-                           title="Eliminar">
-                            <i class="fas fa-trash"></i>
-                        </a>
+                    <div class="row g-1 mb-2">
+                        {% if producto.disponible_web and producto.stock_actual > 0 %}
+                        <div class="col-12">
+                            <button onclick="agregarAlCarrito({{ producto.id }})"
+                                    class="btn btn-sm btn-success w-100 mb-1">
+                                <i class="fas fa-cart-plus"></i> Agregar al Carrito
+                            </button>
+                        </div>
+                        {% endif %}
+                        <div class="col-12">
+                            <div class="btn-group w-100" role="group">
+                                <a href="{% url 'productos:detalle' producto.pk %}"
+                                   class="btn btn-sm btn-info"
+                                   title="Ver detalle">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'productos:editar' producto.pk %}"
+                                   class="btn btn-sm btn-warning"
+                                   title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'productos:movimiento' producto.pk %}"
+                                   class="btn btn-sm btn-primary"
+                                   title="Inventario">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </a>
+                                <a href="{% url 'productos:eliminar' producto.pk %}"
+                                   class="btn btn-sm btn-danger"
+                                   title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -257,5 +277,133 @@
 
 {% block extra_js %}
 <script src="{% static 'js/productos.js' %}"></script>
+
+<!-- JavaScript del Carrito -->
+<script>
+// Actualizar contador del carrito al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    actualizarContadorCarrito();
+});
+
+// Función para obtener el carrito del localStorage
+function obtenerCarrito() {
+    const carrito = localStorage.getItem('carrito');
+    return carrito ? JSON.parse(carrito) : {};
+}
+
+// Función para guardar el carrito en localStorage
+function guardarCarrito(carrito) {
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+}
+
+// Función para actualizar el contador del carrito
+function actualizarContadorCarrito() {
+    const carrito = obtenerCarrito();
+    const totalItems = Object.values(carrito).reduce((total, item) => total + item.cantidad, 0);
+
+    // Buscar y actualizar todos los posibles contadores del carrito
+    const selectores = ['carrito-count', 'header-carrito-count', 'cart-count'];
+    selectores.forEach(selector => {
+        const contador = document.getElementById(selector);
+        if (contador) {
+            contador.textContent = totalItems;
+            contador.classList.remove('bg-light', 'text-dark', 'bg-warning');
+            if (totalItems > 0) {
+                contador.classList.add('bg-warning', 'text-dark');
+            } else {
+                contador.classList.add('bg-light', 'text-dark');
+            }
+        }
+    });
+}
+
+// Función para agregar producto al carrito
+function agregarAlCarrito(productoId) {
+    // Hacer petición AJAX al backend
+    fetch('/tienda/carrito/agregar/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value || getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            'producto_id': productoId,
+            'cantidad': 1
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // También actualizar localStorage para sincronización
+            const carrito = obtenerCarrito();
+            if (carrito[productoId]) {
+                carrito[productoId].cantidad += 1;
+            } else {
+                carrito[productoId] = {
+                    cantidad: 1,
+                    nombre: data.nombre || 'Producto',
+                    precio: data.precio || 0
+                };
+            }
+            guardarCarrito(carrito);
+
+            // Actualizar contadores
+            actualizarContadorCarrito();
+
+            // También actualizar el contador del header si existe
+            if (typeof actualizarContadorCarritoHeader === 'function') {
+                actualizarContadorCarritoHeader();
+            }
+
+            // Mostrar notificación de éxito
+            mostrarNotificacion(data.message || '✅ Producto agregado al carrito', 'success');
+        } else {
+            mostrarNotificacion(data.error || '❌ Error al agregar producto', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarNotificacion('❌ Error de conexión', 'error');
+    });
+}
+
+// Función para mostrar notificaciones
+function mostrarNotificacion(mensaje, tipo = 'info') {
+    // Crear elemento de notificación
+    const notificacion = document.createElement('div');
+    notificacion.className = `alert alert-${tipo === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    notificacion.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notificacion.innerHTML = `
+        ${mensaje}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    // Agregar al body
+    document.body.appendChild(notificacion);
+
+    // Remover automáticamente después de 3 segundos
+    setTimeout(() => {
+        if (notificacion.parentNode) {
+            notificacion.remove();
+        }
+    }, 3000);
+}
+
+// Función para obtener cookie CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
 {% endblock %}
 

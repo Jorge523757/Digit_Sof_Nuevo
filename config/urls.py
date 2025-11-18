@@ -7,6 +7,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),  # Página principal
 
+    # E-commerce
+    path('tienda/', include('ecommerce_urls')),  # URLs del e-commerce
+
     # Módulos
     path('usuarios/', include('usuarios.urls')),
     path('dashboard/', include('dashboard.urls')),
@@ -18,6 +21,7 @@ urlpatterns = [
     path('garantias/', include('garantias.urls')),
     path('compras/', include('compras.urls')),
     path('ventas/', include('ventas.urls')),
+    path('checkout/', include('ventas.urls_checkout')),  # Checkout y facturación
     path('facturacion/', include('facturacion.urls')),
     path('equipos/', include('equipos.urls')),
     path('capacitaciones/', include('capacitaciones.urls')),

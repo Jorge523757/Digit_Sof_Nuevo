@@ -431,7 +431,7 @@ class CartItem(models.Model):
     """Items del carrito"""
     
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey('productos.Producto', on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -441,11 +441,19 @@ class CartItem(models.Model):
         unique_together = ('cart', 'product')
     
     def __str__(self):
-        return f"{self.quantity} x {self.product.name}"
-    
+        return f"{self.quantity} x {self.product.nombre_producto}"
+
     @property
     def total_price(self):
-        return self.product.price * self.quantity
+        return self.product.precio_venta * self.quantity
+
+    @property
+    def available_stock(self):
+        return self.product.stock_actual
+
+    def can_increase_quantity(self, amount=1):
+        """Verifica si se puede aumentar la cantidad"""
+        return (self.quantity + amount) <= self.product.stock_actual
 
 
 class Order(models.Model):

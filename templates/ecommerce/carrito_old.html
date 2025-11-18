@@ -1,0 +1,116 @@
+}
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al eliminar producto');
+            });
+        }
+
+        // Función para limpiar carrito completo
+        function limpiarCarritoCompleto() {
+            if (!confirm('¿Estás seguro de que quieres vaciar todo el carrito?')) return;
+
+            fetch('/tienda/carrito/limpiar/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Limpiar también el localStorage
+                    localStorage.removeItem('carrito');
+                    // Actualizar contadores inmediatamente
+                    actualizarContadorCarrito();
+                    location.reload();
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al limpiar carrito');
+            });
+        }
+
+        // Función para obtener cookie CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Función para actualizar contador del carrito
+        function actualizarContadorCarrito() {
+            const carrito = JSON.parse(localStorage.getItem('carrito') || '{}');
+            const totalItems = Object.values(carrito).reduce((sum, item) => sum + (item.cantidad || 0), 0);
+
+            // Buscar y actualizar todos los contadores del carrito
+            const contadores = document.querySelectorAll('[id*="carrito-count"], [id*="cart-count"], .cart-badge, .carrito-count');
+            contadores.forEach(contador => {
+                if (contador) {
+                    contador.textContent = totalItems;
+                    contador.classList.remove('bg-light', 'text-dark', 'bg-warning');
+                    if (totalItems > 0) {
+                        contador.classList.add('bg-warning', 'text-dark');
+                    } else {
+                        contador.classList.add('bg-light', 'text-dark');
+                    }
+                }
+            });
+
+            // También actualizar en el header si existe
+            const headerCount = document.getElementById('header-carrito-count');
+            if (headerCount) {
+                headerCount.textContent = totalItems;
+                if (totalItems > 0) {
+                    headerCount.classList.remove('bg-light', 'text-dark');
+                    headerCount.classList.add('bg-warning', 'text-dark');
+                } else {
+                    headerCount.classList.remove('bg-warning');
+                    headerCount.classList.add('bg-light', 'text-dark');
+                }
+            }
+        }
+
+        // Sincronizar carrito con localStorage al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Guardar productos actuales en localStorage para sincronización
+            const carritoActual = {};
+            {% for item in productos_carrito %}
+            carritoActual['{{ item.producto.id }}'] = {
+                'nombre': '{{ item.producto.nombre_producto|escapejs }}',
+                'precio': {{ item.producto.precio_venta }},
+                'cantidad': {{ item.cantidad }}
+            };
+            {% endfor %}
+
+            if (Object.keys(carritoActual).length > 0) {
+                localStorage.setItem('carrito', JSON.stringify(carritoActual));
+            }
+
+            // Actualizar contador inicial
+            actualizarContadorCarrito();
+
+            // Configurar listener para cambios en localStorage
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'carrito') {
+                    actualizarContadorCarrito();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

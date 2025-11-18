@@ -1,0 +1,225 @@
+/* Estilos para Reacciones y Detalles de Productos */
+
+/* Reacciones en tarjeta de producto */
+.product-reactions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    background: white;
+    border-radius: 20px;
+    padding: 5px 10px;
+    display: flex;
+    gap: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+
+.product-reactions:hover {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+}
+
+.reaction-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #666;
+}
+
+.reaction-btn:hover {
+    transform: scale(1.2);
+}
+
+.reaction-btn:active {
+    transform: scale(0.95);
+}
+
+.reaction-btn i {
+    transition: color 0.2s ease;
+}
+
+.reaction-btn:hover .fa-thumbs-up {
+    color: #10b981 !important;
+}
+
+.reaction-btn:hover .fa-thumbs-down {
+    color: #ef4444 !important;
+}
+
+.reaction-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    min-width: 15px;
+    text-align: center;
+}
+
+/* Botones de acción de producto */
+.product-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-ver-detalle {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-ver-detalle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-ver-detalle:active {
+    transform: translateY(0);
+}
+
+.btn-add-cart {
+    flex: 1;
+}
+
+/* Ajustes al footer del producto */
+.product-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e5e7eb;
+    gap: 15px;
+}
+
+.product-price {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.price {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #10b981;
+}
+
+.stock {
+    font-size: 0.75rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Estilos para elementos clickeables de detalle */
+.producto-ver-detalle {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.producto-ver-detalle:hover {
+    color: #667eea !important;
+    transform: translateY(-1px);
+}
+
+.product-image.producto-ver-detalle:hover {
+    transform: none;
+}
+
+.product-image.producto-ver-detalle:hover img {
+    transform: scale(1.05);
+}
+
+/* Badge de producto destacado */
+.badge-destacado {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    z-index: 5;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+/* Animaciones de productos */
+.product-card {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.product-card.destacado {
+    border: 2px solid #f59e0b;
+    box-shadow: 0 5px 20px rgba(245, 158, 11, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .product-reactions {
+        padding: 3px 6px;
+        gap: 5px;
+    }
+
+    .reaction-btn {
+        font-size: 14px;
+        padding: 3px;
+    }
+
+    .product-actions {
+        flex-direction: column;
+    }
+
+    .btn-ver-detalle,
+    .btn-add-cart {
+        width: 100%;
+        margin: 0;
+    }
+}
+/* Animaciones adicionales */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.reaction-btn.reacting {
+    animation: pulse 0.3s ease;
+}
+
+/* Cursor pointer para elementos clickeables */
+.product-name,
+.product-image {
+    cursor: pointer;
+    user-select: none;
+}
+
+.product-name:hover {
+    color: #667eea;
+    transition: color 0.3s ease;
+}
+
+

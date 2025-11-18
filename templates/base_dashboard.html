@@ -64,6 +64,11 @@
                 </a>
             </li>
             <li>
+                <a href="{% url 'ecommerce:productos' %}">
+                    <i class="fas fa-store"></i> E-commerce / Tienda
+                </a>
+            </li>
+            <li>
                 <a href="{% url 'garantias:lista' %}">
                     <i class="fas fa-shield-alt"></i> Gestión de Garantías
                 </a>
@@ -125,6 +130,7 @@
                             <li><a href="{% url 'tecnicos:lista' %}"><i class="fas fa-user-tie"></i> Técnicos</a></li>
                             <li><a href="{% url 'ordenes:lista' %}"><i class="fas fa-clipboard-list"></i> Órdenes</a></li>
                             <li><a href="{% url 'productos:lista' %}"><i class="fas fa-box"></i> Productos</a></li>
+                            <li><a href="{% url 'ecommerce:productos' %}"><i class="fas fa-store"></i> E-commerce</a></li>
                             <li><a href="{% url 'proveedores:lista' %}"><i class="fas fa-truck"></i> Proveedores</a></li>
                             <li><a href="{% url 'garantias:lista' %}"><i class="fas fa-shield-alt"></i> Garantías</a></li>
                             <li><a href="{% url 'compras:lista' %}"><i class="fas fa-shopping-cart"></i> Compras</a></li>
@@ -142,6 +148,17 @@
 
             <div class="header-actions">
                 {% if user.is_authenticated %}
+                    <!-- Botón del Carrito -->
+                    <a href="{% url 'ecommerce:ver_carrito' %}" class="btn btn-success btn-sm me-2">
+                        <i class="fas fa-shopping-cart"></i> Carrito
+                        <span class="badge bg-light text-dark ms-1" id="header-carrito-count">0</span>
+                    </a>
+
+                    <!-- Botón ver tienda -->
+                    <a href="{% url 'ecommerce:productos' %}" class="btn btn-info btn-sm me-2">
+                        <i class="fas fa-store"></i> Tienda
+                    </a>
+
                     <div class="user-info">
                         <div class="user-avatar">
                             {{ user.get_full_name|slice:":1"|upper|default:user.username|slice:":1"|upper }}
@@ -262,6 +279,40 @@
 
     <!-- Theme Switcher JS -->
     <script src="{% static 'js/theme-switcher.js' %}"></script>
+
+    <!-- JavaScript del Carrito Global -->
+    <script>
+        // Actualizar contador del carrito al cargar cualquier página del dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarContadorCarritoHeader();
+        });
+
+        // Función para actualizar el contador del header
+        function actualizarContadorCarritoHeader() {
+            const carrito = localStorage.getItem('carrito');
+            const carritoObj = carrito ? JSON.parse(carrito) : {};
+            const totalItems = Object.values(carritoObj).reduce((total, item) => total + item.cantidad, 0);
+
+            const contador = document.getElementById('header-carrito-count');
+            if (contador) {
+                contador.textContent = totalItems;
+                if (totalItems > 0) {
+                    contador.classList.remove('bg-light', 'text-dark');
+                    contador.classList.add('bg-warning', 'text-dark');
+                } else {
+                    contador.classList.remove('bg-warning');
+                    contador.classList.add('bg-light', 'text-dark');
+                }
+            }
+        }
+
+        // Actualizar contador cuando se modifique el carrito
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'carrito') {
+                actualizarContadorCarritoHeader();
+            }
+        });
+    </script>
 
     {% block extra_js %}{% endblock %}
 </body>

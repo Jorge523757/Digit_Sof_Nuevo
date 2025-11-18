@@ -1,0 +1,460 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ producto.nombre_producto }} - Digit Soft</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/productos-carrito.css' %}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .btn-back {
+            background: white;
+            color: #667eea;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,255,255,0.3);
+        }
+
+        .product-detail {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .product-image {
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .reactions {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 50px;
+            display: flex;
+            gap: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .reaction-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .reaction-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .reaction-btn.active {
+            animation: pulse 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        .reaction-count {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .product-info h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .product-category {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            display: inline-block;
+            background: #f0f4ff;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        .product-price {
+            font-size: 42px;
+            color: #10b981;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+
+        .product-stock {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background: #ecfdf5;
+            border-radius: 10px;
+            width: fit-content;
+        }
+
+        .product-stock i {
+            color: #10b981;
+        }
+
+        .product-description {
+            color: #666;
+            line-height: 1.8;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 10px;
+        }
+
+        .product-specs {
+            margin: 30px 0;
+        }
+
+        .product-specs h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .spec-item {
+            display: flex;
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .spec-item:last-child {
+            border-bottom: none;
+        }
+
+        .spec-label {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 150px;
+        }
+
+        .spec-value {
+            color: #666;
+        }
+
+        .btn-add-cart {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-add-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .related-products {
+            padding: 40px;
+            background: #f9fafb;
+        }
+
+        .related-products h3 {
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .related-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .related-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .related-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .related-card h4 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .related-card .price {
+            color: #10b981;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .product-detail {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-box-open"></i> Detalle del Producto</h1>
+            <a href="/" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+
+        <div class="product-detail">
+            <div class="product-image">
+                {% if producto.imagen %}
+                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre_producto }}">
+                {% else %}
+                    <img src="{% static 'images/no-image.png' %}" alt="{{ producto.nombre_producto }}">
+                {% endif %}
+
+                <div class="reactions">
+                    <button class="reaction-btn {% if reaccion_usuario == 'like' %}active{% endif %}"
+                            onclick="reaccionar({{ producto.id }}, 'like')"
+                            id="btn-like">
+                        <i class="fas fa-thumbs-up" style="color: #10b981;"></i>
+                        <span class="reaction-count" id="count-like">{{ contadores.likes }}</span>
+                    </button>
+                    <button class="reaction-btn {% if reaccion_usuario == 'dislike' %}active{% endif %}"
+                            onclick="reaccionar({{ producto.id }}, 'dislike')"
+                            id="btn-dislike">
+                        <i class="fas fa-thumbs-down" style="color: #ef4444;"></i>
+                        <span class="reaction-count" id="count-dislike">{{ contadores.dislikes }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="product-info">
+                <span class="product-category">{{ producto.categoria.nombre|default:"General" }}</span>
+                <h2>{{ producto.nombre_producto }}</h2>
+
+                <div class="product-price">
+                    ${{ producto.precio_venta|floatformat:2 }}
+                </div>
+
+                <div class="product-stock">
+                    <i class="fas fa-box"></i>
+                    <strong>{{ producto.stock_actual }} disponibles</strong>
+                </div>
+
+                <div class="product-description">
+                    <strong>Descripción:</strong><br>
+                    {{ producto.descripcion }}
+                </div>
+
+                {% if producto.procesador or producto.memoria_ram or producto.memoria_rom or producto.marca %}
+                <div class="product-specs">
+                    <h3><i class="fas fa-info-circle"></i> Especificaciones Técnicas</h3>
+                    {% if producto.marca %}
+                    <div class="spec-item">
+                        <span class="spec-label">Marca:</span>
+                        <span class="spec-value">{{ producto.marca }}</span>
+                    </div>
+                    {% endif %}
+                    {% if producto.modelo_equipo %}
+                    <div class="spec-item">
+                        <span class="spec-label">Modelo:</span>
+                        <span class="spec-value">{{ producto.modelo_equipo }}</span>
+                    </div>
+                    {% endif %}
+                    {% if producto.procesador %}
+                    <div class="spec-item">
+                        <span class="spec-label">Procesador:</span>
+                        <span class="spec-value">{{ producto.procesador }}</span>
+                    </div>
+                    {% endif %}
+                    {% if producto.memoria_ram %}
+                    <div class="spec-item">
+                        <span class="spec-label">Memoria RAM:</span>
+                        <span class="spec-value">{{ producto.memoria_ram }}</span>
+                    </div>
+                    {% endif %}
+                    {% if producto.memoria_rom %}
+                    <div class="spec-item">
+                        <span class="spec-label">Almacenamiento:</span>
+                        <span class="spec-value">{{ producto.memoria_rom }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <button class="btn-add-cart" onclick="agregarAlCarrito({{ producto.id }})">
+                    <i class="fas fa-cart-plus"></i>
+                    Agregar al Carrito
+                </button>
+            </div>
+        </div>
+
+        {% if productos_relacionados %}
+        <div class="related-products">
+            <h3><i class="fas fa-tags"></i> Productos Relacionados</h3>
+            <div class="related-grid">
+                {% for prod in productos_relacionados %}
+                <a href="{% url 'productos:detalle_publico' prod.id %}" class="related-card">
+                    {% if prod.imagen %}
+                        <img src="{{ prod.imagen.url }}" alt="{{ prod.nombre_producto }}">
+                    {% else %}
+                        <img src="{% static 'images/no-image.png' %}" alt="{{ prod.nombre_producto }}">
+                    {% endif %}
+                    <h4>{{ prod.nombre_producto }}</h4>
+                    <div class="price">${{ prod.precio_venta|floatformat:2 }}</div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        let reaccionActual = '{{ reaccion_usuario|default:"" }}';
+
+        function reaccionar(productoId, tipo) {
+            fetch('/productos/api/reaccion/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    producto_id: productoId,
+                    tipo: tipo
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar contadores
+                    document.getElementById('count-like').textContent = data.contadores.likes;
+                    document.getElementById('count-dislike').textContent = data.contadores.dislikes;
+
+                    // Actualizar estado visual
+                    const btnLike = document.getElementById('btn-like');
+                    const btnDislike = document.getElementById('btn-dislike');
+
+                    btnLike.classList.remove('active');
+                    btnDislike.classList.remove('active');
+
+                    // Si se clickeó la misma reacción, se quitó
+                    if (reaccionActual === tipo) {
+                        reaccionActual = '';
+                    } else {
+                        // Si se clickeó otra, activarla
+                        reaccionActual = tipo;
+                        if (tipo === 'like') {
+                            btnLike.classList.add('active');
+                        } else {
+                            btnDislike.classList.add('active');
+                        }
+                    }
+
+                    // Animación
+                    const btn = tipo === 'like' ? btnLike : btnDislike;
+                    btn.style.transform = 'scale(1.3)';
+                    setTimeout(() => {
+                        btn.style.transform = 'scale(1)';
+                    }, 200);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al registrar la reacción. Por favor, intenta de nuevo.');
+            });
+        }
+
+        function agregarAlCarrito(productoId) {
+            if (typeof agregarAlCarrito !== 'undefined') {
+                agregarAlCarrito(productoId);
+            } else {
+                alert('Funcionalidad del carrito no disponible. Por favor, regresa a la página principal.');
+            }
+        }
+    </script>
+</body>
+</html>
+

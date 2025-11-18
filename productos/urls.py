@@ -8,6 +8,11 @@ from . import views
 app_name = 'productos'
 
 urlpatterns = [
+    # API pública
+    path('api/publicos/', views.api_productos_publicos, name='api_publicos'),
+    path('api/reaccion/', views.api_reaccion_producto, name='api_reaccion'),
+    path('detalle/<int:pk>/', views.producto_detalle_publico, name='detalle_publico'),
+
     # Lista y búsqueda
     path('', views.productos_lista, name='lista'),
     path('bajo-stock/', views.productos_bajo_stock, name='bajo_stock'),

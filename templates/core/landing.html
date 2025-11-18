@@ -17,6 +17,55 @@
 
     <!-- Accessibility CSS -->
     <link rel="stylesheet" href="{% static 'css/accessibility.css' %}">
+
+    <!-- Productos y Carrito CSS -->
+    <link rel="stylesheet" href="{% static 'css/productos-carrito.css' %}">
+    <link rel="stylesheet" href="{% static 'css/productos-reacciones.css' %}">
+
+    <style>
+        /* Estilos para el botón del carrito en el header */
+        .cart-header-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            color: white !important;
+            padding: 10px 20px !important;
+            border-radius: 25px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            font-weight: 600 !important;
+            text-decoration: none !important;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
+            position: relative !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .cart-header-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+        }
+
+        .cart-badge-header {
+            position: absolute !important;
+            top: -8px !important;
+            right: -8px !important;
+            background: #ef4444 !important;
+            color: white !important;
+            width: 22px !important;
+            height: 22px !important;
+            border-radius: 50% !important;
+            display: none !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 0.75rem !important;
+            font-weight: 700 !important;
+            border: 2px solid white !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+        }
+
+        .cart-badge-header.show {
+            display: flex !important;
+        }
+    </style>
 </head>
 <body>
     <!-- Accessibility Widget -->
@@ -331,6 +380,13 @@
                     <li><a href="#nosotros">Nosotros</a></li>
                     <li><a href="#contacto">Contacto</a></li>
                     <li><a href="#" id="ingresoBtn">Ingreso</a></li>
+                    <li style="display: inline-block;">
+                        <a href="#" id="cartBtn" class="cart-header-btn" style="display: inline-flex !important;">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Carrito</span>
+                            <span id="cartBadge" class="cart-badge-header" style="display: none;">0</span>
+                        </a>
+                    </li>
                 </ul>
                 <div class="menu-toggle" id="mobileMenu">
                     <i class="fas fa-bars"></i>
@@ -534,14 +590,107 @@
     <section id="productos" class="products">
         <div class="container">
             <h2 class="section-title">Nuestros Productos</h2>
+
+            <!-- Filtros dinámicos basados en categorías reales -->
             <div class="product-filters">
                 <button class="filter-btn active" data-filter="all">Todos</button>
-                <button class="filter-btn" data-filter="laptop">Laptops</button>
-                <button class="filter-btn" data-filter="desktop">Computadoras</button>
-                <button class="filter-btn" data-filter="accesorio">Accesorios</button>
+                {% for categoria_data in categorias_con_productos %}
+                <button class="filter-btn" data-filter="{{ categoria_data.categoria.nombre|lower }}">{{ categoria_data.categoria.nombre }}</button>
+                {% endfor %}
             </div>
-            <div class="products-grid">
-                <!-- Los productos se cargarán dinámicamente con JavaScript -->
+
+            <!-- Grid de productos reales desde la base de datos -->
+            <div class="products-grid" id="productsGridReal">
+                {% for categoria_data in categorias_con_productos %}
+                    {% for producto in categoria_data.productos %}
+                    <div class="product-card" data-filter="{{ producto.categoria.nombre|lower }}" data-producto-id="{{ producto.id }}">
+
+                        <!-- Badge de destacado -->
+                        {% if producto.destacado %}
+                        <div class="badge-destacado">⭐ Destacado</div>
+                        {% endif %}
+
+                        <!-- Reacciones -->
+                        <div class="product-reactions">
+                            <button class="reaction-btn reaction-like"
+                                    data-producto-id="{{ producto.id }}"
+                                    data-tipo="like"
+                                    title="Me gusta">
+                                <i class="fas fa-thumbs-up"></i>
+                                <span class="reaction-count" id="like-{{ producto.id }}">0</span>
+                            </button>
+                            <button class="reaction-btn reaction-dislike"
+                                    data-producto-id="{{ producto.id }}"
+                                    data-tipo="dislike"
+                                    title="No me gusta">
+                                <i class="fas fa-thumbs-down"></i>
+                                <span class="reaction-count" id="dislike-{{ producto.id }}">0</span>
+                            </button>
+                        </div>
+
+                        <!-- Imagen del producto -->
+                        <div class="product-image producto-ver-detalle" data-producto-id="{{ producto.id }}">
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre_producto }}">
+                            {% else %}
+                                <div class="no-image"><i class="fas fa-image"></i></div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Información del producto -->
+                        <div class="product-info">
+                            <span class="product-category">{{ producto.categoria.nombre|default:"General" }}</span>
+                            <h3 class="product-name producto-ver-detalle" data-producto-id="{{ producto.id }}">{{ producto.nombre_producto }}</h3>
+
+                            <!-- Especificaciones técnicas -->
+                            <div class="product-specs">
+                                {% if producto.procesador %}
+                                <span><i class="fas fa-microchip"></i> {{ producto.procesador }}</span>
+                                {% endif %}
+                                {% if producto.memoria_ram %}
+                                <span><i class="fas fa-memory"></i> {{ producto.memoria_ram }}</span>
+                                {% endif %}
+                                {% if producto.memoria_rom %}
+                                <span><i class="fas fa-hdd"></i> {{ producto.memoria_rom }}</span>
+                                {% endif %}
+                                {% if producto.marca %}
+                                <span><i class="fas fa-industry"></i> {{ producto.marca }}</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Footer del producto -->
+                            <div class="product-footer">
+                                <div class="product-price">
+                                    <span class="price">${{ producto.precio_venta|floatformat:2 }}</span>
+                                    <span class="stock"><i class="fas fa-box"></i> {{ producto.stock_actual }} disponibles</span>
+                                </div>
+                                <div class="product-actions">
+                                    <button class="btn-ver-detalle"
+                                            data-producto-id="{{ producto.id }}"
+                                            title="Ver detalles">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                    <button class="btn-add-cart"
+                                            data-producto-id="{{ producto.id }}"
+                                            title="Agregar al carrito"
+                                            data-producto-nombre="{{ producto.nombre_producto }}"
+                                            data-producto-precio="{{ producto.precio_venta }}"
+                                            data-producto-stock="{{ producto.stock_actual }}"
+                                            data-producto-categoria="{{ producto.categoria.nombre|default:'General' }}">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% empty %}
+                    <div class="no-products">
+                        <i class="fas fa-box-open" style="font-size: 4rem; color: #ccc; margin-bottom: 1rem;"></i>
+                        <p>No hay productos disponibles en este momento.</p>
+                        <p>Por favor, regresa más tarde o contacta con nosotros.</p>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </section>
@@ -756,6 +905,213 @@
     <!-- Accessibility JS -->
     <script src="{% static 'js/accessibility.js' %}"></script>
 
+    <!-- Productos y Carrito JS -->
+    <script src="{% static 'js/productos-landing.js' %}"></script>
+
+    <!-- Inicializador del Carrito -->
+    <script src="{% static 'js/carrito-init.js' %}"></script>
+
+    <!-- Script para inicializar carrito y detectar botones -->
+    <script>
+        console.log('🔄 Inicializando sistema de carrito...');
+
+        // Esperar a que el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ DOM cargado');
+
+            // Esperar un poco más para asegurar que carrito esté inicializado
+            setTimeout(function() {
+                console.log('🔄 Configurando botón del carrito...');
+
+                // Conectar botón del carrito en el header
+                const cartHeaderBtn = document.getElementById('cartBtn');
+                const cartBadge = document.getElementById('cartBadge');
+
+                if (cartHeaderBtn) {
+                    console.log('✅ Botón del carrito encontrado en header');
+
+                    cartHeaderBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        console.log('🛒 Click en botón del carrito');
+
+                        if (typeof carrito !== 'undefined' && carrito) {
+                            console.log('✅ Carrito disponible, mostrando...');
+                            carrito.mostrarCarrito();
+                        } else {
+                            console.error('❌ Carrito no inicializado');
+                            console.log('Tipo de carrito:', typeof carrito);
+                            alert('El carrito aún no está listo. Recarga la página e intenta de nuevo.');
+                        }
+                    });
+                } else {
+                    console.error('❌ No se encontró el botón del carrito');
+                }
+
+            // Función para actualizar el badge
+            function actualizarBadgeCarrito() {
+                if (cartBadge && typeof carrito !== 'undefined' && carrito) {
+                    const cantidad = carrito.getCantidadTotal();
+                    cartBadge.textContent = cantidad;
+                    if (cantidad > 0) {
+                        cartBadge.classList.add('show');
+                        cartBadge.style.display = 'flex';
+                    } else {
+                        cartBadge.classList.remove('show');
+                        cartBadge.style.display = 'none';
+                    }
+                }
+            }
+
+            // Actualizar badge cada segundo
+            setInterval(actualizarBadgeCarrito, 1000);
+
+            // Buscar todos los botones de carrito en productos reales
+            setTimeout(function() {
+                console.log('🔍 Configurando botones de carrito para productos reales...');
+
+                // Conectar botones de agregar al carrito
+                const botonesAgregar = document.querySelectorAll('.btn-add-cart');
+                console.log(`📦 Encontrados ${botonesAgregar.length} botones de agregar al carrito`);
+
+                botonesAgregar.forEach((boton) => {
+                    boton.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        console.log('🛒 Click en botón de agregar al carrito');
+
+                        // Obtener datos del producto desde los atributos de datos
+                        const productoId = this.dataset.productoId;
+                        const nombre = this.dataset.productoNombre;
+                        const precio = parseFloat(this.dataset.productoPrecio);
+                        const stock = parseInt(this.dataset.productoStock);
+                        const categoria = this.dataset.productoCategoria;
+
+                        if (!productoId || !nombre || !precio) {
+                            console.error('❌ Datos del producto incompletos');
+                            return;
+                        }
+
+                        const datosProducto = {
+                            id: productoId,
+                            nombre: nombre,
+                            precio: precio,
+                            stock: stock,
+                            categoria: categoria || 'General'
+                        };
+
+                        console.log('📦 Producto a agregar:', datosProducto);
+
+                        if (typeof carrito !== 'undefined' && carrito) {
+                            carrito.agregar(datosProducto);
+                            console.log('✅ Producto agregado al carrito');
+                            actualizarBadgeCarrito();
+
+                            // Mostrar animación de éxito
+                            this.style.transform = 'scale(1.2)';
+                            this.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                            setTimeout(() => {
+                                this.style.transform = 'scale(1)';
+                            }, 200);
+                        } else {
+                            console.error('❌ Carrito no disponible');
+                            alert('Error: El carrito no está listo. Recarga la página e intenta de nuevo.');
+                        }
+                    });
+                });
+
+                // Conectar botones de ver detalles
+                const botonesDetalle = document.querySelectorAll('.btn-ver-detalle, .producto-ver-detalle');
+                console.log(`📋 Encontrados ${botonesDetalle.length} botones de ver detalles`);
+
+                botonesDetalle.forEach((boton) => {
+                    boton.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const productoId = this.dataset.productoId;
+                        if (productoId) {
+                            console.log(`📋 Viendo detalles del producto ${productoId}`);
+                            window.location.href = `/productos/detalle/${productoId}/`;
+                        }
+                    });
+                });
+
+                // Conectar botones de reacciones
+                const botonesReaccion = document.querySelectorAll('.reaction-btn');
+                console.log(`👍 Encontrados ${botonesReaccion.length} botones de reacción`);
+
+                botonesReaccion.forEach((boton) => {
+                    boton.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const productoId = this.dataset.productoId;
+                        const tipo = this.dataset.tipo;
+
+                        console.log(`👍 Reacción ${tipo} para producto ${productoId}`);
+
+                        // Animación visual
+                        this.style.transform = 'scale(1.3)';
+                        this.style.color = tipo === 'like' ? '#10b981' : '#ef4444';
+
+                        setTimeout(() => {
+                            this.style.transform = 'scale(1)';
+                            this.style.color = '';
+                        }, 300);
+
+                        // Incrementar contador visual
+                        const counter = this.querySelector('.reaction-count');
+                        if (counter) {
+                            const currentCount = parseInt(counter.textContent) || 0;
+                            counter.textContent = currentCount + 1;
+                        }
+                    });
+                });
+
+                // Configurar filtros de productos
+                const filterButtons = document.querySelectorAll('.filter-btn');
+                filterButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        // Remover active de todos los botones
+                        filterButtons.forEach(b => b.classList.remove('active'));
+                        // Agregar active al botón clickeado
+                        this.classList.add('active');
+
+                        const filter = this.dataset.filter;
+                        filtrarProductos(filter);
+                    });
+                });
+
+                function filtrarProductos(categoria) {
+                    const productos = document.querySelectorAll('.product-card');
+
+                    productos.forEach(producto => {
+                        const productoCategoria = producto.dataset.filter;
+
+                        if (categoria === 'all' || productoCategoria === categoria) {
+                            producto.style.display = 'block';
+                            // Animación de entrada
+                            producto.style.opacity = '0';
+                            producto.style.transform = 'translateY(20px)';
+                            setTimeout(() => {
+                                producto.style.transition = 'all 0.3s ease';
+                                producto.style.opacity = '1';
+                                producto.style.transform = 'translateY(0)';
+                            }, 100);
+                        } else {
+                            producto.style.display = 'none';
+                        }
+                    });
+
+                    console.log(`🔍 Filtrado por categoría: ${categoria}`);
+                }
+
+                console.log('✅ Sistema de productos configurado correctamente');
+            }, 2000);
+        });
+    </script>
+
     <!-- DIAGNÓSTICO BOTÓN INGRESO -->
     <script>
         // Ejecutar después de que TODO esté cargado
@@ -869,6 +1225,47 @@
             <span>Test Menú</span>
         </button>
     </div>
+
+    <!-- SCRIPT DE DIAGNÓSTICO DE PRODUCTOS -->
+    <script>
+        // Verificar productos en el DOM después de que todo esté cargado
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                console.log('🔍 DIAGNÓSTICO DE PRODUCTOS EN EL DOM');
+                console.log('=' * 50);
+
+                const productCards = document.querySelectorAll('.product-card');
+                console.log(`📦 Total de tarjetas de producto encontradas: ${productCards.length}`);
+
+                if (productCards.length === 0) {
+                    console.error('❌ NO SE ENCONTRARON PRODUCTOS EN EL DOM');
+                    console.log('🔍 Verificando el contenido del grid...');
+                    const grid = document.querySelector('.products-grid');
+                    if (grid) {
+                        console.log('Grid HTML:', grid.innerHTML.substring(0, 500));
+                    }
+                } else {
+                    console.log('✅ Productos encontrados en el DOM:');
+                    productCards.forEach((card, index) => {
+                        const nombre = card.querySelector('.product-name')?.textContent || 'Sin nombre';
+                        const precio = card.querySelector('.price')?.textContent || 'Sin precio';
+                        const categoria = card.querySelector('.product-category')?.textContent || 'Sin categoría';
+                        console.log(`   ${index + 1}. ${nombre} - ${precio} (${categoria})`);
+                    });
+                }
+
+                // Verificar botones de carrito
+                const botonesCarrito = document.querySelectorAll('.btn-add-cart');
+                console.log(`🛒 Botones de carrito encontrados: ${botonesCarrito.length}`);
+
+                if (productCards.length > 0 && botonesCarrito.length === 0) {
+                    console.warn('⚠️ Productos encontrados pero sin botones de carrito');
+                }
+
+                console.log('=' * 50);
+            }, 1000);
+        });
+    </script>
 </body>
 </html>
 
