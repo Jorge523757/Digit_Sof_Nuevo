@@ -9,7 +9,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-digt-soft-2024-cambiar-en-produccion'
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0',
+    '192.168.1.56',       # IP Ethernet
+    '192.168.1.*',        # Red Ethernet completa
+    '192.168.137.1',      # IP del adaptador de área local
+    '192.168.137.221',    # IP WiFi
+    '192.168.137.*',      # Toda la red WiFi
+    '*',                  # Permite todas las conexiones (solo desarrollo)
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',

@@ -17,4 +17,9 @@ urlpatterns = [
     path('carrito/actualizar/', productos_views.actualizar_carrito, name='actualizar_carrito'),
     path('carrito/eliminar/', productos_views.eliminar_del_carrito, name='eliminar_carrito'),
     path('carrito/limpiar/', productos_views.limpiar_carrito, name='limpiar_carrito'),
+
+    # Checkout y facturación
+    path('checkout/', productos_views.checkout_carrito, name='checkout'),
+    path('checkout/procesar/', productos_views.procesar_compra, name='procesar_compra'),
+    path('factura/<int:venta_id>/', productos_views.ver_factura, name='ver_factura'),
 ]

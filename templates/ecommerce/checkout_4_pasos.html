@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+{% load math_filters %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - DigitSoft</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            background: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .header-ecommerce {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* PROGRESS BAR */
+        .progress-container {
+            margin: 2rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            height: 4px;
+            background: #e9ecef;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .progress-line-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .step-item {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: #6c757d;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .step-item.active .step-circle {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step-item.completed .step-circle {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .step-item.completed .step-circle i {
+            display: block;
+        }
+
+        .step-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .step-item.active .step-label {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* STEP CONTENT */
+        .step-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .checkout-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        /* SHIPPING OPTIONS */
+        .shipping-option, .payment-option {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .shipping-option:hover, .payment-option:hover {
+            border-color: var(--primary-color);
+            background: #f8f9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .shipping-option.selected, .payment-option.selected {
+            border-color: var(--primary-color);
+            background: #f8f9ff;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .shipping-option.selected::after, .payment-option.selected::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: var(--success-color);
+            font-size: 1.2rem;
+        }
+
+        .shipping-option input[type="radio"],
+        .payment-option input[type="radio"] {
+            margin-right: 1rem;
+        }
+
+        /* SUMMARY BOX */
+        .order-summary {
+            position: sticky;
+            top: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .summary-total {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--success-color);
+            padding-top: 1rem;
+            border-top: 2px solid #e9ecef;
+            margin-top: 0.5rem;
+        }
+
+        .product-item-mini {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .product-item-mini img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 1rem;
+        }
+
+        /* BUTTONS */
+        .btn-next, .btn-prev, .btn-confirm {
+            padding: 0.85rem 2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+        .btn-prev {
+            background: #f8f9fa;
+            color: #495057;
+            border: 1px solid #dee2e6;
+        }
+
+        .btn-prev:hover {
+            background: #e9ecef;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, var(--success-color), #20c997);
+            color: white;
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+            color: white;
+        }
+
+        .step-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+
+        /* CONFIRMATION STEP */
+        .confirmation-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .confirmation-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounce 1s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-row:nth-child(even) {
+            background: white;
+        }
+
+        .badge-payment {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .step-label {
+                font-size: 0.7rem;
+            }
+
+            .step-circle {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header-ecommerce">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-shopping-bag me-2"></i>
+                        Finalizar Compra
+                    </h1>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="{% url 'ecommerce:ver_carrito' %}" class="btn btn-outline-light">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Volver al Carrito
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container pb-5">
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-steps">
+                <div class="progress-line">
+                    <div class="progress-line-fill" id="progressFill"></div>
+                </div>
+                <div class="step-item active" data-step="1">
+                    <div class="step-circle">
+                        <span class="step-number">1</span>
+                        <i class="fas fa-check" style="display: none;"></i>
+                    </div>
+                    <div class="step-label">Datos Personales</div>
+                </div>
+                <div class="step-item" data-step="2">
+                    <div class="step-circle">
+                        <span class="step-number">2</span>
+                        <i class="fas fa-check" style="display: none;"></i>
+                    </div>
+                    <div class="step-label">Envío</div>
+                </div>
+                <div class="step-item" data-step="3">
+                    <div class="step-circle">
+                        <span class="step-number">3</span>
+                        <i class="fas fa-check" style="display: none;"></i>
+                    </div>
+                    <div class="step-label">Pago</div>
+                </div>
+                <div class="step-item" data-step="4">
+                    <div class="step-circle">
+                        <span class="step-number">4</span>
+                        <i class="fas fa-check" style="display: none;"></i>
+                    </div>
+                    <div class="step-label">Confirmación</div>
+                </div>
+            </div>
+        </div>
+
+        <form id="checkoutForm" method="POST" action="{% url 'ecommerce:procesar_compra' %}">
+            {% csrf_token %}
+            <div class="row">
+                <!-- Main Content -->
+                <div class="col-lg-8">
+                    <!-- PASO 1: DATOS PERSONALES -->
+                    <div class="step-content active" id="step-1">
+                        <div class="checkout-card">
+                            <h4 class="mb-4">
+                                <i class="fas fa-user me-2 text-primary"></i>
+                                Información Personal
+                            </h4>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nombre Completo *</label>
+                                    <input type="text" class="form-control" name="nombre" id="nombre"
+                                           placeholder="Juan Pérez" required
+                                           value="{{ user.get_full_name|default:'' }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Correo Electrónico *</label>
+                                    <input type="email" class="form-control" name="email" id="email"
+                                           placeholder="correo@ejemplo.com" required
+                                           value="{{ user.email|default:'' }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Teléfono *</label>
+                                    <input type="tel" class="form-control" name="telefono" id="telefono"
+                                           placeholder="300 123 4567" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Documento de Identidad</label>
+                                    <input type="text" class="form-control" name="documento" id="documento"
+                                           placeholder="1234567890">
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <label class="form-label">Dirección Completa *</label>
+                                    <textarea class="form-control" name="direccion" id="direccion" rows="2"
+                                              placeholder="Calle 123 #45-67, Apartamento 101" required></textarea>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Ciudad *</label>
+                                    <input type="text" class="form-control" name="ciudad" id="ciudad"
+                                           placeholder="Bogotá" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Departamento</label>
+                                    <select class="form-select" name="departamento">
+                                        <option value="">Seleccionar...</option>
+                                        <option value="Cundinamarca">Cundinamarca</option>
+                                        <option value="Antioquia">Antioquia</option>
+                                        <option value="Valle del Cauca">Valle del Cauca</option>
+                                        <option value="Santander">Santander</option>
+                                        <option value="Atlántico">Atlántico</option>
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-actions">
+                            <div></div>
+                            <button type="button" class="btn btn-next" onclick="nextStep(2)">
+                                Continuar <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PASO 2: TIPO DE ENVÍO -->
+                    <div class="step-content" id="step-2">
+                        <div class="checkout-card">
+                            <h4 class="mb-4">
+                                <i class="fas fa-truck me-2 text-primary"></i>
+                                Selecciona el Tipo de Envío
+                            </h4>
+
+                            <div class="shipping-option selected" onclick="selectShipping('normal', this)">
+                                <input type="radio" name="tipo_envio" value="normal" checked id="envio-normal">
+                                <label for="envio-normal" class="d-inline">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-1">
+                                                <i class="fas fa-box me-2"></i>
+                                                Envío Normal
+                                            </h5>
+                                            <p class="text-muted mb-0">Entrega en 5-7 días hábiles</p>
+                                        </div>
+                                        <div class="text-end">
+                                            <h4 class="mb-0 text-primary">$5,000</h4>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="shipping-option" onclick="selectShipping('express', this)">
+                                <input type="radio" name="tipo_envio" value="express" id="envio-express">
+                                <label for="envio-express" class="d-inline">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-1">
+                                                <i class="fas fa-shipping-fast me-2"></i>
+                                                Envío Rápido
+                                            </h5>
+                                            <p class="text-muted mb-0">Entrega en 1-2 días hábiles</p>
+                                            <span class="badge bg-warning text-dark">Recomendado</span>
+                                        </div>
+                                        <div class="text-end">
+                                            <h4 class="mb-0 text-primary">$15,000</h4>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="alert alert-info mt-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Nota:</strong> El envío gratis aplica para compras superiores a $100,000
+                            </div>
+                        </div>
+
+                        <div class="step-actions">
+                            <button type="button" class="btn btn-prev" onclick="prevStep(1)">
+                                <i class="fas fa-arrow-left me-2"></i> Anterior
+                            </button>
+                            <button type="button" class="btn btn-next" onclick="nextStep(3)">
+                                Continuar <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PASO 3: MÉTODO DE PAGO -->
+                    <div class="step-content" id="step-3">
+                        <div class="checkout-card">
+                            <h4 class="mb-4">
+                                <i class="fas fa-credit-card me-2 text-primary"></i>
+                                Método de Pago
+                            </h4>
+
+                            <div class="payment-option selected" onclick="selectPayment('cash', this)">
+                                <input type="radio" name="metodo_pago" value="cash" checked id="pago-cash">
+                                <label for="pago-cash" class="d-inline">
+                                    <h5 class="mb-1">
+                                        <i class="fas fa-money-bill-wave me-2 text-success"></i>
+                                        Contraentrega
+                                    </h5>
+                                    <p class="text-muted mb-0">Paga en efectivo cuando recibas tu pedido</p>
+                                </label>
+                            </div>
+
+                            <div class="payment-option" onclick="selectPayment('card', this)">
+                                <input type="radio" name="metodo_pago" value="card" id="pago-card">
+                                <label for="pago-card" class="d-inline">
+                                    <h5 class="mb-1">
+                                        <i class="fas fa-credit-card me-2 text-primary"></i>
+                                        Tarjeta de Crédito/Débito
+                                    </h5>
+                                    <p class="text-muted mb-0">Visa, Mastercard, American Express</p>
+                                </label>
+                            </div>
+
+                            <div class="payment-option" onclick="selectPayment('nequi', this)">
+                                <input type="radio" name="metodo_pago" value="nequi" id="pago-nequi">
+                                <label for="pago-nequi" class="d-inline">
+                                    <h5 class="mb-1">
+                                        <i class="fas fa-mobile-alt me-2 text-danger"></i>
+                                        Nequi
+                                    </h5>
+                                    <p class="text-muted mb-0">Pago rápido y seguro con Nequi</p>
+                                </label>
+                            </div>
+
+                            <div class="payment-option" onclick="selectPayment('daviplata', this)">
+                                <input type="radio" name="metodo_pago" value="daviplata" id="pago-daviplata">
+                                <label for="pago-daviplata" class="d-inline">
+                                    <h5 class="mb-1">
+                                        <i class="fas fa-mobile-alt me-2 text-warning"></i>
+                                        Daviplata
+                                    </h5>
+                                    <p class="text-muted mb-0">Pago con tu billetera digital</p>
+                                </label>
+                            </div>
+
+                            <div class="payment-option" onclick="selectPayment('transfer', this)">
+                                <input type="radio" name="metodo_pago" value="transfer" id="pago-transfer">
+                                <label for="pago-transfer" class="d-inline">
+                                    <h5 class="mb-1">
+                                        <i class="fas fa-university me-2 text-info"></i>
+                                        Transferencia Bancaria
+                                    </h5>
+                                    <p class="text-muted mb-0">Transferencia directa a nuestra cuenta</p>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="step-actions">
+                            <button type="button" class="btn btn-prev" onclick="prevStep(2)">
+                                <i class="fas fa-arrow-left me-2"></i> Anterior
+                            </button>
+                            <button type="button" class="btn btn-next" onclick="nextStep(4)">
+                                Continuar <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PASO 4: CONFIRMACIÓN -->
+                    <div class="step-content" id="step-4">
+                        <div class="confirmation-box">
+                            <div class="confirmation-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3>¡Todo Listo para Confirmar!</h3>
+                            <p class="mb-0">Revisa tu pedido antes de finalizar la compra</p>
+                        </div>
+
+                        <div class="checkout-card">
+                            <h5 class="mb-3">
+                                <i class="fas fa-user-check me-2"></i>
+                                Datos de Entrega
+                            </h5>
+                            <div class="info-row">
+                                <span><strong>Nombre:</strong></span>
+                                <span id="confirm-nombre"></span>
+                            </div>
+                            <div class="info-row">
+                                <span><strong>Email:</strong></span>
+                                <span id="confirm-email"></span>
+                            </div>
+                            <div class="info-row">
+                                <span><strong>Teléfono:</strong></span>
+                                <span id="confirm-telefono"></span>
+                            </div>
+                            <div class="info-row">
+                                <span><strong>Dirección:</strong></span>
+                                <span id="confirm-direccion"></span>
+                            </div>
+                            <div class="info-row">
+                                <span><strong>Ciudad:</strong></span>
+                                <span id="confirm-ciudad"></span>
+                            </div>
+                        </div>
+
+                        <div class="checkout-card">
+                            <h5 class="mb-3">
+                                <i class="fas fa-truck me-2"></i>
+                                Información de Envío
+                            </h5>
+                            <div class="info-row">
+                                <span><strong>Tipo de Envío:</strong></span>
+                                <span id="confirm-envio"></span>
+                            </div>
+                            <div class="info-row">
+                                <span><strong>Costo de Envío:</strong></span>
+                                <span id="confirm-costo-envio"></span>
+                            </div>
+                        </div>
+
+                        <div class="checkout-card">
+                            <h5 class="mb-3">
+                                <i class="fas fa-credit-card me-2"></i>
+                                Método de Pago
+                            </h5>
+                            <div class="text-center py-3">
+                                <span class="badge-payment badge bg-primary" id="confirm-pago"></span>
+                            </div>
+                        </div>
+
+                        <div class="step-actions">
+                            <button type="button" class="btn btn-prev" onclick="prevStep(3)">
+                                <i class="fas fa-arrow-left me-2"></i> Anterior
+                            </button>
+                            <button type="submit" class="btn btn-confirm">
+                                <i class="fas fa-check-circle me-2"></i> Confirmar Compra
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar - Resumen del Pedido -->
+                <div class="col-lg-4">
+                    <div class="order-summary">
+                        <h5 class="mb-3">
+                            <i class="fas fa-receipt me-2"></i>
+                            Resumen del Pedido
+                        </h5>
+
+                        <div class="mb-3">
+                            <h6 class="mb-2">Productos ({{ cart.total_items }})</h6>
+                            {% for item in cart_items %}
+                            <div class="product-item-mini">
+                                {% if item.product.imagen %}
+                                <img src="{{ item.product.imagen.url }}" alt="{{ item.product.nombre_producto }}">
+                                {% else %}
+                                <div style="width: 50px; height: 50px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                                    <i class="fas fa-box text-muted"></i>
+                                </div>
+                                {% endif %}
+                                <div class="flex-grow-1">
+                                    <div class="small fw-bold">{{ item.product.nombre_producto|truncatechars:30 }}</div>
+                                    <div class="text-muted small">Cantidad: {{ item.quantity }}</div>
+                                </div>
+                                <div class="text-end">
+                                    <strong>${{ item.total_price|floatformat:0 }}</strong>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="summary-item">
+                            <span>Subtotal</span>
+                            <span id="summary-subtotal">${{ subtotal|floatformat:0 }}</span>
+                        </div>
+
+                        <div class="summary-item">
+                            <span>IVA (19%)</span>
+                            <span id="summary-iva">${{ iva|floatformat:0 }}</span>
+                        </div>
+
+                        <div class="summary-item">
+                            <span>Envío</span>
+                            <span id="summary-envio">$5,000</span>
+                        </div>
+
+                        <div class="summary-item summary-total">
+                            <span>Total</span>
+                            <span id="summary-total">${{ total_normal|floatformat:0 }}</span>
+                        </div>
+
+                        <div class="mt-3 text-center">
+                            <small class="text-muted">
+                                <i class="fas fa-lock me-1"></i>
+                                Compra 100% segura
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        // Datos del carrito
+        const subtotal = {{ subtotal|default:0 }};
+        const iva = {{ iva|default:0 }};
+        let costoEnvio = 5000;
+
+        // Función para ir al siguiente paso
+        function nextStep(step) {
+            if (!validateStep(currentStep)) {
+                return;
+            }
+
+            // Ocultar paso actual
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+
+            // Marcar paso actual como completado
+            const stepItem = document.querySelector(`.step-item[data-step="${currentStep}"]`);
+            stepItem.classList.remove('active');
+            stepItem.classList.add('completed');
+            stepItem.querySelector('.step-number').style.display = 'none';
+            stepItem.querySelector('.fa-check').style.display = 'block';
+
+            // Mostrar siguiente paso
+            document.getElementById(`step-${step}`).classList.add('active');
+            document.querySelector(`.step-item[data-step="${step}"]`).classList.add('active');
+
+            // Si es el paso 4, cargar resumen
+            if (step === 4) {
+                loadConfirmationData();
+            }
+
+            currentStep = step;
+            updateProgressBar();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Función para ir al paso anterior
+        function prevStep(step) {
+            // Ocultar paso actual
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            document.querySelector(`.step-item[data-step="${currentStep}"]`).classList.remove('active');
+
+            // Mostrar paso anterior
+            document.getElementById(`step-${step}`).classList.add('active');
+            const stepItem = document.querySelector(`.step-item[data-step="${step}"]`);
+            stepItem.classList.add('active');
+            stepItem.classList.remove('completed');
+            stepItem.querySelector('.step-number').style.display = 'block';
+            stepItem.querySelector('.fa-check').style.display = 'none';
+
+            currentStep = step;
+            updateProgressBar();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Validar paso actual
+        function validateStep(step) {
+            const stepDiv = document.getElementById(`step-${step}`);
+            const requiredInputs = stepDiv.querySelectorAll('input[required], textarea[required]');
+
+            for (let input of requiredInputs) {
+                if (!input.value.trim()) {
+                    showNotification(`Por favor completa el campo: ${input.previousElementSibling.textContent}`, 'warning');
+                    input.focus();
+                    return false;
+                }
+
+                // Validar email
+                if (input.type === 'email' && !isValidEmail(input.value)) {
+                    showNotification('Por favor ingresa un correo electrónico válido', 'warning');
+                    input.focus();
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // Validar email
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        // Actualizar barra de progreso
+        function updateProgressBar() {
+            const percentage = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+        }
+
+        // Seleccionar tipo de envío
+        function selectShipping(type, element) {
+            document.querySelectorAll('.shipping-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            element.querySelector('input[type="radio"]').checked = true;
+
+            // Actualizar costo de envío
+            costoEnvio = type === 'express' ? 15000 : 5000;
+            updateSummary();
+        }
+
+        // Seleccionar método de pago
+        function selectPayment(method, element) {
+            document.querySelectorAll('.payment-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            element.querySelector('input[type="radio"]').checked = true;
+        }
+
+        // Actualizar resumen
+        function updateSummary() {
+            document.getElementById('summary-envio').textContent = '$' + costoEnvio.toLocaleString('es-CO');
+            const total = subtotal + iva + costoEnvio;
+            document.getElementById('summary-total').textContent = '$' + total.toLocaleString('es-CO');
+        }
+
+        // Cargar datos de confirmación
+        function loadConfirmationData() {
+            // Datos personales
+            document.getElementById('confirm-nombre').textContent = document.getElementById('nombre').value;
+            document.getElementById('confirm-email').textContent = document.getElementById('email').value;
+            document.getElementById('confirm-telefono').textContent = document.getElementById('telefono').value;
+            document.getElementById('confirm-direccion').textContent = document.getElementById('direccion').value;
+            document.getElementById('confirm-ciudad').textContent = document.getElementById('ciudad').value;
+
+            // Tipo de envío
+            const tipoEnvio = document.querySelector('input[name="tipo_envio"]:checked').value;
+            const envioText = tipoEnvio === 'express' ? 'Envío Rápido (1-2 días)' : 'Envío Normal (5-7 días)';
+            document.getElementById('confirm-envio').textContent = envioText;
+            document.getElementById('confirm-costo-envio').textContent = '$' + costoEnvio.toLocaleString('es-CO');
+
+            // Método de pago
+            const metodoPago = document.querySelector('input[name="metodo_pago"]:checked');
+            const pagoText = metodoPago.parentElement.querySelector('h5').textContent.trim();
+            document.getElementById('confirm-pago').textContent = pagoText;
+        }
+
+        // Mostrar notificación
+        function showNotification(message, type = 'info') {
+            // Crear notificación
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(notification);
+
+            // Auto eliminar después de 5 segundos
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Obtener cookie CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Manejar envío del formulario
+        document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.querySelector('.btn-confirm');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
+
+            // Enviar formulario
+            this.submit();
+        });
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgressBar();
+            updateSummary();
+        });
+    </script>
+</body>
+</html>
+

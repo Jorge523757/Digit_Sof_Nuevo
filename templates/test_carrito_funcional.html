@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Botones del Carrito</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            background: #f0f0f0;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test de Funcionalidad del Carrito</h1>
+
+    <div class="test-section">
+        <h2>1. Test de Conexión al Servidor</h2>
+        <button onclick="testConexion()">Probar Conexión</button>
+        <div id="result-conexion" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test CSRF Token</h2>
+        <button onclick="testCSRF()">Verificar CSRF Token</button>
+        <div id="result-csrf" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test Agregar al Carrito</h2>
+        <button onclick="testAgregar()">Agregar Producto ID 1</button>
+        <div id="result-agregar" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Test Eliminar del Carrito</h2>
+        <button onclick="testEliminar()">Eliminar Producto ID 1</button>
+        <div id="result-eliminar" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Test Limpiar Carrito</h2>
+        <button onclick="testLimpiar()">Vaciar Carrito Completo</button>
+        <div id="result-limpiar" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Test localStorage</h2>
+        <button onclick="testLocalStorage()">Verificar localStorage</button>
+        <div id="result-localstorage" class="result"></div>
+    </div>
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function mostrarResultado(elementId, mensaje, tipo) {
+            const element = document.getElementById(elementId);
+            element.className = `result ${tipo}`;
+            element.innerHTML = mensaje;
+        }
+
+        async function testConexion() {
+            mostrarResultado('result-conexion', '⏳ Probando conexión...', 'info');
+            try {
+                const response = await fetch('/tienda/');
+                if (response.ok) {
+                    mostrarResultado('result-conexion', `✅ Conexión exitosa! Status: ${response.status}`, 'success');
+                } else {
+                    mostrarResultado('result-conexion', `❌ Error: Status ${response.status}`, 'error');
+                }
+            } catch (error) {
+                mostrarResultado('result-conexion', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function testCSRF() {
+            const csrf = getCookie('csrftoken');
+            if (csrf) {
+                mostrarResultado('result-csrf', `✅ CSRF Token encontrado: ${csrf.substring(0, 20)}...`, 'success');
+            } else {
+                mostrarResultado('result-csrf', `❌ CSRF Token NO encontrado. Recarga la página.`, 'error');
+            }
+        }
+
+        async function testAgregar() {
+            mostrarResultado('result-agregar', '⏳ Agregando producto...', 'info');
+            const csrf = getCookie('csrftoken');
+
+            if (!csrf) {
+                mostrarResultado('result-agregar', '❌ No hay CSRF token. Recarga la página.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/tienda/carrito/agregar/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf
+                    },
+                    body: JSON.stringify({
+                        producto_id: 1,
+                        cantidad: 1
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    mostrarResultado('result-agregar', `✅ ${data.message}<br>Total items: ${data.total_items}`, 'success');
+                } else {
+                    mostrarResultado('result-agregar', `❌ ${data.error}`, 'error');
+                }
+            } catch (error) {
+                mostrarResultado('result-agregar', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testEliminar() {
+            mostrarResultado('result-eliminar', '⏳ Eliminando producto...', 'info');
+            const csrf = getCookie('csrftoken');
+
+            if (!csrf) {
+                mostrarResultado('result-eliminar', '❌ No hay CSRF token. Recarga la página.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/tienda/carrito/eliminar/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf
+                    },
+                    body: JSON.stringify({
+                        producto_id: 1
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    mostrarResultado('result-eliminar', `✅ ${data.message}`, 'success');
+                } else {
+                    mostrarResultado('result-eliminar', `❌ ${data.error}`, 'error');
+                }
+            } catch (error) {
+                mostrarResultado('result-eliminar', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLimpiar() {
+            mostrarResultado('result-limpiar', '⏳ Vaciando carrito...', 'info');
+            const csrf = getCookie('csrftoken');
+
+            if (!csrf) {
+                mostrarResultado('result-limpiar', '❌ No hay CSRF token. Recarga la página.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/tienda/carrito/limpiar/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf
+                    },
+                    body: JSON.stringify({})
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    mostrarResultado('result-limpiar', `✅ ${data.message}`, 'success');
+                    localStorage.removeItem('carrito');
+                } else {
+                    mostrarResultado('result-limpiar', `❌ ${data.error}`, 'error');
+                }
+            } catch (error) {
+                mostrarResultado('result-limpiar', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function testLocalStorage() {
+            try {
+                const carrito = localStorage.getItem('carrito');
+                if (carrito) {
+                    const datos = JSON.parse(carrito);
+                    const totalItems = Object.values(datos).reduce((sum, item) => sum + (item.cantidad || 0), 0);
+                    mostrarResultado('result-localstorage',
+                        `✅ localStorage funcionando<br>` +
+                        `Productos en carrito: ${Object.keys(datos).length}<br>` +
+                        `Total items: ${totalItems}<br>` +
+                        `<pre>${JSON.stringify(datos, null, 2)}</pre>`,
+                        'success');
+                } else {
+                    mostrarResultado('result-localstorage', '⚠️ No hay datos en localStorage', 'info');
+                }
+            } catch (error) {
+                mostrarResultado('result-localstorage', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-test al cargar
+        window.addEventListener('load', function() {
+            console.log('🔧 Página de test cargada');
+            console.log('📍 URL actual:', window.location.href);
+            console.log('🍪 Cookies:', document.cookie);
+            console.log('💾 localStorage:', localStorage.getItem('carrito'));
+        });
+    </script>
+</body>
+</html>
+

@@ -1,135 +1,3 @@
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({
-                    'producto_id': productoId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Actualizar localStorage
-                    const carrito = JSON.parse(localStorage.getItem('carrito') || '{}');
-                    delete carrito[productoId];
-                    localStorage.setItem('carrito', JSON.stringify(carrito));
-                    location.reload();
-                } else {
-                    alert(data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al eliminar producto');
-            });
-        }
-
-        // Función para limpiar carrito completo
-        function limpiarCarritoCompleto() {
-            if (!confirm('¿Estás seguro de que quieres vaciar todo el carrito?')) return;
-
-            fetch('/tienda/carrito/limpiar/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Limpiar también el localStorage
-                    localStorage.removeItem('carrito');
-                    // Actualizar contadores inmediatamente
-                    actualizarContadorCarrito();
-                    location.reload();
-                } else {
-                    alert(data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al limpiar carrito');
-            });
-        }
-
-        // Función para obtener cookie CSRF
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        // Función para actualizar contador del carrito
-        function actualizarContadorCarrito() {
-            const carrito = JSON.parse(localStorage.getItem('carrito') || '{}');
-            const totalItems = Object.values(carrito).reduce((sum, item) => sum + (item.cantidad || 0), 0);
-
-            // Buscar y actualizar todos los contadores del carrito
-            const contadores = document.querySelectorAll('[id*="carrito-count"], [id*="cart-count"], .cart-badge, .carrito-count');
-            contadores.forEach(contador => {
-                if (contador) {
-                    contador.textContent = totalItems;
-                    contador.classList.remove('bg-light', 'text-dark', 'bg-warning');
-                    if (totalItems > 0) {
-                        contador.classList.add('bg-warning', 'text-dark');
-                    } else {
-                        contador.classList.add('bg-light', 'text-dark');
-                    }
-                }
-            });
-
-            // También actualizar en el header si existe
-            const headerCount = document.getElementById('header-carrito-count');
-            if (headerCount) {
-                headerCount.textContent = totalItems;
-                if (totalItems > 0) {
-                    headerCount.classList.remove('bg-light', 'text-dark');
-                    headerCount.classList.add('bg-warning', 'text-dark');
-                } else {
-                    headerCount.classList.remove('bg-warning');
-                    headerCount.classList.add('bg-light', 'text-dark');
-                }
-            }
-        }
-
-        // Sincronizar carrito con localStorage al cargar la página
-        document.addEventListener('DOMContentLoaded', function() {
-            // Guardar productos actuales en localStorage para sincronización
-            const carritoActual = {};
-            {% for item in productos_carrito %}
-            carritoActual['{{ item.producto.id }}'] = {
-                'nombre': '{{ item.producto.nombre_producto|escapejs }}',
-                'precio': {{ item.producto.precio_venta }},
-                'cantidad': {{ item.cantidad }}
-            };
-            {% endfor %}
-
-            if (Object.keys(carritoActual).length > 0) {
-                localStorage.setItem('carrito', JSON.stringify(carritoActual));
-            }
-
-            // Actualizar contador inicial
-            actualizarContadorCarrito();
-
-            // Configurar listener para cambios en localStorage
-            window.addEventListener('storage', function(e) {
-                if (e.key === 'carrito') {
-                    actualizarContadorCarrito();
-                }
-            });
-        });
-    </script>
-</body>
-</html>
 <!DOCTYPE html>
 {% load math_filters %}
 <html lang="es">
@@ -147,7 +15,8 @@
         .header-ecommerce {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 1rem 0;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
         }
 
         .cart-item {
@@ -321,7 +190,7 @@
                             <p class="text-muted small mb-2">
                                 Subtotal: <strong>${{ item.subtotal|floatformat:2 }}</strong>
                             </p>
-                            <button class="btn btn-outline-danger btn-sm" onclick="eliminarDelCarrito({{ item.producto.id }})">
+                            <button class="btn btn-outline-danger btn-sm" onclick="eliminarProducto({{ item.producto.id }}, event)">
                                 <i class="fas fa-trash me-1"></i>
                                 Eliminar
                             </button>
@@ -332,7 +201,7 @@
 
                 <!-- Acciones del carrito -->
                 <div class="d-flex justify-content-between mt-3">
-                    <button class="btn btn-outline-warning" onclick="limpiarCarritoCompleto()">
+                    <button class="btn btn-outline-warning" onclick="vaciarTodoElCarrito(event)">
                         <i class="fas fa-broom me-1"></i>
                         Vaciar Carrito
                     </button>
@@ -368,7 +237,7 @@
                         <strong class="text-primary">${{ total|mul:1.19|floatformat:2 }}</strong>
                     </div>
 
-                    <button class="btn-checkout">
+                    <button class="btn-checkout" onclick="procederAlPago()">
                         <i class="fas fa-credit-card me-2"></i>
                         Proceder al Pago
                     </button>
@@ -402,47 +271,377 @@
 
     <!-- JavaScript del Carrito -->
     <script>
+        console.log('🛒 Carrito cargado - JavaScript activo');
+
+        // Variables globales
+        let confirmCallback = null;
+
+        // ============================================
+        // SISTEMA DE MODAL DE CONFIRMACIÓN
+        // ============================================
+
+        function showConfirmModal(title, message, iconType, confirmText, onConfirm) {
+            const modal = document.getElementById('confirmModal');
+            const modalIcon = document.getElementById('modalIcon');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+
+            // Configurar icono
+            modalIcon.className = 'modal-icon ' + iconType;
+            if (iconType === 'danger') {
+                modalIcon.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            } else if (iconType === 'warning') {
+                modalIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+            }
+
+            // Configurar textos
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            confirmBtn.innerHTML = '<i class="fas fa-check me-2"></i>' + confirmText;
+
+            // Configurar callback
+            confirmCallback = onConfirm;
+
+            // Mostrar modal
+            modal.classList.add('show');
+
+            // Prevenir scroll del body
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeConfirmModal() {
+            const modal = document.getElementById('confirmModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+            confirmCallback = null;
+        }
+
+        function confirmAction() {
+            if (confirmCallback) {
+                confirmCallback();
+            }
+            closeConfirmModal();
+        }
+
+        // Asignar evento al botón de confirmar
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('modalConfirmBtn').addEventListener('click', confirmAction);
+
+            // Cerrar modal al hacer clic fuera
+            document.getElementById('confirmModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeConfirmModal();
+                }
+            });
+        });
+
+        // ============================================
+        // SISTEMA DE NOTIFICACIONES TOAST
+        // ============================================
+
+        function showToast(title, message, type = 'success') {
+            const toast = document.getElementById('toastNotification');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+
+            // Configurar icono según tipo
+            toastIcon.className = 'toast-icon ' + type;
+            if (type === 'success') {
+                toastIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            } else if (type === 'error') {
+                toastIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
+            } else if (type === 'info') {
+                toastIcon.innerHTML = '<i class="fas fa-info-circle"></i>';
+            }
+
+            // Configurar textos
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+
+            // Mostrar toast
+            toast.classList.add('show');
+
+            // Ocultar automáticamente después de 4 segundos
+            setTimeout(() => {
+                closeToast();
+            }, 4000);
+        }
+
+        function closeToast() {
+            const toast = document.getElementById('toastNotification');
+            toast.classList.remove('show');
+        }
+
+        // ============================================
+        // FUNCIONES DEL CARRITO
+        // ============================================
+
+        // Función para obtener cookie CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Función para eliminar producto del carrito
+        function eliminarProducto(productoId, event) {
+            if (event) event.preventDefault();
+
+            console.log('🗑️ Solicitando eliminar producto:', productoId);
+
+            // Mostrar modal de confirmación profesional
+            showConfirmModal(
+                '¿Eliminar producto?',
+                'Este producto será eliminado de tu carrito de compras.',
+                'danger',
+                'Eliminar',
+                function() {
+                    // Ejecutar eliminación
+                    console.log('✅ Confirmado, enviando petición...');
+
+                    fetch('{% url "ecommerce:eliminar_carrito" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({ producto_id: productoId })
+                    })
+                    .then(response => {
+                        console.log('📡 Respuesta recibida:', response.status);
+                        if (!response.ok) {
+                            throw new Error('Error del servidor: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('📦 Datos:', data);
+                        if (data.success) {
+                            // Actualizar localStorage
+                            try {
+                                const carrito = JSON.parse(localStorage.getItem('carrito') || '{}');
+                                delete carrito[productoId];
+                                localStorage.setItem('carrito', JSON.stringify(carrito));
+                                console.log('✅ LocalStorage actualizado');
+                            } catch (e) {
+                                console.error('⚠️ Error en localStorage:', e);
+                            }
+
+                            // Mostrar notificación de éxito
+                            showToast('¡Producto eliminado!', 'El producto ha sido eliminado de tu carrito.', 'success');
+
+                            // Recargar página después de mostrar notificación
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            showToast('Error', data.error || 'No se pudo eliminar el producto.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Error:', error);
+                        showToast('Error de conexión', 'No se pudo conectar con el servidor.', 'error');
+                    });
+                }
+            );
+
+            return false;
+        }
+
+        // Función para vaciar todo el carrito
+        function vaciarTodoElCarrito(event) {
+            if (event) event.preventDefault();
+
+            console.log('🧹 Solicitando vaciar carrito');
+
+            // Mostrar modal de confirmación profesional
+            showConfirmModal(
+                '¿Vaciar todo el carrito?',
+                'Se eliminarán todos los productos de tu carrito. Esta acción no se puede deshacer.',
+                'warning',
+                'Vaciar Carrito',
+                function() {
+                    // Ejecutar vaciado
+                    console.log('✅ Confirmado, enviando petición...');
+
+                    fetch('{% url "ecommerce:limpiar_carrito" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({})
+                    })
+                    .then(response => {
+                        console.log('📡 Respuesta recibida:', response.status);
+                        if (!response.ok) {
+                            throw new Error('Error del servidor: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('📦 Datos:', data);
+                        if (data.success) {
+                            // Limpiar localStorage
+                            try {
+                                localStorage.removeItem('carrito');
+                                console.log('✅ LocalStorage limpiado');
+                            } catch (e) {
+                                console.error('⚠️ Error en localStorage:', e);
+                            }
+
+                            // Mostrar notificación de éxito
+                            showToast('¡Carrito vaciado!', 'Todos los productos han sido eliminados.', 'success');
+
+                            // Recargar página después de mostrar notificación
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            showToast('Error', data.error || 'No se pudo vaciar el carrito.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Error:', error);
+                        showToast('Error de conexión', 'No se pudo conectar con el servidor.', 'error');
+                    });
+                }
+            );
+
+            return false;
+        }
+
         // Función para actualizar cantidad
         function actualizarCantidad(productoId, nuevaCantidad) {
-            if (nuevaCantidad <= 0) return;
+            nuevaCantidad = parseInt(nuevaCantidad);
 
-            fetch('/tienda/carrito/actualizar/', {
+            console.log('🔢 Actualizando cantidad:', { productoId, nuevaCantidad });
+
+            if (nuevaCantidad <= 0 || isNaN(nuevaCantidad)) {
+                console.log('❌ Cantidad inválida');
+                showToast('Cantidad inválida', 'La cantidad debe ser mayor a 0.', 'error');
+                return;
+            }
+
+            fetch('{% url "ecommerce:actualizar_carrito" %}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCookie('csrftoken')
                 },
                 body: JSON.stringify({
-                    'producto_id': productoId,
-                    'cantidad': parseInt(nuevaCantidad)
+                    producto_id: productoId,
+                    cantidad: nuevaCantidad
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('📡 Respuesta:', response.status);
+                if (!response.ok) {
+                    throw new Error('Error del servidor: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('📦 Datos:', data);
                 if (data.success) {
                     // Actualizar localStorage
-                    const carrito = JSON.parse(localStorage.getItem('carrito') || '{}');
-                    if (carrito[productoId]) {
-                        carrito[productoId].cantidad = parseInt(nuevaCantidad);
-                        localStorage.setItem('carrito', JSON.stringify(carrito));
+                    try {
+                        const carrito = JSON.parse(localStorage.getItem('carrito') || '{}');
+                        if (carrito[productoId]) {
+                            carrito[productoId].cantidad = nuevaCantidad;
+                            localStorage.setItem('carrito', JSON.stringify(carrito));
+                        }
+                        console.log('✅ Cantidad actualizada');
+                    } catch (e) {
+                        console.error('⚠️ Error en localStorage:', e);
                     }
-                    location.reload(); // Recargar para actualizar totales
+
+                    // Mostrar notificación
+                    showToast('Cantidad actualizada', 'El carrito ha sido actualizado correctamente.', 'info');
+
+                    // Recargar página para reflejar cambios
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 800);
                 } else {
-                    alert(data.error);
+                    showToast('Error', data.error || 'No se pudo actualizar la cantidad.', 'error');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('Error al actualizar cantidad');
+                console.error('❌ Error:', error);
+                showToast('Error de conexión', 'No se pudo conectar con el servidor.', 'error');
             });
         }
 
-        // Función para eliminar producto del carrito
-        function eliminarDelCarrito(productoId) {
-            if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
+        // Función para proceder al pago
+        function procederAlPago() {
+            console.log('💳 Redirigiendo a checkout');
+            showToast('Redirigiendo...', 'Te estamos llevando al proceso de pago.', 'info');
+            setTimeout(() => {
+                window.location.href = '{% url "ecommerce:checkout" %}';
+            }, 800);
+        }
 
-            fetch('/tienda/carrito/eliminar/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
+        // Actualizar contador del carrito
+        function actualizarContadorCarrito() {
+            try {
+                const carrito = JSON.parse(localStorage.getItem('carrito') || '{}');
+                const totalItems = Object.values(carrito).reduce((sum, item) => {
+                    return sum + (item && item.cantidad ? parseInt(item.cantidad) : 0);
+                }, 0);
+
+                console.log('📊 Total items en carrito:', totalItems);
+
+                // Actualizar todos los contadores
+                const contadores = document.querySelectorAll('[id*="carrito"], [id*="cart"], .cart-counter, .cart-badge');
+                contadores.forEach(el => {
+                    if (el) {
+                        el.textContent = totalItems;
+                        if (totalItems > 0) {
+                            el.style.display = 'inline-block';
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error('⚠️ Error actualizando contador:', e);
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ DOM cargado, inicializando carrito');
+
+            // Sincronizar con localStorage
+            const carritoActual = {};
+            {% for item in productos_carrito %}
+            carritoActual['{{ item.producto.id }}'] = {
+                nombre: '{{ item.producto.nombre_producto|escapejs }}',
+                precio: {{ item.producto.precio_venta }},
+                cantidad: {{ item.cantidad }}
+            };
+            {% endfor %}
+
+            if (Object.keys(carritoActual).length > 0) {
+                localStorage.setItem('carrito', JSON.stringify(carritoActual));
+                console.log('💾 Carrito sincronizado:', Object.keys(carritoActual).length, 'productos');
+            }
+
+            actualizarContadorCarrito();
+
+            console.log('🎉 Sistema de carrito listo');
+        });
+    </script>
+</body>
+</html>
 

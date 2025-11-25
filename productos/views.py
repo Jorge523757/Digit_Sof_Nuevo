@@ -10,12 +10,208 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
+from decimal import Decimal
 import json
 
 from .models import Producto, CategoriaProducto, MovimientoInventario, ReaccionProducto
 from .forms import ProductoForm, BuscarProductoForm, MovimientoInventarioForm
 from usuarios.decorators import staff_required
 
+
+# VISTAS DE E-COMMERCE - CHECKOUT Y FACTURACIÓN
+# ==============================================
+
+@login_required
+def checkout_carrito(request):
+    """Vista de checkout para procesar la compra"""
+    carrito = obtener_carrito(request)
+
+    if not carrito:
+        messages.warning(request, 'Tu carrito está vacío')
+        return redirect('ecommerce:productos')
+        return redirect('ecommerce:productos')
+
+    productos_carrito = []
+    subtotal = 0
+
+    for producto_id, item in carrito.items():
+        try:
+            producto = Producto.objects.get(id=producto_id, activo=True)
+
+            # Verificar stock disponible
+            if item['cantidad'] > producto.stock_actual:
+                messages.error(request, f'Stock insuficiente para {producto.nombre_producto}')
+                return redirect('ecommerce:ver_carrito')
+
+            productos_carrito.append({
+                'producto': producto,
+                'cantidad': item['cantidad'],
+                'subtotal': item['precio'] * item['cantidad']
+            })
+            subtotal += item['precio'] * item['cantidad']
+        except Producto.DoesNotExist:
+            continue
+
+    # Calcular totales
+    iva = subtotal * Decimal('0.19')
+    total = subtotal + iva
+
+    context = {
+        'productos_carrito': productos_carrito,
+        'subtotal': subtotal,
+        'iva': iva,
+        'total': total,
+        'cantidad_items': len(productos_carrito)
+    }
+
+    return render(request, 'ecommerce/checkout.html', context)
+
+
+@login_required
+@csrf_exempt
+def procesar_compra(request):
+    """Procesar la compra y generar factura"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
+    try:
+        from ventas.models import Venta, DetalleVenta
+        from clientes.models import Cliente
+        from django.utils import timezone
+        import random
+
+        data = json.loads(request.body)
+        metodo_pago = data.get('metodo_pago', 'EFECTIVO')
+
+        carrito = obtener_carrito(request)
+
+        if not carrito:
+            return JsonResponse({'success': False, 'error': 'Carrito vacío'})
+
+        # Obtener o crear cliente para el usuario
+        try:
+            cliente = Cliente.objects.filter(usuario=request.user).first()
+            if not cliente:
+                # Crear cliente temporal
+                cliente = Cliente.objects.create(
+                    nombres=request.user.first_name or 'Cliente',
+                    apellidos=request.user.last_name or 'Web',
+                    email=request.user.email,
+                    usuario=request.user
+                )
+        except:
+            return JsonResponse({'success': False, 'error': 'Error al obtener datos del cliente'})
+
+        # Calcular totales
+        subtotal = Decimal('0')
+        productos_venta = []
+
+        for producto_id, item in carrito.items():
+            try:
+                producto = Producto.objects.get(id=producto_id, activo=True)
+
+                # Verificar stock
+                if item['cantidad'] > producto.stock_actual:
+                    return JsonResponse({
+                        'success': False,
+                        'error': f'Stock insuficiente para {producto.nombre_producto}'
+                    })
+
+                precio = Decimal(str(item['precio']))
+                cantidad = item['cantidad']
+                subtotal_item = precio * cantidad
+                subtotal += subtotal_item
+
+                productos_venta.append({
+                    'producto': producto,
+                    'cantidad': cantidad,
+                    'precio': precio,
+                    'subtotal': subtotal_item
+                })
+            except Producto.DoesNotExist:
+                continue
+
+        if not productos_venta:
+            return JsonResponse({'success': False, 'error': 'No hay productos válidos en el carrito'})
+
+        # Calcular impuestos y total
+        impuestos = subtotal * Decimal('0.19')
+        total = subtotal + impuestos
+
+        # Crear la venta
+        numero_venta = f"VEN-{timezone.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"
+
+        venta = Venta.objects.create(
+            numero_venta=numero_venta,
+            cliente=cliente,
+            estado='COMPLETADA',
+            canal_venta='WEB',
+            subtotal=subtotal,
+            descuento=Decimal('0'),
+            impuestos=impuestos,
+            total=total,
+            metodo_pago=metodo_pago,
+            observaciones='Compra desde e-commerce'
+        )
+
+        # Crear detalles de la venta y actualizar stock
+        for item in productos_venta:
+            producto = item['producto']
+
+            DetalleVenta.objects.create(
+                venta=venta,
+                producto=producto,
+                cantidad=item['cantidad'],
+                precio_unitario=item['precio'],
+                subtotal=item['subtotal']
+            )
+
+            # Actualizar stock
+            producto.stock_actual -= item['cantidad']
+            producto.save()
+
+        # Limpiar carrito
+        request.session['carrito'] = {}
+        request.session.modified = True
+
+        return JsonResponse({
+            'success': True,
+            'message': '✅ Compra procesada exitosamente',
+            'venta_id': venta.id,
+            'numero_venta': venta.numero_venta,
+            'total': float(total)
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': f'Error al procesar compra: {str(e)}'})
+
+
+@login_required
+def ver_factura(request, venta_id):
+    """Ver factura de una venta"""
+    from ventas.models import Venta, DetalleVenta
+
+    venta = get_object_or_404(Venta, id=venta_id)
+
+    # Verificar que el usuario tenga permiso para ver esta factura
+    if not request.user.is_staff and venta.cliente.usuario != request.user:
+        messages.error(request, 'No tienes permiso para ver esta factura')
+        return redirect('ecommerce:productos')
+
+    detalles = DetalleVenta.objects.filter(venta=venta).select_related('producto')
+
+    context = {
+        'venta': venta,
+        'detalles': detalles,
+        'fecha_actual': timezone.now()
+    }
+
+    return render(request, 'ecommerce/factura.html', context)
+
+
+# VISTAS CRUD DE PRODUCTOS
+# =========================
 
 @login_required
 @staff_required
@@ -482,6 +678,8 @@ def ver_carrito(request):
 @csrf_exempt
 def agregar_al_carrito(request):
     """Agregar producto al carrito via AJAX"""
+    print(f"🛒 agregar_al_carrito - Método: {request.method}")
+
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Método no permitido'})
 
@@ -490,7 +688,14 @@ def agregar_al_carrito(request):
         producto_id = str(data.get('producto_id'))
         cantidad = int(data.get('cantidad', 1))
 
-        producto = get_object_or_404(Producto, id=producto_id, activo=True)
+        print(f"📦 Producto ID: {producto_id}, Cantidad: {cantidad}")
+
+        try:
+            producto = Producto.objects.get(id=producto_id, activo=True)
+            print(f"✅ Producto encontrado: {producto.nombre_producto}")
+        except Producto.DoesNotExist:
+            print(f"❌ Producto no encontrado: {producto_id}")
+            return JsonResponse({'success': False, 'error': 'Producto no encontrado'})
 
         # Verificar stock disponible
         carrito = obtener_carrito(request)
@@ -498,10 +703,26 @@ def agregar_al_carrito(request):
         nueva_cantidad = cantidad_actual + cantidad
 
         if nueva_cantidad > producto.stock_actual:
-            return JsonResponse({
-                'success': False,
-                'error': f'Stock insuficiente. Disponible: {producto.stock_actual}'
-            })
+            if cantidad_actual > 0:
+                # Ya tiene productos en el carrito
+                if cantidad_actual == producto.stock_actual:
+                    # Ya tiene el máximo posible
+                    return JsonResponse({
+                        'success': False,
+                        'error': f'⚠️ Ya tienes el máximo disponible de <strong>{producto.nombre_producto}</strong> en tu carrito ({cantidad_actual} unidades). <br><br><a href="/tienda/carrito/" class="btn btn-sm btn-primary mt-2"><i class="fas fa-shopping-cart"></i> Ver Carrito</a>',
+                        'max_reached': True
+                    })
+                else:
+                    return JsonResponse({
+                        'success': False,
+                        'error': f'⚠️ Stock insuficiente para <strong>{producto.nombre_producto}</strong>. Tienes {cantidad_actual} en el carrito y solo hay {producto.stock_actual} disponibles en total. <br><small class="text-muted">Puedes agregar máximo {producto.stock_actual - cantidad_actual} más.</small>'
+                    })
+            else:
+                # Primera vez que intenta agregar
+                return JsonResponse({
+                    'success': False,
+                    'error': f'⚠️ Stock insuficiente. Solo hay <strong>{producto.stock_actual} unidades</strong> disponibles de {producto.nombre_producto}.'
+                })
 
         # Agregar o actualizar producto en carrito
         if producto_id in carrito:
@@ -523,7 +744,7 @@ def agregar_al_carrito(request):
             'success': True,
             'message': f'✅ {producto.nombre_producto} agregado al carrito',
             'total_items': total_items,
-            'total_precio': total_precio
+            'total_precio': total_precio,
         })
 
     except Exception as e:
@@ -533,6 +754,8 @@ def agregar_al_carrito(request):
 @csrf_exempt
 def actualizar_carrito(request):
     """Actualizar cantidad de producto en carrito"""
+    print(f"🔢 actualizar_carrito - Método: {request.method}")
+
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Método no permitido'})
 
@@ -540,6 +763,7 @@ def actualizar_carrito(request):
         data = json.loads(request.body)
         producto_id = str(data.get('producto_id'))
         nueva_cantidad = int(data.get('cantidad'))
+        print(f"📦 Actualizando producto ID: {producto_id}, Nueva cantidad: {nueva_cantidad}")
 
         if nueva_cantidad <= 0:
             return JsonResponse({'success': False, 'error': 'Cantidad inválida'})
@@ -550,7 +774,7 @@ def actualizar_carrito(request):
         if nueva_cantidad > producto.stock_actual:
             return JsonResponse({
                 'success': False,
-                'error': f'Stock insuficiente. Disponible: {producto.stock_actual}'
+                'error': f'⚠️ Stock insuficiente para {producto.nombre_producto}. Solo hay {producto.stock_actual} unidades disponibles.'
             })
 
         carrito = obtener_carrito(request)
@@ -580,14 +804,18 @@ def actualizar_carrito(request):
 @csrf_exempt
 def eliminar_del_carrito(request):
     """Eliminar producto del carrito"""
+    print(f"🗑️ eliminar_del_carrito - Método: {request.method}")
+
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Método no permitido'})
 
     try:
         data = json.loads(request.body)
         producto_id = str(data.get('producto_id'))
+        print(f"📦 Eliminando producto ID: {producto_id}")
 
         carrito = obtener_carrito(request)
+        print(f"🛒 Carrito actual: {list(carrito.keys())}")
 
         if producto_id in carrito:
             nombre_producto = carrito[producto_id]['nombre']
@@ -614,12 +842,19 @@ def eliminar_del_carrito(request):
 @csrf_exempt
 def limpiar_carrito(request):
     """Limpiar todo el carrito"""
+    print(f"🧹 limpiar_carrito - Método: {request.method}")
+
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Método no permitido'})
 
     try:
+        carrito_anterior = obtener_carrito(request)
+        print(f"🛒 Carrito antes de limpiar: {len(carrito_anterior)} items")
+
         request.session['carrito'] = {}
         request.session.modified = True
+
+        print("✅ Carrito limpiado exitosamente")
 
         return JsonResponse({
             'success': True,

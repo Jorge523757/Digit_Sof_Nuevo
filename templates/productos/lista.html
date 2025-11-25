@@ -282,7 +282,37 @@
 <script>
 // Actualizar contador del carrito al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔧 Módulo de productos cargado');
+
+    // Limpiar localStorage si tiene datos corruptos
+    try {
+        const carrito = obtenerCarrito();
+        if (carrito && typeof carrito !== 'object') {
+            console.warn('⚠️ Carrito corrupto, limpiando...');
+            localStorage.removeItem('carrito');
+        }
+    } catch (e) {
+        console.error('❌ Error al leer carrito:', e);
+        localStorage.removeItem('carrito');
+    }
+
+    // Actualizar contador inicial
     actualizarContadorCarrito();
+
+    // Escuchar cambios en localStorage (desde otras pestañas)
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'carrito') {
+            console.log('🔄 Carrito actualizado en otra pestaña');
+            actualizarContadorCarrito();
+        }
+    });
+
+    // Actualizar contador cada 2 segundos para mantener sincronización
+    setInterval(function() {
+        actualizarContadorCarrito();
+    }, 2000);
+
+    console.log('✅ Sistema de carrito inicializado');
 });
 
 // Función para obtener el carrito del localStorage
@@ -299,7 +329,17 @@ function guardarCarrito(carrito) {
 // Función para actualizar el contador del carrito
 function actualizarContadorCarrito() {
     const carrito = obtenerCarrito();
-    const totalItems = Object.values(carrito).reduce((total, item) => total + item.cantidad, 0);
+
+    // Calcular total de items de forma segura
+    let totalItems = 0;
+    if (carrito && typeof carrito === 'object') {
+        totalItems = Object.values(carrito).reduce((total, item) => {
+            return total + (item && item.cantidad ? parseInt(item.cantidad) : 0);
+        }, 0);
+    }
+
+    console.log('📊 Actualizando contador en módulo de productos');
+    console.log('   Total items:', totalItems);
 
     // Buscar y actualizar todos los posibles contadores del carrito
     const selectores = ['carrito-count', 'header-carrito-count', 'cart-count'];
@@ -315,6 +355,27 @@ function actualizarContadorCarrito() {
             }
         }
     });
+
+    // También actualizar iconos de carrito con badge
+    const cartIcons = document.querySelectorAll('.fa-shopping-cart');
+    cartIcons.forEach(icon => {
+        const parent = icon.parentElement;
+        if (!parent) return;
+
+        let badge = parent.querySelector('.badge');
+        if (badge) {
+            badge.textContent = totalItems;
+            if (totalItems > 0) {
+                badge.classList.remove('bg-light', 'text-dark');
+                badge.classList.add('bg-warning', 'text-dark');
+            } else {
+                badge.classList.remove('bg-warning');
+                badge.classList.add('bg-light', 'text-dark');
+            }
+        }
+    });
+
+    console.log('✅ Contador actualizado correctamente');
 }
 
 // Función para agregar producto al carrito

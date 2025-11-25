@@ -1,0 +1,220 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║       📱 CÓMO VER DIGITSOF DESDE TU TELÉFONO/TABLET           ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════
+  PASO 1: VERIFICA EL SERVIDOR
+═══════════════════════════════════════════════════════════════
+
+Tu servidor ya está corriendo en:
+   http://0.0.0.0:8000/
+
+✅ Mensaje en terminal: "Starting development server at..."
+
+
+═══════════════════════════════════════════════════════════════
+  PASO 2: CONECTA TU DISPOSITIVO AL MISMO WIFI
+═══════════════════════════════════════════════════════════════
+
+En tu teléfono/tablet:
+   1. Ve a: Configuración → WiFi
+   2. Conéctate al mismo WiFi que tu computadora
+   3. Verifica que esté conectado (debe mostrar el mismo nombre)
+
+
+═══════════════════════════════════════════════════════════════
+  PASO 3: ABRE EL NAVEGADOR EN TU DISPOSITIVO
+═══════════════════════════════════════════════════════════════
+
+Abre cualquiera de estos navegadores:
+   • Chrome (Android)
+   • Safari (iPhone/iPad)
+   • Firefox
+   • Edge
+
+
+═══════════════════════════════════════════════════════════════
+  PASO 4: ESCRIBE LA DIRECCIÓN
+═══════════════════════════════════════════════════════════════
+
+En la barra de direcciones, escribe EXACTAMENTE:
+
+   ┌─────────────────────────────────────────┐
+   │  http://192.168.137.221:8000/          │
+   └─────────────────────────────────────────┘
+
+⚠️ IMPORTANTE:
+   • Asegúrate de escribir "http://" NO "https://"
+   • Incluye el puerto ":8000"
+   • No agregues espacios
+
+
+═══════════════════════════════════════════════════════════════
+  PASO 5: NAVEGA POR LA TIENDA
+═══════════════════════════════════════════════════════════════
+
+URLs disponibles:
+
+🏠 Inicio:
+   http://192.168.137.221:8000/
+
+🛒 Tienda (Ver productos como en la imagen):
+   http://192.168.137.221:8000/tienda/
+
+🛒 Carrito de compras:
+   http://192.168.137.221:8000/tienda/carrito/
+
+📊 Dashboard:
+   http://192.168.137.221:8000/dashboard/
+
+🔐 Login:
+   http://192.168.137.221:8000/usuarios/login/
+
+📦 Gestión de productos:
+   http://192.168.137.221:8000/productos/
+
+
+═══════════════════════════════════════════════════════════════
+  💡 CONSEJOS ÚTILES
+═══════════════════════════════════════════════════════════════
+
+✅ Guarda como favorito:
+   - Una vez conectado, agrega la página a favoritos
+   - Así no tendrás que escribir la URL cada vez
+
+✅ Crea un acceso directo:
+   - En Android: Chrome → Menú → Añadir a pantalla de inicio
+   - En iOS: Safari → Compartir → Añadir a pantalla de inicio
+
+✅ Comparte con otros:
+   - Cualquier dispositivo en tu WiFi puede acceder
+   - Solo necesitan la URL: http://192.168.137.221:8000/
+
+
+═══════════════════════════════════════════════════════════════
+  🆘 SI NO FUNCIONA
+═══════════════════════════════════════════════════════════════
+
+❌ "No se puede conectar" o "Tiempo de espera agotado"
+
+   Solución 1: Verifica la conexión WiFi
+   • Asegúrate que ambos estén en el MISMO WiFi
+   • En tu teléfono: Configuración → WiFi
+   • Debe mostrar el mismo nombre de red
+
+   Solución 2: Verifica el servidor
+   • Mira la ventana de comandos en tu PC
+   • Debe decir: "Starting development server..."
+   • Si no, reinicia con CTRL+C y vuelve a correr
+
+   Solución 3: Prueba hacer ping
+   • Si tienes otra PC en la red, prueba:
+     ping 192.168.137.221
+   • Si responde, el problema es el firewall
+
+   Solución 4: Desactiva el firewall (solo para probar)
+   • Panel de Control → Firewall → Desactivar temporalmente
+   • Prueba conectar desde el teléfono
+   • Si funciona, el problema es el firewall
+
+
+❌ "Bad Request (400)" o "Solicitud incorrecta"
+
+   Solución: Reinicia el servidor
+   • En la terminal, presiona: CTRL + C
+   • Vuelve a ejecutar: python manage.py runserver 0.0.0.0:8000
+   • El archivo settings.py ya está configurado correctamente
+
+
+❌ La página carga pero se ve rara
+
+   Solución: Limpia la caché
+   • En el navegador móvil: Configuración → Privacidad
+   • Borrar caché y cookies
+   • Vuelve a cargar la página
+
+
+═══════════════════════════════════════════════════════════════
+  📝 EJEMPLO PRÁCTICO
+═══════════════════════════════════════════════════════════════
+
+Imagina que quieres ver la tienda desde tu celular:
+
+1. 📱 Toma tu teléfono
+2. 📶 Verifica que esté en el WiFi correcto
+3. 🌐 Abre Chrome o Safari
+4. ⌨️  Escribe: http://192.168.137.221:8000/tienda/
+5. ↩️  Presiona Enter
+6. 🎉 ¡Verás la tienda DigitSoft como en tu PC!
+
+
+═══════════════════════════════════════════════════════════════
+  ✅ VERIFICACIÓN RÁPIDA
+═══════════════════════════════════════════════════════════════
+
+Antes de intentar desde el teléfono, verifica en tu PC:
+
+1. Abre el navegador en tu computadora
+2. Escribe: http://192.168.137.221:8000/
+3. Si funciona aquí, funcionará en tu teléfono
+4. Si NO funciona, prueba: http://localhost:8000/
+
+
+═══════════════════════════════════════════════════════════════
+  🎯 RESUMEN DE 1 MINUTO
+═══════════════════════════════════════════════════════════════
+
+1️⃣  Servidor corriendo ✅ (ya lo tienes)
+2️⃣  Mismo WiFi ✅ (conecta tu teléfono)
+3️⃣  Navegador abierto ✅ (Chrome/Safari en tu teléfono)
+4️⃣  Escribe: http://192.168.137.221:8000/
+5️⃣  ¡Listo! 🎊
+
+
+═══════════════════════════════════════════════════════════════
+  📞 CREDENCIALES DE PRUEBA
+═══════════════════════════════════════════════════════════════
+
+Si necesitas hacer login desde el teléfono:
+
+Usuario: admin
+Contraseña: (la que configuraste)
+
+O crea un nuevo usuario desde:
+http://192.168.137.221:8000/usuarios/registro/
+
+
+═══════════════════════════════════════════════════════════════
+  🔒 NOTA DE SEGURIDAD
+═══════════════════════════════════════════════════════════════
+
+⚠️  Esta configuración es SOLO para desarrollo/pruebas
+
+NO uses esto en producción porque:
+• No tiene HTTPS (no es seguro para datos reales)
+• Está abierto a toda la red local
+• DEBUG está activado (muestra información sensible)
+
+Para producción necesitas:
+• Servidor dedicado con HTTPS
+• Dominio propio
+• Certificado SSL
+• DEBUG = False
+• ALLOWED_HOSTS específicos
+
+
+═══════════════════════════════════════════════════════════════
+
+¡TODO LISTO! 🎉
+
+Tu servidor está configurado y esperando conexiones desde tu teléfono.
+
+Ahora toma tu teléfono, conéctalo al WiFi, y accede a:
+http://192.168.137.221:8000/
+
+¡Disfruta de tu e-commerce desde cualquier dispositivo! 🛒✨
+
+═══════════════════════════════════════════════════════════════
+

@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (body) body.classList.add('menu-open');
         });
     } else {
-        console.error('Sidebar toggle button not found!');
+        console.log('Sidebar toggle button not found!');
     }
 
     // Cerrar menú lateral
