@@ -25,15 +25,16 @@ from usuarios.decorators import staff_required
 @login_required
 def checkout_carrito(request):
     """Vista de checkout para procesar la compra"""
+    from clientes.models import Cliente
+
     carrito = obtener_carrito(request)
 
     if not carrito:
         messages.warning(request, 'Tu carrito está vacío')
         return redirect('ecommerce:productos')
-        return redirect('ecommerce:productos')
 
     productos_carrito = []
-    subtotal = 0
+    subtotal = Decimal('0')  # ✅ Inicializar como Decimal
 
     for producto_id, item in carrito.items():
         try:
@@ -44,25 +45,39 @@ def checkout_carrito(request):
                 messages.error(request, f'Stock insuficiente para {producto.nombre_producto}')
                 return redirect('ecommerce:ver_carrito')
 
+            # ✅ Convertir precio a Decimal
+            precio = Decimal(str(item['precio']))
+            cantidad = item['cantidad']
+            subtotal_item = precio * cantidad
+
             productos_carrito.append({
                 'producto': producto,
-                'cantidad': item['cantidad'],
-                'subtotal': item['precio'] * item['cantidad']
+                'cantidad': cantidad,
+                'subtotal': subtotal_item
             })
-            subtotal += item['precio'] * item['cantidad']
+            subtotal += subtotal_item
         except Producto.DoesNotExist:
             continue
 
-    # Calcular totales
+    # Calcular totales (ahora todo es Decimal)
     iva = subtotal * Decimal('0.19')
     total = subtotal + iva
+
+    # Obtener datos del cliente si existe
+    cliente = None
+    try:
+        cliente = Cliente.objects.filter(correo=request.user.email).first()
+    except:
+        pass
 
     context = {
         'productos_carrito': productos_carrito,
         'subtotal': subtotal,
         'iva': iva,
         'total': total,
-        'cantidad_items': len(productos_carrito)
+        'cantidad_items': len(productos_carrito),
+        'cliente': cliente,
+        'user': request.user,
     }
 
     return render(request, 'ecommerce/checkout.html', context)
@@ -84,24 +99,48 @@ def procesar_compra(request):
         data = json.loads(request.body)
         metodo_pago = data.get('metodo_pago', 'EFECTIVO')
 
+        # Obtener datos del cliente del formulario
+        cliente_data = {
+            'nombres': data.get('nombres', ''),
+            'apellidos': data.get('apellidos', ''),
+            'numero_documento': data.get('numero_documento', ''),
+            'telefono': data.get('telefono', ''),
+            'correo': data.get('correo', request.user.email),
+            'direccion': data.get('direccion', ''),
+        }
+
         carrito = obtener_carrito(request)
 
         if not carrito:
             return JsonResponse({'success': False, 'error': 'Carrito vacío'})
 
-        # Obtener o crear cliente para el usuario
+        # Buscar o crear cliente
+        cliente = None
         try:
-            cliente = Cliente.objects.filter(usuario=request.user).first()
-            if not cliente:
-                # Crear cliente temporal
+            # Buscar por correo primero
+            cliente = Cliente.objects.filter(correo=cliente_data['correo']).first()
+
+            if cliente:
+                # Actualizar datos del cliente si cambió algo
+                cliente.nombres = cliente_data['nombres'] or cliente.nombres
+                cliente.apellidos = cliente_data['apellidos'] or cliente.apellidos
+                cliente.numero_documento = cliente_data['numero_documento'] or cliente.numero_documento
+                cliente.telefono = cliente_data['telefono'] or cliente.telefono
+                cliente.direccion = cliente_data['direccion'] or cliente.direccion
+                cliente.save()
+            else:
+                # Crear nuevo cliente
                 cliente = Cliente.objects.create(
-                    nombres=request.user.first_name or 'Cliente',
-                    apellidos=request.user.last_name or 'Web',
-                    email=request.user.email,
-                    usuario=request.user
+                    nombres=cliente_data['nombres'] or request.user.first_name or 'Cliente',
+                    apellidos=cliente_data['apellidos'] or request.user.last_name or 'Web',
+                    numero_documento=cliente_data['numero_documento'] or f'WEB-{request.user.id}',
+                    telefono=cliente_data['telefono'] or 'Sin teléfono',
+                    correo=cliente_data['correo'],
+                    direccion=cliente_data['direccion'] or 'Sin dirección',
+                    activo=True
                 )
-        except:
-            return JsonResponse({'success': False, 'error': 'Error al obtener datos del cliente'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': f'Error al procesar datos del cliente: {str(e)}'})
 
         # Calcular totales
         subtotal = Decimal('0')
@@ -866,4 +905,13 @@ def limpiar_carrito(request):
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
 
+
+def obtener_contador_carrito(request):
+    """Obtener contador de items en el carrito"""
+    carrito = obtener_carrito(request)
+    total_items = sum(item['cantidad'] for item in carrito.values())
+    return JsonResponse({
+        'success': True,
+        'total_items': total_items
+    })
 

@@ -83,7 +83,31 @@ class CarritoCompras {
 
     guardarCarrito() {
         try {
+            // Guardar en formato antiguo (para compatibilidad)
             localStorage.setItem('carrito', JSON.stringify(this.items));
+
+            // Guardar TAMBIÉN en carrito_v1 con estructura para renderizado
+            const carritoV1 = {};
+            this.items.forEach(item => {
+                carritoV1[item.id] = {
+                    id: item.id,
+                    name: item.nombre,
+                    nombre: item.nombre,
+                    price: item.precio,
+                    precio: item.precio,
+                    qty: item.cantidad,
+                    cantidad: item.cantidad,
+                    image: item.imagen || '',
+                    imagen: item.imagen || '',
+                    stock: item.stock,
+                    categoria: item.categoria,
+                    codigo: item.codigo,
+                    marca: item.marca
+                };
+            });
+            localStorage.setItem('carrito_v1', JSON.stringify(carritoV1));
+            console.log('💾 Carrito guardado en localStorage (carrito y carrito_v1)');
+
             this.actualizarBadge();
         } catch (error) {
             if (error.name === 'QuotaExceededError' || error.code === 22) {
@@ -141,16 +165,23 @@ class CarritoCompras {
             return;
         }
 
-        // PASO 2: Normalizar ID (CRÍTICO para evitar duplicados)
-        const productoId = parseInt(producto.id);
+        // PASO 2: Normalizar y validar ID
+        let productoId = producto.id;
 
-        if (isNaN(productoId)) {
-            console.error('❌ ID no es un número:', producto.id);
+        // Validar que el ID existe y no está vacío
+        if (!productoId || productoId === '' || productoId === 'undefined' || productoId === 'null') {
+            console.error('❌ ID inválido:', producto.id);
             this.mostrarNotificacion('❌ Error: ID de producto inválido', 'error');
             return;
         }
 
-        console.log('  🔑 ID normalizado:', productoId);
+        // Normalizar: Si es un número puro string (ej: "123"), convertir a número
+        // Si es un ID con formato especial (ej: "prod-123-abc"), mantener como string
+        if (typeof productoId === 'string' && /^\d+$/.test(productoId)) {
+            productoId = parseInt(productoId);
+        }
+
+        console.log('  🔑 ID normalizado:', productoId, '(tipo:', typeof productoId, ')');
 
         // PASO 3: FORZAR limpieza de duplicados ANTES de agregar
         console.log('  🧹 Limpiando duplicados antes de agregar...');
@@ -161,8 +192,11 @@ class CarritoCompras {
             console.warn(`  ⚠️ Se eliminaron ${itemsAntes - itemsDespues} duplicados`);
         }
 
-        // PASO 4: Buscar si ya existe (con comparación numérica estricta)
-        const itemExistente = this.items.find(item => parseInt(item.id) === productoId);
+        // PASO 4: Buscar si ya existe (comparación flexible para strings y números)
+        const itemExistente = this.items.find(item => {
+            // Comparar de forma flexible: convertir ambos a string para comparación
+            return String(item.id) === String(productoId);
+        });
 
         if (itemExistente) {
             // PRODUCTO YA EXISTE - Solo incrementar cantidad

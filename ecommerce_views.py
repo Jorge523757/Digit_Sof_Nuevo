@@ -346,3 +346,77 @@ def limpiar_carrito(request):
         messages.info(request, 'El carrito ya está vacío')
 
     return redirect('ecommerce:ver_carrito')
+
+
+def productos_estilo_exito(request):
+    """Vista de productos con diseño estilo e-commerce (Éxito/Amazon)"""
+    # Filtros
+    categorias_seleccionadas = request.GET.getlist('category')
+    marcas_seleccionadas = request.GET.getlist('brand')
+    buscar = request.GET.get('q')
+    ordenar = request.GET.get('orden', 'relevance')
+    precio_rango = request.GET.get('precio')
+
+    # Query base - solo productos activos y disponibles en web
+    productos = Producto.objects.filter(
+        activo=True,
+        disponible_web=True,
+        stock_actual__gt=0
+    )
+
+    # Aplicar filtros
+    if categorias_seleccionadas:
+        productos = productos.filter(categoria_id__in=categorias_seleccionadas)
+
+    if marcas_seleccionadas:
+        productos = productos.filter(marca__in=marcas_seleccionadas)
+
+    if buscar:
+        productos = productos.filter(
+            Q(nombre_producto__icontains=buscar) |
+            Q(descripcion__icontains=buscar) |
+            Q(marca__icontains=buscar) |
+            Q(modelo_equipo__icontains=buscar)
+        )
+
+    # Filtro de precio
+    if precio_rango:
+        if precio_rango == '0-500000':
+            productos = productos.filter(precio_venta__lt=500000)
+        elif precio_rango == '500000-1000000':
+            productos = productos.filter(precio_venta__gte=500000, precio_venta__lt=1000000)
+        elif precio_rango == '1000000-2000000':
+            productos = productos.filter(precio_venta__gte=1000000, precio_venta__lt=2000000)
+        elif precio_rango == '2000000-':
+            productos = productos.filter(precio_venta__gte=2000000)
+
+    # Ordenamiento
+    orden_map = {
+        'relevance': '-destacado',
+        'price_asc': 'precio_venta',
+        'price_desc': '-precio_venta',
+        'newest': '-fecha_registro',
+    }
+    productos = productos.order_by(orden_map.get(ordenar, '-destacado'), 'nombre_producto')
+
+    # Obtener categorías para filtros
+    categorias = CategoriaProducto.objects.filter(activo=True)
+
+    # Obtener marcas únicas de productos disponibles
+    marcas = Producto.objects.filter(
+        activo=True,
+        disponible_web=True,
+        stock_actual__gt=0
+    ).values_list('marca', flat=True).distinct().exclude(marca__isnull=True).exclude(marca='')
+
+    context = {
+        'productos': productos,
+        'categorias': categorias,
+        'marcas': sorted(marcas),
+        'categorias_seleccionadas': categorias_seleccionadas,
+        'marcas_seleccionadas': marcas_seleccionadas,
+        'buscar': buscar,
+        'ordenar': ordenar,
+    }
+
+    return render(request, 'ecommerce/productos_estilo_exito.html', context)

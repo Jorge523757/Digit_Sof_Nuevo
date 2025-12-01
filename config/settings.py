@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Apps del proyecto
+    'main',  # App principal con modelos Cart y CartItem
     'core',
     'usuarios',
     'dashboard',

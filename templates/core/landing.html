@@ -676,7 +676,8 @@
                                             data-producto-nombre="{{ producto.nombre_producto }}"
                                             data-producto-precio="{{ producto.precio_venta }}"
                                             data-producto-stock="{{ producto.stock_actual }}"
-                                            data-producto-categoria="{{ producto.categoria.nombre|default:'General' }}">
+                                            data-producto-categoria="{{ producto.categoria.nombre|default:'General' }}"
+                                            data-producto-imagen="{% if producto.imagen_principal %}{{ producto.imagen_principal.url }}{% else %}/static/images/logo.jpg{% endif %}">
                                         <i class="fas fa-cart-plus"></i>
                                     </button>
                                 </div>
@@ -826,15 +827,19 @@
                     <h3>Envíanos un Mensaje</h3>
                     <form id="contactForm">
                         <div class="form-group">
+                            <label for="name" class="sr-only">Nombre completo</label>
                             <input type="text" id="name" placeholder="Nombre completo" required>
                         </div>
                         <div class="form-group">
+                            <label for="email" class="sr-only">Correo electrónico</label>
                             <input type="email" id="email" placeholder="Correo electrónico" required>
                         </div>
                         <div class="form-group">
+                            <label for="phone" class="sr-only">Teléfono</label>
                             <input type="tel" id="phone" placeholder="Teléfono">
                         </div>
                         <div class="form-group">
+                            <label for="message" class="sr-only">Tu mensaje</label>
                             <textarea id="message" rows="5" placeholder="Tu mensaje" required></textarea>
                         </div>
                         <button type="submit" class="btn">Enviar Mensaje</button>
@@ -883,7 +888,8 @@
                     <h3>Suscríbete</h3>
                     <p>Recibe nuestras promociones y noticias.</p>
                     <form id="newsletterForm">
-                        <input type="email" placeholder="Tu correo electrónico" required>
+                        <label for="newsletter-email" class="sr-only">Tu correo electrónico</label>
+                        <input type="email" id="newsletter-email" placeholder="Tu correo electrónico" required>
                         <button type="submit"><i class="fas fa-paper-plane"></i></button>
                     </form>
                 </div>
@@ -982,13 +988,33 @@
 
                         // Obtener datos del producto desde los atributos de datos
                         const productoId = this.dataset.productoId;
-                        const nombre = this.dataset.productoNombre;
-                        const precio = parseFloat(this.dataset.productoPrecio);
-                        const stock = parseInt(this.dataset.productoStock);
-                        const categoria = this.dataset.productoCategoria;
+                        const nombre = this.dataset.productoNombre || 'Producto';
+                        const precioRaw = parseFloat(this.dataset.productoPrecio);
+                        const precio = isNaN(precioRaw) ? 0 : precioRaw;
+                        const stockRaw = parseInt(this.dataset.productoStock);
+                        const stock = isNaN(stockRaw) ? 999 : stockRaw;
+                        const categoria = this.dataset.productoCategoria || 'General';
+                        const imagen = this.dataset.productoImagen || '/static/images/logo.jpg';
 
-                        if (!productoId || !nombre || !precio) {
-                            console.error('❌ Datos del producto incompletos');
+                        // Validación mínima: solo verificar que existe ID
+                        if (!productoId) {
+                            console.error('❌ Producto sin ID:', {
+                                boton: this,
+                                dataset: this.dataset
+                            });
+                            return;
+                        }
+
+                        // Validar que al menos tenga nombre O precio válido
+                        if (!nombre || nombre === 'Producto' && precio === 0) {
+                            console.error('❌ Datos del producto incompletos:', {
+                                id: productoId,
+                                nombre: nombre,
+                                precio: precio,
+                                stock: stock,
+                                precioRaw: this.dataset.productoPrecio,
+                                nombreRaw: this.dataset.productoNombre
+                            });
                             return;
                         }
 
@@ -997,7 +1023,8 @@
                             nombre: nombre,
                             precio: precio,
                             stock: stock,
-                            categoria: categoria || 'General'
+                            categoria: categoria,
+                            imagen: imagen
                         };
 
                         console.log('📦 Producto a agregar:', datosProducto);
@@ -1131,7 +1158,7 @@
                 if (btnIngreso) {
                     console.log('║ ID del botón:', btnIngreso.id);
                     console.log('║ Texto del botón:', btnIngreso.textContent);
-                    console.log('║ Tiene listeners:', getEventListeners ? '✅' : '⚠️ No disponible');
+                    console.log('║ Tiene listeners:', typeof getEventListeners !== 'undefined' ? '✅' : '⚠️ No disponible');
 
                     // Agregar listener de prueba
                     btnIngreso.addEventListener('click', function(e) {
