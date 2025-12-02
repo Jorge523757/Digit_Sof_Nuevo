@@ -1,0 +1,92 @@
+<!-- Widget Flotante de WhatsApp -->
+<style>
+.whatsapp-float-btn{position:fixed;bottom:25px;right:25px;background:#25D366;color:white;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 4px 12px rgba(37,211,102,0.4);cursor:pointer;z-index:9999;transition:all 0.3s ease;border:none}
+.whatsapp-float-btn:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(37,211,102,0.6)}
+.whatsapp-modal{display:none;position:fixed;bottom:100px;right:25px;width:320px;background:white;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.2);z-index:9998;overflow:hidden;animation:slideUp 0.3s ease}
+.whatsapp-modal.active{display:block}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.whatsapp-header{background:linear-gradient(135deg,#25D366 0%,#128C7E 100%);color:white;padding:20px;position:relative}
+.whatsapp-close-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.2);border:none;color:white;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s}
+.whatsapp-close-btn:hover{background:rgba(255,255,255,0.3)}
+.whatsapp-header-content{display:flex;align-items:center;gap:12px}
+.whatsapp-header-icon{font-size:32px}
+.whatsapp-header-text h4{margin:0;font-size:16px;font-weight:600}
+.whatsapp-header-text p{margin:4px 0 0 0;font-size:12px;opacity:0.9}
+.whatsapp-body{padding:15px;background:#f0f0f0}
+.whatsapp-info{background:white;padding:10px 15px;border-radius:8px;margin-bottom:15px;font-size:13px;color:#666;text-align:center}
+.whatsapp-options{display:flex;flex-direction:column;gap:8px}
+.whatsapp-option{background:white;border:none;padding:12px 15px;border-radius:8px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s;text-decoration:none;color:inherit}
+.whatsapp-option:hover{background:#e8f5e9;transform:translateX(3px)}
+.whatsapp-option-icon{width:40px;height:40px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:20px;flex-shrink:0}
+.whatsapp-option-text{flex:1;text-align:left}
+.whatsapp-option-title{font-weight:600;font-size:14px;color:#333;margin:0}
+.whatsapp-option-subtitle{font-size:12px;color:#999;margin:2px 0 0 0}
+.whatsapp-option-arrow{color:#25D366;font-size:18px}
+@media (max-width:480px){.whatsapp-modal{width:calc(100% - 20px);right:10px;bottom:90px}.whatsapp-float-btn{bottom:20px;right:20px;width:55px;height:55px;font-size:26px}}
+</style>
+
+<button class="whatsapp-float-btn" id="whatsappFloatBtn" onclick="toggleWhatsAppModal()"><i class="fab fa-whatsapp"></i></button>
+
+<div class="whatsapp-modal" id="whatsappModal">
+<div class="whatsapp-header">
+<button class="whatsapp-close-btn" onclick="toggleWhatsAppModal()"><i class="fas fa-times"></i></button>
+<div class="whatsapp-header-content">
+<div class="whatsapp-header-icon"><i class="fab fa-whatsapp"></i></div>
+<div class="whatsapp-header-text">
+<h4>Iniciar una conversación</h4>
+<p>¡Hola! haga click en alguno de nuestros agentes para iniciar una conversación en WhatsApp</p>
+</div>
+</div>
+</div>
+<div class="whatsapp-body">
+<div class="whatsapp-info">Respondemos en unos minutos</div>
+<div class="whatsapp-options">
+<a href="https://wa.me/573148004120?text=Hola,%20estoy%20interesado%20en%20sus%20servicios%20de%20Venta" class="whatsapp-option" target="_blank" rel="noopener noreferrer">
+<div class="whatsapp-option-icon"><i class="fab fa-whatsapp"></i></div>
+<div class="whatsapp-option-text">
+<p class="whatsapp-option-title">Venta</p>
+<p class="whatsapp-option-subtitle">Venta</p>
+</div>
+<div class="whatsapp-option-arrow"><i class="fab fa-whatsapp"></i></div>
+</a>
+<a href="https://wa.me/573148004120?text=Hola,%20necesito%20información%20sobre%20Diseño%20Web" class="whatsapp-option" target="_blank" rel="noopener noreferrer">
+<div class="whatsapp-option-icon"><i class="fab fa-whatsapp"></i></div>
+<div class="whatsapp-option-text">
+<p class="whatsapp-option-title">Diseño Web</p>
+<p class="whatsapp-option-subtitle">Diseño Web</p>
+</div>
+<div class="whatsapp-option-arrow"><i class="fab fa-whatsapp"></i></div>
+</a>
+<a href="https://wa.me/573148004120?text=Hola,%20necesito%20ayuda%20con%20Software" class="whatsapp-option" target="_blank" rel="noopener noreferrer">
+<div class="whatsapp-option-icon"><i class="fab fa-whatsapp"></i></div>
+<div class="whatsapp-option-text">
+<p class="whatsapp-option-title">Software</p>
+<p class="whatsapp-option-subtitle">Software</p>
+</div>
+<div class="whatsapp-option-arrow"><i class="fab fa-whatsapp"></i></div>
+</a>
+<a href="https://wa.me/573148004120?text=Hola,%20requiero%20Soporte%20Técnico" class="whatsapp-option" target="_blank" rel="noopener noreferrer">
+<div class="whatsapp-option-icon"><i class="fab fa-whatsapp"></i></div>
+<div class="whatsapp-option-text">
+<p class="whatsapp-option-title">Soporte Técnico</p>
+<p class="whatsapp-option-subtitle">Soporte Técnico</p>
+</div>
+<div class="whatsapp-option-arrow"><i class="fab fa-whatsapp"></i></div>
+</a>
+<a href="https://wa.me/573148004120?text=Hola,%20necesito%20información%20sobre%20Infraestructura" class="whatsapp-option" target="_blank" rel="noopener noreferrer">
+<div class="whatsapp-option-icon"><i class="fab fa-whatsapp"></i></div>
+<div class="whatsapp-option-text">
+<p class="whatsapp-option-title">Infraestructura</p>
+<p class="whatsapp-option-subtitle">Infraestructura</p>
+</div>
+<div class="whatsapp-option-arrow"><i class="fab fa-whatsapp"></i></div>
+</a>
+</div>
+</div>
+</div>
+
+<script>
+function toggleWhatsAppModal(){const modal=document.getElementById('whatsappModal');modal.classList.toggle('active')}
+document.addEventListener('click',function(event){const modal=document.getElementById('whatsappModal');const btn=document.getElementById('whatsappFloatBtn');if(modal&&btn&&!modal.contains(event.target)&&!btn.contains(event.target)){modal.classList.remove('active')}});
+</script>
+
