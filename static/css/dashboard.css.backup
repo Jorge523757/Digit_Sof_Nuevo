@@ -517,14 +517,11 @@ footer {
     }
 }
 
-/* COMENTADO - El botón de menú ahora siempre es visible */
-/*
 @media (min-width: 993px) {
     .menu-toggle {
         display: none;
     }
 }
-*/
 
 @media (max-width: 768px) {
     .sidebar {

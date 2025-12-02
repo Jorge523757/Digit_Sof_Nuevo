@@ -207,3 +207,234 @@
     color: #ff9800;
 }
 
+/* ========== ACTIVITY TIMELINE ========== */
+.activity-timeline {
+    position: relative;
+    padding-left: 40px;
+}
+
+.activity-timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%);
+}
+
+.activity-item {
+    position: relative;
+    margin-bottom: 25px;
+    display: flex;
+    gap: 15px;
+}
+
+.activity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    position: relative;
+    z-index: 1;
+}
+
+.activity-icon.bg-success {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+}
+
+.activity-icon.bg-primary {
+    background: linear-gradient(135deg, #037dc4 0%, #0f9bec 100%);
+}
+
+.activity-icon.bg-info {
+    background: linear-gradient(135deg, #3498db 0%, #5dade2 100%);
+}
+
+.activity-icon.bg-warning {
+    background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+}
+
+.activity-icon.bg-danger {
+    background: linear-gradient(135deg, #e74c3c 0%, #ec7063 100%);
+}
+
+.activity-content {
+    flex: 1;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    transition: all 0.3s ease;
+}
+
+.activity-content:hover {
+    background: #e8f4f8;
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.activity-header strong {
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.activity-time {
+    font-size: 0.8rem;
+    color: #95a5a6;
+}
+
+.activity-text {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* ========== TASKS LIST ========== */
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.task-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid;
+    transition: all 0.3s ease;
+}
+
+.task-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+}
+
+.task-item.priority-high {
+    border-left-color: #e74c3c;
+    background: linear-gradient(90deg, #ffebee 0%, #f8f9fa 50%);
+}
+
+.task-item.priority-medium {
+    border-left-color: #f39c12;
+    background: linear-gradient(90deg, #fff3e0 0%, #f8f9fa 50%);
+}
+
+.task-item.priority-low {
+    border-left-color: #3498db;
+    background: linear-gradient(90deg, #e3f2fd 0%, #f8f9fa 50%);
+}
+
+.task-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.task-item.priority-high .task-icon {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.task-item.priority-medium .task-icon {
+    background: rgba(243, 156, 18, 0.1);
+    color: #f39c12;
+}
+
+.task-item.priority-low .task-icon {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+}
+
+.task-content {
+    flex: 1;
+}
+
+.task-content strong {
+    color: #2c3e50;
+    font-size: 0.95rem;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.task-content p {
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+.task-link {
+    color: #037dc4;
+    font-size: 0.85rem;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.task-link:hover {
+    color: #0f9bec;
+    padding-left: 5px;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .stats-row {
+        grid-template-columns: 1fr;
+    }
+
+    .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .activity-timeline {
+        padding-left: 30px;
+    }
+
+    .activity-timeline::before {
+        left: 11px;
+    }
+
+    .activity-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .welcome-banner {
+        padding: 25px;
+    }
+
+    .welcome-banner h2 {
+        font-size: 1.5rem;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+    }
+
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
