@@ -1,0 +1,447 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}{% if accion == 'Registrar' %}Registrar Cliente{% else %}Editar Cliente{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Encabezado -->
+            <div class="mb-4">
+                <a href="{% url 'clientes:lista' %}" class="btn btn-outline-secondary mb-3">
+                    <i class="fas fa-arrow-left"></i> Volver al listado
+                </a>
+                <h2>
+                    <i class="fas fa-{% if accion == 'Registrar' %}user-plus{% else %}user-edit{% endif %}"></i>
+                    {{ accion }} Cliente
+                </h2>
+                <p class="text-muted">
+                    {% if accion == 'Registrar' %}
+                    RF1: Complete los datos para registrar un nuevo cliente
+                    {% else %}
+                    RF3: Modifique los datos del cliente
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- Formulario -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clipboard-list"></i> Datos del Cliente
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <!-- Nombres -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.nombres.id_for_label }}" class="form-label">
+                                    {{ form.nombres.label }}
+                                </label>
+                                {{ form.nombres }}
+                                {% if form.nombres.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.nombres.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Apellidos -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.apellidos.id_for_label }}" class="form-label">
+                                    {{ form.apellidos.label }}
+                                </label>
+                                {{ form.apellidos }}
+                                {% if form.apellidos.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.apellidos.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Número de Documento -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.numero_documento.id_for_label }}" class="form-label">
+                                    {{ form.numero_documento.label }}
+                                </label>
+                                {{ form.numero_documento }}
+                                {% if form.numero_documento.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.numero_documento.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Teléfono -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.telefono.id_for_label }}" class="form-label">
+                                    {{ form.telefono.label }}
+                                </label>
+                                {{ form.telefono }}
+                                {% if form.telefono.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.telefono.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Correo Electrónico -->
+                        <div class="mb-3">
+                            <label for="{{ form.correo.id_for_label }}" class="form-label">
+                                {{ form.correo.label }}
+                            </label>
+                            {{ form.correo }}
+                            {% if form.correo.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.correo.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Dirección -->
+                        <div class="mb-3">
+                            <label for="{{ form.direccion.id_for_label }}" class="form-label">
+                                {{ form.direccion.label }}
+                            </label>
+                            {{ form.direccion }}
+                            {% if form.direccion.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.direccion.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Cliente Activo -->
+                        <div class="mb-3 form-check">
+                            {{ form.activo }}
+                            <label for="{{ form.activo.id_for_label }}" class="form-check-label">
+                                {{ form.activo.label }}
+                            </label>
+                            {% if form.activo.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.activo.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Errores generales -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <!-- Botones -->
+                        <div class="d-flex gap-2 justify-content-end mt-4">
+                            <a href="{% url 'clientes:lista' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {{ accion }} Cliente
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="alert alert-info mt-3">
+                <i class="fas fa-info-circle"></i>
+                <strong>Nota:</strong> Todos los campos marcados con (*) son obligatorios.
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .form-control:focus, .form-check-input:focus {
+        border-color: #037dc4;
+        box-shadow: 0 0 0 0.2rem rgba(3, 125, 196, 0.25);
+    }
+
+    .form-control.is-valid {
+        border-color: #28a745;
+        padding-right: calc(1.5em + 0.75rem);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    .validation-message {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .validation-message.valid {
+        color: #28a745;
+    }
+
+    .char-counter {
+        font-size: 0.75rem;
+        color: #6c757d;
+        float: right;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const nombresInput = document.getElementById('id_nombres');
+    const apellidosInput = document.getElementById('id_apellidos');
+    const documentoInput = document.getElementById('id_numero_documento');
+    const telefonoInput = document.getElementById('id_telefono');
+    const correoInput = document.getElementById('id_correo');
+    const direccionInput = document.getElementById('id_direccion');
+
+    // Validación de nombres y apellidos (solo letras y espacios)
+    function validateNombreApellido(input, fieldName) {
+        const value = input.value.trim();
+        const regex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/;
+
+        if (!value) {
+            showError(input, `${fieldName} es obligatorio`);
+            return false;
+        } else if (value.length < 2) {
+            showError(input, `${fieldName} debe tener al menos 2 caracteres`);
+            return false;
+        } else if (!regex.test(value)) {
+            showError(input, `${fieldName} solo puede contener letras y espacios`);
+            return false;
+        } else {
+            showSuccess(input, `${fieldName} válido ✓`);
+            return true;
+        }
+    }
+
+    // Validación de documento (solo números)
+    function validateDocumento(input) {
+        const value = input.value.trim();
+
+        if (!value) {
+            showError(input, 'Documento es obligatorio');
+            return false;
+        } else if (!/^\d+$/.test(value)) {
+            showError(input, 'El documento debe contener solo números');
+            return false;
+        } else if (value.length < 5 || value.length > 20) {
+            showError(input, 'El documento debe tener entre 5 y 20 dígitos');
+            return false;
+        } else {
+            showSuccess(input, 'Documento válido ✓');
+            return true;
+        }
+    }
+
+    // Validación de teléfono
+    function validateTelefono(input) {
+        const value = input.value.trim();
+        const numeros = value.replace(/[^\d]/g, '');
+
+        if (!value) {
+            showError(input, 'Teléfono es obligatorio');
+            return false;
+        } else if (numeros.length < 7) {
+            showError(input, 'El teléfono debe tener al menos 7 dígitos');
+            return false;
+        } else if (numeros.length > 15) {
+            showError(input, 'El teléfono no puede tener más de 15 dígitos');
+            return false;
+        } else {
+            showSuccess(input, 'Teléfono válido ✓');
+            return true;
+        }
+    }
+
+    // Validación de correo
+    function validateCorreo(input) {
+        const value = input.value.trim();
+        const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (!value) {
+            showError(input, 'Correo es obligatorio');
+            return false;
+        } else if (!regex.test(value)) {
+            showError(input, 'Ingrese un correo electrónico válido');
+            return false;
+        } else {
+            showSuccess(input, 'Correo válido ✓');
+            return true;
+        }
+    }
+
+    // Validación de dirección
+    function validateDireccion(input) {
+        const value = input.value.trim();
+
+        if (!value) {
+            showError(input, 'Dirección es obligatoria');
+            return false;
+        } else if (value.length < 10) {
+            showError(input, `Dirección muy corta (${value.length}/10 caracteres mínimos)`);
+            return false;
+        } else if (value.length > 300) {
+            showError(input, `Dirección muy larga (${value.length}/300 caracteres máximo)`);
+            return false;
+        } else {
+            showSuccess(input, 'Dirección válida ✓');
+            return true;
+        }
+    }
+
+    // Mostrar error
+    function showError(input, message) {
+        input.classList.remove('is-valid');
+        input.classList.add('is-invalid');
+
+        let errorDiv = input.parentNode.querySelector('.validation-message');
+        if (!errorDiv) {
+            errorDiv = document.createElement('div');
+            errorDiv.className = 'validation-message';
+            input.parentNode.appendChild(errorDiv);
+        }
+        errorDiv.className = 'validation-message text-danger';
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+    }
+
+    // Mostrar éxito
+    function showSuccess(input, message) {
+        input.classList.remove('is-invalid');
+        input.classList.add('is-valid');
+
+        let successDiv = input.parentNode.querySelector('.validation-message');
+        if (!successDiv) {
+            successDiv = document.createElement('div');
+            successDiv.className = 'validation-message';
+            input.parentNode.appendChild(successDiv);
+        }
+        successDiv.className = 'validation-message valid';
+        successDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+    }
+
+    // Event listeners para validación en tiempo real
+    if (nombresInput) {
+        nombresInput.addEventListener('input', function() {
+            validateNombreApellido(this, 'Nombres');
+        });
+        nombresInput.addEventListener('blur', function() {
+            // Capitalizar automáticamente
+            this.value = this.value.trim().split(' ').map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            ).join(' ');
+            validateNombreApellido(this, 'Nombres');
+        });
+    }
+
+    if (apellidosInput) {
+        apellidosInput.addEventListener('input', function() {
+            validateNombreApellido(this, 'Apellidos');
+        });
+        apellidosInput.addEventListener('blur', function() {
+            // Capitalizar automáticamente
+            this.value = this.value.trim().split(' ').map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            ).join(' ');
+            validateNombreApellido(this, 'Apellidos');
+        });
+    }
+
+    if (documentoInput) {
+        documentoInput.addEventListener('input', function() {
+            // Remover caracteres no numéricos
+            this.value = this.value.replace(/[^\d]/g, '');
+            validateDocumento(this);
+        });
+    }
+
+    if (telefonoInput) {
+        telefonoInput.addEventListener('input', function() {
+            validateTelefono(this);
+        });
+    }
+
+    if (correoInput) {
+        correoInput.addEventListener('input', function() {
+            validateCorreo(this);
+        });
+        correoInput.addEventListener('blur', function() {
+            this.value = this.value.trim().toLowerCase();
+            validateCorreo(this);
+        });
+    }
+
+    if (direccionInput) {
+        direccionInput.addEventListener('input', function() {
+            validateDireccion(this);
+            // Mostrar contador de caracteres
+            updateCharCounter(this, 300);
+        });
+    }
+
+    // Contador de caracteres
+    function updateCharCounter(input, maxLength) {
+        const length = input.value.length;
+        let counter = input.parentNode.querySelector('.char-counter');
+
+        if (!counter) {
+            counter = document.createElement('small');
+            counter.className = 'char-counter';
+            input.parentNode.querySelector('label').appendChild(counter);
+        }
+
+        counter.textContent = `${length}/${maxLength}`;
+        counter.style.color = length > maxLength ? '#dc3545' : '#6c757d';
+    }
+
+    // Validación al enviar el formulario
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+
+        if (nombresInput) isValid = validateNombreApellido(nombresInput, 'Nombres') && isValid;
+        if (apellidosInput) isValid = validateNombreApellido(apellidosInput, 'Apellidos') && isValid;
+        if (documentoInput) isValid = validateDocumento(documentoInput) && isValid;
+        if (telefonoInput) isValid = validateTelefono(telefonoInput) && isValid;
+        if (correoInput) isValid = validateCorreo(correoInput) && isValid;
+        if (direccionInput) isValid = validateDireccion(direccionInput) && isValid;
+
+        if (!isValid) {
+            e.preventDefault();
+            alert('Por favor, corrija los errores en el formulario antes de continuar.');
+            // Hacer scroll al primer error
+            const firstError = form.querySelector('.is-invalid');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError.focus();
+            }
+        }
+    });
+
+    // Prevenir pegado de contenido no válido en documento
+    if (documentoInput) {
+        documentoInput.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pastedData = (e.clipboardData || window.clipboardData).getData('text');
+            this.value = pastedData.replace(/[^\d]/g, '');
+            validateDocumento(this);
+        });
+    }
+});
+</script>
+{% endblock %}
+

@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Servicio Técnico{% endblock %}
+{% block content %}
+<div class="servicio-tecnico-container">
+    <header class="st-header">
+        <img src="/static/imagenes/laptop1.jpg" alt="Servicio Técnico" class="st-icon">
+        <h1 class="titulo">Módulo de Servicio Técnico</h1>
+    </header>
+    <p class="bienvenida">Bienvenido al módulo de servicio técnico. Aquí puedes gestionar los servicios, asignar técnicos y consultar el historial.</p>
+    <div class="st-actions">
+        <button class="btn">Nuevo Servicio</button>
+        <button class="btn">Asignar Técnico</button>
+        <button class="btn">Ver Historial</button>
+    </div>
+    <section class="st-table-section">
+        <h2>Servicios Técnicos Recientes</h2>
+        <table class="st-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Equipo</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>001</td>
+                    <td>Juan Pérez</td>
+                    <td>Laptop HP</td>
+                    <td>En proceso</td>
+                    <td>2025-10-01</td>
+                </tr>
+                <tr>
+                    <td>002</td>
+                    <td>María Gómez</td>
+                    <td>Impresora Epson</td>
+                    <td>Finalizado</td>
+                    <td>2025-09-28</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+{% endblock %}
+<style>
+.servicio-tecnico-container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    padding: 32px;
+}
+.st-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+.st-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+.titulo {
+    color: #2c3e50;
+    font-size: 2.2em;
+    margin-bottom: 0;
+}
+.bienvenida {
+    color: #34495e;
+    font-size: 1.2em;
+    margin-bottom: 24px;
+}
+.st-actions {
+    margin-bottom: 28px;
+}
+.btn {
+    background: #2980b9;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 18px;
+    margin-right: 10px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.2s;
+}
+.btn:hover {
+    background: #1c5d8c;
+}
+.st-table-section {
+    margin-top: 18px;
+}
+.st-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.st-table th, .st-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e1e1e1;
+}
+.st-table th {
+    background: #eaf1fb;
+    color: #2980b9;
+}
+.st-table tr:last-child td {
+    border-bottom: none;
+}
+@media (max-width: 600px) {
+    .servicio-tecnico-container {
+        padding: 12px;
+    }
+    .st-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .titulo {
+        font-size: 1.4em;
+    }
+    .st-table th, .st-table td {
+        padding: 8px 6px;
+    }
+}
+</style>

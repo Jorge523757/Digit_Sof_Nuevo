@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+{% load math_filters %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - DigitSoft</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .header-ecommerce {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .checkout-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .checkout-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            margin-bottom: 1.5rem;
+            border: 1px solid #e8ecf1;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .section-title i {
+            color: #667eea;
+            font-size: 1.4rem;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+        .form-control, .form-select {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .product-summary {
+            border: 2px solid #e8ecf1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+        }
+        .product-summary:hover {
+            border-color: #667eea;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+        .product-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid #e8ecf1;
+        }
+        .payment-method {
+            border: 2px solid #e8ecf1;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+            display: flex;
+            align-items: center;
+        }
+        .payment-method:hover {
+            border-color: #667eea;
+            background: white;
+            transform: translateX(4px);
+        }
+        .payment-method.selected {
+            border-color: #667eea;
+            background: #f7f9ff;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+        .payment-method input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+            accent-color: #667eea;
+        }
+        .btn-confirm-purchase {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            color: white;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        .btn-confirm-purchase:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+        .order-summary {
+            position: sticky;
+            top: 20px;
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e8ecf1;
+        }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e8ecf1;
+            font-size: 1rem;
+        }
+        .summary-total {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            border-top: 2px solid #e8ecf1;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0 3rem 0;
+            gap: 2rem;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .step-number {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #cbd5e0;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        .step-number.active {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            transform: scale(1.1);
+        }
+        .step-text {
+            font-weight: 500;
+            color: #718096;
+        }
+        .step.active .step-text {
+            color: #28a745;
+            font-weight: 600;
+        }
+        .info-badge {
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #166534;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header-ecommerce">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-shopping-bag me-2"></i>
+                        Finalizar Compra
+                    </h1>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="{% url 'ecommerce:ver_carrito' %}" class="btn btn-outline-light">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Volver al Carrito
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container checkout-container">
+        <!-- Indicador de pasos -->
+        <div class="step-indicator">
+            <div class="step">
+                <div class="step-number">1</div>
+                <span class="step-text">Carrito</span>
+            </div>
+            <div class="step active">
+                <div class="step-number active">2</div>
+                <span class="step-text">Pago</span>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <span class="step-text">Confirmación</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Columna Izquierda -->
+            <div class="col-lg-8">
+                <!-- Datos del Cliente -->
+                <div class="checkout-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-user"></i>
+                        Datos de Facturación
+                    </h4>
+                    <form id="formCliente">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nombres *</label>
+                                <input type="text" class="form-control" id="nombres" name="nombres"
+                                       value="{% if cliente %}{{ cliente.nombres }}{% else %}{{ user.first_name }}{% endif %}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Apellidos *</label>
+                                <input type="text" class="form-control" id="apellidos" name="apellidos"
+                                       value="{% if cliente %}{{ cliente.apellidos }}{% else %}{{ user.last_name }}{% endif %}" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Número de Documento *</label>
+                                <input type="text" class="form-control" id="numero_documento" name="numero_documento"
+                                       value="{% if cliente %}{{ cliente.numero_documento }}{% endif %}" required>
+                                <small class="text-muted">Cédula de ciudadanía o NIT</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Teléfono *</label>
+                                <input type="tel" class="form-control" id="telefono" name="telefono"
+                                       value="{% if cliente %}{{ cliente.telefono }}{% endif %}" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Correo Electrónico *</label>
+                            <input type="email" class="form-control" id="correo" name="correo"
+                                   value="{% if cliente %}{{ cliente.correo }}{% else %}{{ user.email }}{% endif %}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dirección de Envío *</label>
+                            <textarea class="form-control" id="direccion" name="direccion" rows="3" required>{% if cliente %}{{ cliente.direccion }}{% endif %}</textarea>
+                            <small class="text-muted">Dirección completa incluyendo ciudad y departamento</small>
+                        </div>
+                        <div class="info-badge">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Nota:</strong> Estos datos serán usados para la factura y el envío de tus productos.
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Resumen de productos -->
+                <div class="checkout-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-box"></i>
+                        Resumen de tu pedido
+                    </h4>
+                    {% for item in productos_carrito %}
+                    <div class="product-summary">
+                        <div class="row align-items-center">
+                            <div class="col-md-2">
+                                {% if item.producto.imagen %}
+                                    <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre_producto }}" class="product-img">
+                                {% else %}
+                                    <div class="product-img d-flex align-items-center justify-content-center" style="background: #f0f0f0;">
+                                        <i class="fas fa-box text-muted fa-2x"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="mb-1 fw-bold">{{ item.producto.nombre_producto }}</h6>
+                                <small class="text-muted">Cantidad: {{ item.cantidad }}</small>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <p class="mb-0 fw-bold text-primary fs-5">${{ item.subtotal|floatformat:2 }}</p>
+                                <small class="text-muted">${{ item.producto.precio_venta|floatformat:2 }} c/u</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Método de pago -->
+                <div class="checkout-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-credit-card"></i>
+                        Método de Pago
+                    </h4>
+                    <div class="payment-method selected" onclick="selectPaymentMethod('EFECTIVO', this)">
+                        <input type="radio" name="payment" value="EFECTIVO" checked>
+                        <div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-money-bill-wave me-2 text-success fa-lg"></i>
+                                <strong>Efectivo</strong>
+                            </div>
+                            <small class="text-muted ms-4">Pago contra entrega</small>
+                        </div>
+                    </div>
+                    <div class="payment-method" onclick="selectPaymentMethod('TARJETA', this)">
+                        <input type="radio" name="payment" value="TARJETA">
+                        <div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-credit-card me-2 text-primary fa-lg"></i>
+                                <strong>Tarjeta de Crédito/Débito</strong>
+                            </div>
+                            <small class="text-muted ms-4">Visa, Mastercard, American Express</small>
+                        </div>
+                    </div>
+                    <div class="payment-method" onclick="selectPaymentMethod('TRANSFERENCIA', this)">
+                        <input type="radio" name="payment" value="TRANSFERENCIA">
+                        <div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-university me-2 text-info fa-lg"></i>
+                                <strong>Transferencia Bancaria</strong>
+                            </div>
+                            <small class="text-muted ms-4">Pago directo a cuenta bancaria</small>
+                        </div>
+                    </div>
+                    <div class="payment-method" onclick="selectPaymentMethod('PSE', this)">
+                        <input type="radio" name="payment" value="PSE">
+                        <div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-wallet me-2 text-warning fa-lg"></i>
+                                <strong>PSE</strong>
+                            </div>
+                            <small class="text-muted ms-4">Pago a través de tu banco online</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha - Resumen -->
+            <div class="col-lg-4">
+                <div class="order-summary">
+                    <h5 class="section-title">
+                        <i class="fas fa-receipt"></i>
+                        Resumen del Pedido
+                    </h5>
+                    <div class="summary-item">
+                        <span>Productos ({{ cantidad_items }})</span>
+                        <span class="fw-bold">${{ subtotal|floatformat:2 }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>IVA (19%)</span>
+                        <span class="fw-bold">${{ iva|floatformat:2 }}</span>
+                    </div>
+                    <div class="summary-item summary-total">
+                        <span>Total a Pagar</span>
+                        <span>${{ total|floatformat:2 }}</span>
+                    </div>
+                    <button class="btn-confirm-purchase mt-3" onclick="confirmarCompra()">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Confirmar Compra
+                    </button>
+                    <div class="secure-badge">
+                        <i class="fas fa-lock"></i>
+                        <span>Pago 100% seguro y protegido</span>
+                    </div>
+                    <div class="secure-badge" style="background: #fff7ed; border-color: #fed7aa; color: #92400e;">
+                        <i class="fas fa-truck"></i>
+                        <span>Envío gratis en compras > $100.000</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let metodoPagoSeleccionado = 'EFECTIVO';
+
+        function selectPaymentMethod(metodo, elemento) {
+            document.querySelectorAll('.payment-method').forEach(pm => pm.classList.remove('selected'));
+            elemento.classList.add('selected');
+            elemento.querySelector('input[type="radio"]').checked = true;
+            metodoPagoSeleccionado = metodo;
+        }
+
+        function confirmarCompra() {
+            const form = document.getElementById('formCliente');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const nombres = document.getElementById('nombres').value;
+            const apellidos = document.getElementById('apellidos').value;
+            const numero_documento = document.getElementById('numero_documento').value;
+            const telefono = document.getElementById('telefono').value;
+            const correo = document.getElementById('correo').value;
+            const direccion = document.getElementById('direccion').value;
+
+            if (!confirm('¿Confirmar la compra con los siguientes datos?\n\n' +
+                        'Cliente: ' + nombres + ' ' + apellidos + '\n' +
+                        'Documento: ' + numero_documento + '\n' +
+                        'Teléfono: ' + telefono + '\n' +
+                        'Correo: ' + correo + '\n' +
+                        'Dirección: ' + direccion)) {
+                return;
+            }
+
+            const btnConfirmar = document.querySelector('.btn-confirm-purchase');
+            btnConfirmar.disabled = true;
+            btnConfirmar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
+
+            fetch('/tienda/checkout/procesar/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    'metodo_pago': metodoPagoSeleccionado,
+                    'nombres': nombres,
+                    'apellidos': apellidos,
+                    'numero_documento': numero_documento,
+                    'telefono': telefono,
+                    'correo': correo,
+                    'direccion': direccion
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ ' + data.message + '\nNúmero de venta: ' + data.numero_venta);
+                    window.location.href = '/tienda/factura/' + data.venta_id + '/';
+                } else {
+                    alert('❌ Error: ' + data.error);
+                    btnConfirmar.disabled = false;
+                    btnConfirmar.innerHTML = '<i class="fas fa-check-circle me-2"></i>Confirmar Compra';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('❌ Error al procesar la compra');
+                btnConfirmar.disabled = false;
+                btnConfirmar.innerHTML = '<i class="fas fa-check-circle me-2"></i>Confirmar Compra';
+            });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>
+

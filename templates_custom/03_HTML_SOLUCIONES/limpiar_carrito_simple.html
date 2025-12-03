@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Limpiar Carrito - Digit Soft</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .btn-clear {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-back {
+            background: #3b82f6;
+            color: white;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f3f4f6;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Limpiar Carrito</h1>
+        <div class="status" id="status">
+            Verificando...
+        </div>
+        <button class="btn-clear" onclick="limpiarCarrito()">
+            🗑️ Limpiar Carrito
+        </button>
+        <button class="btn-back" onclick="window.location.href='/ecommerce/productos/'">
+            🏪 Ir a la Tienda
+        </button>
+    </div>
+
+    <script>
+        function actualizarEstado() {
+            const carrito = JSON.parse(localStorage.getItem('carrito_v1') || '{}');
+            const items = Object.values(carrito);
+            const status = document.getElementById('status');
+
+            if (items.length === 0) {
+                status.innerHTML = '✅ El carrito está vacío';
+                status.style.background = '#d1fae5';
+                status.style.color = '#065f46';
+            } else {
+                status.innerHTML = `⚠️ Hay ${items.length} item(s) en el carrito`;
+                status.style.background = '#fee2e2';
+                status.style.color = '#991b1b';
+            }
+        }
+
+        function limpiarCarrito() {
+            if (confirm('¿Estás seguro de que quieres eliminar todos los productos del carrito?')) {
+                localStorage.removeItem('carrito_v1');
+                localStorage.removeItem('carrito');
+                localStorage.removeItem('cart');
+                alert('✅ Carrito limpiado correctamente');
+                actualizarEstado();
+            }
+        }
+
+        // Actualizar al cargar
+        actualizarEstado();
+    </script>
+</body>
+</html>
+

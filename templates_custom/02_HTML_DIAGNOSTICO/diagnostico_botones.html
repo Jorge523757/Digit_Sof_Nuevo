@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico E-commerce</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .diagnostic-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 { color: #667eea; }
+        h2 { color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        .test-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #ccc;
+            background: #f9f9f9;
+        }
+        .success { border-left-color: #28a745; background: #d4edda; }
+        .error { border-left-color: #dc3545; background: #f8d7da; }
+        .warning { border-left-color: #ffc107; background: #fff3cd; }
+        code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #5568d3; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="diagnostic-box">
+        <h1>🔧 Diagnóstico del E-commerce - Digit Soft</h1>
+        <p>Este script diagnosticará por qué no funcionan los botones de tu e-commerce</p>
+        <button onclick="runDiagnostics()">▶️ Ejecutar Diagnóstico</button>
+        <button onclick="testAddToCart()">🛒 Probar Agregar al Carrito</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        const resultsDiv = document.getElementById('results');
+
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-item ${type}`;
+            div.innerHTML = message;
+            resultsDiv.appendChild(div);
+        }
+
+        function clearResults() {
+            resultsDiv.innerHTML = '';
+        }
+
+        async function runDiagnostics() {
+            clearResults();
+            log('<h2>🔍 Iniciando Diagnóstico...</h2>', 'info');
+
+            // Test 1: Verificar jQuery
+            log('<h3>Test 1: Verificar jQuery</h3>', 'info');
+            if (typeof jQuery !== 'undefined') {
+                log(`✅ jQuery cargado: Versión ${jQuery.fn.jquery}`, 'success');
+            } else {
+                log('❌ jQuery NO está cargado', 'error');
+            }
+
+            // Test 2: Verificar Bootstrap
+            log('<h3>Test 2: Verificar Bootstrap</h3>', 'info');
+            if (typeof bootstrap !== 'undefined') {
+                log('✅ Bootstrap cargado correctamente', 'success');
+            } else {
+                log('❌ Bootstrap NO está cargado', 'error');
+            }
+
+            // Test 3: Verificar CSRF Token
+            log('<h3>Test 3: Verificar CSRF Token</h3>', 'info');
+            const csrfToken = getCookie('csrftoken');
+            if (csrfToken) {
+                log(`✅ CSRF Token encontrado: ${csrfToken.substring(0, 20)}...`, 'success');
+            } else {
+                log('❌ CSRF Token NO encontrado. Esto causará errores en las peticiones POST', 'error');
+            }
+
+            // Test 4: Verificar función getCookie
+            log('<h3>Test 4: Verificar función getCookie</h3>', 'info');
+            if (typeof getCookie === 'function') {
+                log('✅ Función getCookie() existe', 'success');
+            } else {
+                log('❌ Función getCookie() NO existe', 'error');
+            }
+
+            // Test 5: Verificar función addToCart
+            log('<h3>Test 5: Verificar función addToCart</h3>', 'info');
+            if (typeof addToCart === 'function') {
+                log('✅ Función addToCart() existe', 'success');
+            } else {
+                log('❌ Función addToCart() NO existe', 'error');
+            }
+
+            // Test 6: Verificar URL del endpoint
+            log('<h3>Test 6: Probar Endpoint del Carrito</h3>', 'info');
+            try {
+                const response = await fetch('/tienda/carrito/agregar/', {
+                    method: 'OPTIONS'
+                });
+                log(`✅ Endpoint /tienda/carrito/agregar/ responde (Status: ${response.status})`, 'success');
+            } catch (error) {
+                log(`❌ Error al conectar con /tienda/carrito/agregar/: ${error.message}`, 'error');
+            }
+
+            // Test 7: Verificar localStorage
+            log('<h3>Test 7: Verificar LocalStorage</h3>', 'info');
+            try {
+                localStorage.setItem('test', 'test');
+                localStorage.removeItem('test');
+                log('✅ LocalStorage funciona correctamente', 'success');
+
+                const carrito = localStorage.getItem('carrito');
+                if (carrito) {
+                    const items = JSON.parse(carrito);
+                    log(`✅ Carrito en localStorage: ${Object.keys(items).length} productos`, 'success');
+                } else {
+                    log('⚠️ No hay carrito en localStorage (normal si está vacío)', 'warning');
+                }
+            } catch (error) {
+                log(`❌ Error con localStorage: ${error.message}`, 'error');
+            }
+
+            // Test 8: Verificar Console Errors
+            log('<h3>Test 8: Instrucciones Adicionales</h3>', 'info');
+            log('👉 Abre la Consola del Navegador (F12) y revisa si hay errores en rojo', 'warning');
+            log('👉 Verifica la pestaña "Network" al hacer click en "Agregar al Carrito"', 'warning');
+
+            log('<h2>✅ Diagnóstico Completado</h2>', 'success');
+        }
+
+        async function testAddToCart() {
+            clearResults();
+            log('<h2>🛒 Probando Agregar al Carrito...</h2>', 'info');
+
+            const productoId = 1; // ID de prueba
+            const url = '/tienda/carrito/agregar/';
+            const csrfToken = getCookie('csrftoken');
+
+            log(`<strong>URL:</strong> ${url}`, 'info');
+            log(`<strong>Producto ID:</strong> ${productoId}`, 'info');
+            log(`<strong>CSRF Token:</strong> ${csrfToken ? 'Presente ✅' : 'FALTA ❌'}`, csrfToken ? 'success' : 'error');
+
+            if (!csrfToken) {
+                log('❌ No se puede continuar sin CSRF Token. Recarga la página desde el servidor Django.', 'error');
+                return;
+            }
+
+            try {
+                log('📤 Enviando petición POST...', 'info');
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        producto_id: productoId,
+                        cantidad: 1
+                    })
+                });
+
+                log(`📥 Respuesta recibida - Status: ${response.status}`, response.ok ? 'success' : 'error');
+
+                const data = await response.json();
+                log(`<strong>Respuesta del servidor:</strong><br><code>${JSON.stringify(data, null, 2)}</code>`,
+                    data.success ? 'success' : 'error');
+
+                if (data.success) {
+                    log('✅ ¡El endpoint funciona correctamente!', 'success');
+                } else {
+                    log(`❌ Error del servidor: ${data.error || 'Error desconocido'}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error al hacer la petición: ${error.message}`, 'error');
+                log('Posibles causas:', 'warning');
+                log('• El servidor Django no está corriendo', 'warning');
+                log('• La URL es incorrecta', 'warning');
+                log('• Problema con CORS', 'warning');
+            }
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,161 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ accion }} Técnico - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/tecnicos.css' %}">
+<link rel="stylesheet" href="{% static 'css/theme-switcher.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="tecnicos-container">
+    <!-- Encabezado -->
+    <div class="tecnicos-header">
+        <div class="header-left">
+            <h1><i class="fas fa-user-cog"></i> {{ accion }} Técnico</h1>
+            <p class="text-muted">Complete la información del técnico</p>
+        </div>
+        <div class="header-right">
+            <a href="{% url 'tecnicos:lista' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="form-container">
+        <form method="post" class="tecnico-form" novalidate>
+            {% csrf_token %}
+
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Error:</strong> Por favor corrija los errores a continuación.
+                </div>
+            {% endif %}
+
+            <div class="form-section">
+                <h3><i class="fas fa-user"></i> Información Personal</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.nombres.id_for_label }}">
+                            Nombres <span class="required">*</span>
+                        </label>
+                        {{ form.nombres }}
+                        {% if form.nombres.errors %}
+                            <div class="error-message">
+                                {{ form.nombres.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.apellidos.id_for_label }}">
+                            Apellidos <span class="required">*</span>
+                        </label>
+                        {{ form.apellidos }}
+                        {% if form.apellidos.errors %}
+                            <div class="error-message">
+                                {{ form.apellidos.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.numero_documento.id_for_label }}">
+                            Número de Documento <span class="required">*</span>
+                        </label>
+                        {{ form.numero_documento }}
+                        {% if form.numero_documento.errors %}
+                            <div class="error-message">
+                                {{ form.numero_documento.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3><i class="fas fa-address-book"></i> Información de Contacto</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.telefono.id_for_label }}">
+                            Teléfono <span class="required">*</span>
+                        </label>
+                        {{ form.telefono }}
+                        {% if form.telefono.errors %}
+                            <div class="error-message">
+                                {{ form.telefono.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.correo.id_for_label }}">
+                            Correo Electrónico <span class="required">*</span>
+                        </label>
+                        {{ form.correo }}
+                        {% if form.correo.errors %}
+                            <div class="error-message">
+                                {{ form.correo.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3><i class="fas fa-briefcase"></i> Información Profesional</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.profesion.id_for_label }}">
+                            Profesión <span class="required">*</span>
+                        </label>
+                        {{ form.profesion }}
+                        {% if form.profesion.errors %}
+                            <div class="error-message">
+                                {{ form.profesion.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3><i class="fas fa-toggle-on"></i> Estado</h3>
+                <div class="form-row">
+                    <div class="form-group form-check-group">
+                        {{ form.activo }}
+                        <label class="form-check-label" for="{{ form.activo.id_for_label }}">
+                            Técnico Activo
+                        </label>
+                        {% if form.activo.errors %}
+                            <div class="error-message">
+                                {{ form.activo.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> {{ accion }} Técnico
+                </button>
+                <a href="{% url 'tecnicos:lista' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/theme-switcher.js' %}"></script>
+<script src="{% static 'js/tecnicos.js' %}"></script>
+{% endblock %}
+

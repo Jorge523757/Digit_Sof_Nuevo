@@ -1,0 +1,9 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Detalle Equipo{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <h2>Detalle de Equipo: {{ equipo.codigo_equipo }}</h2>
+    <p>Nombre: {{ equipo.nombre }}</p>
+</div>
+{% endblock %}
+

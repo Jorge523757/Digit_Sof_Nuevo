@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if buscar %}Búsqueda: {{ buscar }}{% else %}Productos{% endif %} - Digit Soft</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        .header-ecommerce {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+        }
+
+        .product-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .product-image {
+            height: 200px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .product-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        .product-image .no-image {
+            color: #ccc;
+            font-size: 3rem;
+        }
+
+        .price-original {
+            color: #999;
+            text-decoration: line-through;
+            font-size: 0.9rem;
+        }
+
+        .price-sale {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .discount-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #e74c3c;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .stock-badge {
+            font-size: 0.85rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stock-high {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .stock-medium {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .stock-low {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .btn-add-cart {
+            background: #667eea;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add-cart:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+
+        .filters-sidebar {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .cart-counter {
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+        }
+
+        .search-bar {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .featured-products {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 15px;
+            color: white;
+        }
+
+        .pagination-container {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header E-commerce -->
+    <header class="header-ecommerce">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-2">
+                    <h4 class="mb-0">
+                        <i class="fas fa-laptop-code me-2"></i>
+                        Digit Soft
+                    </h4>
+                </div>
+                <div class="col-md-8">
+                    <!-- Barra de búsqueda -->
+                    <form method="GET" class="search-bar">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="q"
+                                   value="{{ buscar|default:'' }}"
+                                   placeholder="Buscar productos, marcas, modelos...">
+                            <button class="btn btn-light" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-2 text-end">
+                    {% if user.is_authenticated %}
+                        <!-- Carrito -->
+                        <button type="button" class="btn btn-light me-2 position-relative" id="cartBtn">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-counter" id="cartBadge" style="display: none;">0</span>
+                            <span class="cart-counter" id="cart-counter-header" style="display: none;">0</span>
+                        </button>
+                        <!-- Usuario -->
+                        <div class="dropdown d-inline">
+                            <a href="#" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> {{ user.first_name|default:user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'dashboard:index' %}">Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'usuarios:logout' %}">Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'usuarios:login' %}" class="btn btn-light">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Sidebar de Filtros -->
+            <div class="col-md-3">
+                <div class="filters-sidebar">
+                    <h5><i class="fas fa-filter me-2"></i>Filtros</h5>
+
+                    <!-- Categorías -->
+                    <div class="mt-3">
+                        <h6>Categorías</h6>
+                        <ul class="list-unstyled">
+                            <li>
+                                <a href="{% url 'ecommerce:productos' %}"
+                                   class="text-decoration-none {% if not categoria_actual %}fw-bold{% endif %}">
+                                    Todas las categorías
+                                </a>
+                            </li>
+                            {% for categoria in categorias %}
+                            <li>
+                                <a href="?categoria={{ categoria.id }}{% if buscar %}&q={{ buscar }}{% endif %}"
+                                   class="text-decoration-none {% if categoria_actual == categoria.id|stringformat:'s' %}fw-bold text-primary{% endif %}">
+                                    {{ categoria.nombre }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Ordenamiento -->
+                    <div class="mt-3">
+                        <h6>Ordenar por</h6>
+                        <select class="form-select" id="ordenar" onchange="changeOrder()">
+                            <option value="nombre" {% if ordenar == 'nombre' %}selected{% endif %}>Nombre A-Z</option>
+                            <option value="precio_asc" {% if ordenar == 'precio_asc' %}selected{% endif %}>Precio: Menor a Mayor</option>
+                            <option value="precio_desc" {% if ordenar == 'precio_desc' %}selected{% endif %}>Precio: Mayor a Menor</option>
+                            <option value="nuevo" {% if ordenar == 'nuevo' %}selected{% endif %}>Más Nuevos</option>
+                            <option value="stock" {% if ordenar == 'stock' %}selected{% endif %}>Mayor Stock</option>
+                        </select>
+                    </div>
+
+                    <!-- Estadísticas -->
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6><i class="fas fa-chart-bar me-2"></i>Estadísticas</h6>
+                        <p class="mb-1"><strong>{{ total_productos }}</strong> productos encontrados</p>
+                        <p class="mb-1"><strong>{{ categorias.count }}</strong> categorías</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido Principal -->
+            <div class="col-md-9">
+                <!-- Productos Destacados -->
+                {% if productos_destacados and not buscar %}
+                <div class="featured-products text-center">
+                    <h3><i class="fas fa-star me-2"></i>Productos Destacados</h3>
+                    <p class="mb-4">Los mejores productos seleccionados para ti</p>
+                    <div class="row">
+                        {% for producto in productos_destacados %}
+                        <div class="col-md-4 col-lg-2 mb-3">
+                            <div class="card bg-transparent border-light text-white">
+                                <div class="card-body text-center p-2">
+                                    <a href="{% url 'ecommerce:producto_detalle' producto.id %}" class="text-white text-decoration-none">
+                                        <h6 class="card-title mb-1" style="font-size: 0.9rem;">{{ producto.nombre_producto|truncatechars:30 }}</h6>
+                                        <p class="mb-1"><strong>${{ producto.precio_venta|floatformat:0 }}</strong></p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Resultados de Búsqueda -->
+                {% if buscar %}
+                <div class="alert alert-info">
+                    <i class="fas fa-search me-2"></i>
+                    Resultados para "<strong>{{ buscar }}</strong>": {{ total_productos }} productos encontrados
+                    <a href="{% url 'ecommerce:productos' %}" class="btn btn-sm btn-outline-info ms-2">Ver todos</a>
+                </div>
+                {% endif %}
+
+                <!-- Grid de Productos -->
+                <div class="row">
+                    {% for producto in productos %}
+                    <div class="col-md-4 col-lg-3 mb-4">
+                        <div class="card product-card position-relative h-100">
+                            <!-- Badge de descuento si hay precio mayorista -->
+                            {% if producto.precio_mayorista %}
+                            <div class="discount-badge">
+                                OFERTA
+                            </div>
+                            {% endif %}
+
+                            <!-- Imagen del producto -->
+                            <div class="product-image">
+                                {% if producto.imagen %}
+                                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre_producto }}">
+                                {% else %}
+                                    <i class="fas fa-laptop-code no-image"></i>
+                                {% endif %}
+                            </div>
+
+                            <div class="card-body d-flex flex-column">
+                                <!-- Marca y modelo -->
+                                {% if producto.marca %}
+                                <small class="text-muted">{{ producto.marca }}</small>
+                                {% endif %}
+
+                                <!-- Nombre del producto -->
+                                <h6 class="card-title">
+                                    <a href="{% url 'ecommerce:producto_detalle' producto.id %}"
+                                       class="text-decoration-none text-dark">
+                                        {{ producto.nombre_producto|truncatechars:50 }}
+                                    </a>
+                                </h6>
+
+                                <!-- Descripción corta -->
+                                <p class="card-text text-muted small mb-2">
+                                    {{ producto.descripcion|truncatechars:80 }}
+                                </p>
+
+                                <!-- Especificaciones técnicas -->
+                                {% if producto.procesador or producto.memoria_ram %}
+                                <div class="mb-2">
+                                    {% if producto.procesador %}
+                                    <small class="badge bg-light text-dark me-1">{{ producto.procesador|truncatechars:15 }}</small>
+                                    {% endif %}
+                                    {% if producto.memoria_ram %}
+                                    <small class="badge bg-light text-dark">{{ producto.memoria_ram }}</small>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+
+                                <!-- Precios -->
+                                <div class="mt-auto">
+                                    <div class="price-section mb-2">
+                                        {% if producto.precio_mayorista %}
+                                        <div class="price-original">${{ producto.precio_venta|floatformat:0 }}</div>
+                                        <div class="price-sale">${{ producto.precio_mayorista|floatformat:0 }}</div>
+                                        {% else %}
+                                        <div class="price-sale">${{ producto.precio_venta|floatformat:0 }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Stock -->
+                                    <div class="stock-info mb-2">
+                                        {% if producto.stock_actual <= 0 %}
+                                        <span class="stock-badge stock-low">
+                                            <i class="fas fa-times-circle"></i> Sin stock
+                                        </span>
+                                        {% elif producto.stock_actual <= 5 %}
+                                        <span class="stock-badge stock-low">
+                                            <i class="fas fa-exclamation-circle"></i> ¡Solo quedan {{ producto.stock_actual }}!
+                                        </span>
+                                        {% elif producto.stock_actual <= 10 %}
+                                        <span class="stock-badge stock-medium">
+                                            <i class="fas fa-exclamation-triangle"></i> Pocas unidades ({{ producto.stock_actual }})
+                                        </span>
+                                        {% else %}
+                                        <span class="stock-badge stock-high">
+                                            <i class="fas fa-check-circle"></i> En stock ({{ producto.stock_actual }})
+                                        </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Botones -->
+                                    <div class="d-flex gap-2">
+                                        <!-- Botón agregar al carrito -->
+                                        {% if user.is_authenticated %}
+                                            {% if producto.stock_actual > 0 %}
+                                            <button class="btn btn-add-cart btn-add-to-cart flex-grow-1"
+                                                    onclick="addToCart({{ producto.id }})"
+                                                    data-producto-id="{{ producto.id }}">
+                                                <i class="fas fa-cart-plus me-1"></i>
+                                                <span class="btn-text">Agregar</span>
+                                            </button>
+                                            {% else %}
+                                            <button class="btn btn-secondary flex-grow-1" disabled>
+                                                <i class="fas fa-ban me-1"></i>
+                                                Sin Stock
+                                            </button>
+                                            {% endif %}
+                                        {% else %}
+                                        <a href="{% url 'usuarios:login' %}" class="btn btn-add-cart flex-grow-1">
+                                            <i class="fas fa-sign-in-alt me-1"></i>
+                                            Iniciar Sesión
+                                        </a>
+                                        {% endif %}
+
+                                        <!-- Botón ver detalles -->
+                                        <a href="{% url 'ecommerce:producto_detalle' producto.id %}"
+                                           class="btn btn-outline-secondary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-warning text-center">
+                            <i class="fas fa-search me-2"></i>
+                            No se encontraron productos
+                            {% if buscar or categoria_actual %}
+                            <br>
+                            <a href="{% url 'ecommerce:productos' %}" class="btn btn-primary mt-2">Ver todos los productos</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Paginación -->
+                {% if page_obj.has_other_pages %}
+                <nav aria-label="Paginación de productos" class="pagination-container">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if buscar %}&q={{ buscar }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}&orden={{ ordenar }}">
+                                Anterior
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% if buscar %}&q={{ buscar }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}&orden={{ ordenar }}">
+                                {{ num }}
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if buscar %}&q={{ buscar }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}&orden={{ ordenar }}">
+                                Siguiente
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        console.log('🚀 Productos.html cargado');
+
+        // Función para cambiar el orden
+        function changeOrder() {
+            const select = document.getElementById('ordenar');
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('orden', select.value);
+            currentUrl.searchParams.set('page', '1');
+            window.location.href = currentUrl.toString();
+        }
+
+        // Función para agregar al carrito
+        function addToCart(productoId) {
+            console.log('=== AGREGAR AL CARRITO ===');
+            console.log('Producto ID:', productoId);
+
+            // Buscar el botón que llamó a la función
+            const button = document.querySelector(`button[onclick*="addToCart(${productoId})"]`);
+            if (!button) {
+                console.error('❌ No se encontró el botón');
+                return;
+            }
+
+            const originalText = button.innerHTML;
+
+            // Mostrar loading
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Agregando...';
+            button.disabled = true;
+
+            // URL correcta según config/urls.py
+            const url = '/tienda/carrito/agregar/';
+            const csrfToken = getCookie('csrftoken');
+
+            console.log('📍 URL:', url);
+            console.log('🔑 CSRF Token:', csrfToken ? 'Presente ✅' : 'FALTA ❌');
+
+            if (!csrfToken) {
+                showNotification('❌ Error de seguridad. Por favor recarga la página.', 'error');
+                button.innerHTML = originalText;
+                button.disabled = false;
+                return;
+            }
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    producto_id: productoId,
+                    cantidad: 1
+                })
+            })
+            .then(response => {
+                console.log('📥 Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('📦 Response data:', data);
+
+                if (data.success) {
+                    // Mostrar éxito
+                    button.innerHTML = '<i class="fas fa-check me-1"></i>¡Agregado!';
+                    button.classList.remove('btn-add-cart');
+                    button.classList.add('btn-success');
+
+                    // Actualizar contador
+                    if (data.total_items) {
+                        updateCartBadge(data.total_items);
+                    }
+
+                    // Volver al estado original
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.classList.remove('btn-success');
+                        button.classList.add('btn-add-cart');
+                        button.disabled = false;
+                    }, 2000);
+
+                    // Mostrar notificación
+                    showNotification(data.message || '✅ Producto agregado al carrito', 'success');
+                } else {
+                    console.error('❌ Error del servidor:', data.error);
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+
+                    if (data.max_reached) {
+                        showNotification(data.error || 'Stock máximo alcanzado', 'warning');
+                    } else {
+                        showNotification(data.error || 'Error al agregar al carrito', 'error');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error catch:', error);
+                button.innerHTML = originalText;
+                button.disabled = false;
+                showNotification('❌ Error al agregar al carrito. Verifica la conexión.', 'error');
+            });
+        }
+
+        // Función para actualizar badge del carrito
+        function updateCartBadge(count) {
+            const badges = document.querySelectorAll('#cartBadge, #cart-counter-header, .cart-counter');
+            badges.forEach(badge => {
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'inline-block' : 'none';
+            });
+        }
+
+        // Función para mostrar notificaciones
+        function showNotification(message, type) {
+            // Remover notificaciones anteriores
+            const existingNotifications = document.querySelectorAll('.custom-notification');
+            existingNotifications.forEach(notif => notif.remove());
+
+            // Configuración según tipo
+            let icon, bgColor;
+            if (type === 'success') {
+                icon = 'fa-check-circle';
+                bgColor = '#28a745';
+            } else if (type === 'warning') {
+                icon = 'fa-exclamation-triangle';
+                bgColor = '#ffc107';
+            } else {
+                icon = 'fa-exclamation-circle';
+                bgColor = '#dc3545';
+            }
+
+            // Crear notificación
+            const notification = document.createElement('div');
+            notification.className = 'custom-notification alert alert-dismissible fade show position-fixed shadow-lg';
+            notification.style.cssText = `
+                top: 70px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 10000;
+                min-width: 350px;
+                max-width: 550px;
+                background: white;
+                border-left: 5px solid ${bgColor};
+                border-radius: 10px;
+                animation: slideDown 0.4s ease-out;
+                box-shadow: 0 5px 25px rgba(0,0,0,0.25);
+            `;
+            notification.innerHTML = `
+                <div class="d-flex align-items-start p-3">
+                    <i class="fas ${icon} me-3" style="color: ${bgColor}; font-size: 2rem; margin-top: 2px; flex-shrink: 0;"></i>
+                    <div class="flex-grow-1" style="color: #333; font-size: 0.95rem; line-height: 1.6;">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close ms-3" data-bs-dismiss="alert" style="font-size: 0.8rem; flex-shrink: 0;" onclick="this.parentElement.parentElement.remove()"></button>
+                </div>
+            `;
+
+            // Agregar animación CSS si no existe
+            if (!document.getElementById('notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideDown {
+                        from {
+                            transform: translateX(-50%) translateY(-100px);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(-50%) translateY(0);
+                            opacity: 1;
+                        }
+                    }
+                    @keyframes slideUp {
+                        from {
+                            transform: translateX(-50%) translateY(0);
+                            opacity: 1;
+                        }
+                        to {
+                            transform: translateX(-50%) translateY(-100px);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            document.body.appendChild(notification);
+
+            // Auto eliminar después de 5 segundos
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.style.animation = 'slideUp 0.4s ease-out forwards';
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 400);
+                }
+            }, 5000);
+        }
+
+        // Función para obtener cookie CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Inicialización al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ DOM cargado - Inicializando...');
+
+            // Agregar evento al botón del carrito
+            const cartBtn = document.getElementById('cartBtn');
+            if (cartBtn) {
+                cartBtn.addEventListener('click', function() {
+                    window.location.href = '/tienda/carrito/';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+

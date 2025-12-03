@@ -1,0 +1,1299 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digit Soft - Soluciones Informáticas</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- AOS Animation Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+
+    <!-- Landing Page CSS -->
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+
+    <!-- Accessibility CSS -->
+    <link rel="stylesheet" href="{% static 'css/accessibility.css' %}">
+
+    <!-- Productos y Carrito CSS -->
+    <link rel="stylesheet" href="{% static 'css/productos-carrito.css' %}">
+    <link rel="stylesheet" href="{% static 'css/productos-reacciones.css' %}">
+
+    <style>
+        /* Estilos para el botón del carrito en el header */
+        .cart-header-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            color: white !important;
+            padding: 10px 20px !important;
+            border-radius: 25px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            font-weight: 600 !important;
+            text-decoration: none !important;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
+            position: relative !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .cart-header-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+        }
+
+        .cart-badge-header {
+            position: absolute !important;
+            top: -8px !important;
+            right: -8px !important;
+            background: #ef4444 !important;
+            color: white !important;
+            width: 22px !important;
+            height: 22px !important;
+            border-radius: 50% !important;
+            display: none !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 0.75rem !important;
+            font-weight: 700 !important;
+            border: 2px solid white !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+        }
+
+        .cart-badge-header.show {
+            display: flex !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Accessibility Widget -->
+    <aside class="accessibility-widget" aria-label="Panel de Accesibilidad">
+        <!-- Botón flotante para abrir/cerrar -->
+        <button class="accessibility-toggle"
+                id="accessibilityToggle"
+                aria-label="Abrir panel de accesibilidad"
+                aria-expanded="false"
+                type="button">
+            <i class="fas fa-universal-access" aria-hidden="true"></i>
+        </button>
+
+        <!-- Panel de opciones (inicialmente oculto) -->
+        <div class="accessibility-panel hidden" id="accessibilityPanel" role="toolbar" aria-label="Herramientas de Accesibilidad">
+            <div class="accessibility-header">
+                <h3>Accesibilidad</h3>
+                <button class="accessibility-close"
+                        id="accessibilityClose"
+                        aria-label="Cerrar panel"
+                        type="button">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="accessibility-content">
+                <!-- Aumentar Letra -->
+                <button class="accessibility-btn"
+                        id="fontLarge"
+                        title="Aumentar Tamaño de Letra"
+                        aria-label="Aumentar tamaño de texto"
+                        aria-pressed="false"
+                        type="button">
+                    <i class="fas fa-search-plus" aria-hidden="true"></i>
+                    <span>A+</span>
+                </button>
+
+                <!-- Disminuir Letra -->
+                <button class="accessibility-btn"
+                        id="fontSmall"
+                        title="Disminuir Tamaño de Letra"
+                        aria-label="Disminuir tamaño de texto"
+                        aria-pressed="false"
+                        type="button">
+                    <i class="fas fa-search-minus" aria-hidden="true"></i>
+                    <span>A-</span>
+                </button>
+
+                <div class="accessibility-separator" role="separator"></div>
+
+                <!-- Alto Contraste -->
+                <button class="accessibility-btn"
+                        id="highContrast"
+                        title="Activar Alto Contraste"
+                        aria-label="Activar modo de alto contraste"
+                        aria-pressed="false"
+                        type="button">
+                    <i class="fas fa-adjust" aria-hidden="true"></i>
+                    <span>Contraste</span>
+                </button>
+
+                <!-- Modo Oscuro -->
+                <button class="accessibility-btn"
+                        id="darkMode"
+                        title="Activar Modo Oscuro"
+                        aria-label="Activar modo oscuro"
+                        aria-pressed="false"
+                        type="button">
+                    <i class="fas fa-moon" aria-hidden="true"></i>
+                    <span>Oscuro</span>
+                </button>
+
+                <!-- Escala de Grises -->
+                <button class="accessibility-btn"
+                        id="grayscale"
+                        title="Activar Escala de Grises"
+                        aria-label="Activar escala de grises"
+                        aria-pressed="false"
+                        type="button">
+                    <i class="fas fa-palette" aria-hidden="true"></i>
+                    <span>Grises</span>
+                </button>
+
+                <div class="accessibility-separator" role="separator"></div>
+
+                <!-- Resaltar Enlaces -->
+                <button class="accessibility-btn"
+                        id="highlightLinks"
+                        title="Resaltar Todos los Enlaces"
+                        aria-label="Resaltar enlaces en la página"
+                        aria-pressed="false"
+                        type="button">
+                    <i class="fas fa-link" aria-hidden="true"></i>
+                    <span>Enlaces</span>
+                </button>
+
+                <!-- Lector de Pantalla -->
+                <button class="accessibility-btn"
+                        id="screenReader"
+                        title="Modo Lector de Pantalla"
+                        aria-label="Activar modo lector de pantalla"
+                        aria-pressed="false"
+                        type="button">
+                    <i class="fas fa-volume-up" aria-hidden="true"></i>
+                    <span>Lector</span>
+                </button>
+
+                <!-- Espaciado -->
+                <button class="accessibility-btn"
+                        id="increasedSpacing"
+                        title="Aumentar Espaciado"
+                        aria-label="Aumentar espaciado entre líneas y letras"
+                        aria-pressed="false"
+                        type="button">
+                    <i class="fas fa-text-width" aria-hidden="true"></i>
+                    <span>Espacio</span>
+                </button>
+
+                <div class="accessibility-separator" role="separator"></div>
+
+                <!-- Resetear -->
+                <button class="reset-btn"
+                        id="resetAccessibility"
+                        title="Restablecer Configuración"
+                        aria-label="Restablecer todas las configuraciones de accesibilidad"
+                        type="button">
+                    <i class="fas fa-redo" aria-hidden="true"></i>
+                    <span>Reset</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999;" onclick="closeSidebarDirect()"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="mainSidebar" style="position: fixed; top: 0; left: -320px; width: 320px; height: 100%; background: linear-gradient(180deg, #1a252f 0%, #0d1419 100%); color: white; z-index: 10000; overflow-y: auto; transition: left 0.4s ease;">
+        <div class="sidebar-header" style="padding: 25px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: space-between; align-items: center;">
+            <div class="sidebar-logo" style="display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-cog" style="font-size: 1.5rem; color: #ffd700;"></i>
+                <h3 style="margin: 0; font-size: 1.2rem;">Menú de Gestión</h3>
+            </div>
+            <button class="close-sidebar" onclick="closeSidebarDirect()" style="background: rgba(255,255,255,0.1); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.3rem;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="sidebar-content">
+            <!-- Sección: Gestión de Personas -->
+            <div class="sidebar-section">
+                <h4 class="sidebar-section-title">
+                    <i class="fas fa-user-friends"></i>
+                    Gestión de Personas
+                </h4>
+                <ul class="sidebar-menu">
+                    <li>
+                        <a href="{% url 'clientes:lista' %}">
+                            <div class="menu-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <span>Clientes</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'tecnicos:lista' %}">
+                            <div class="menu-icon">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <span>Técnicos</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Sección: Operaciones -->
+            <div class="sidebar-section">
+                <h4 class="sidebar-section-title">
+                    <i class="fas fa-tasks"></i>
+                    Operaciones
+                </h4>
+                <ul class="sidebar-menu">
+                    <li>
+                        <a href="{% url 'ordenes:lista' %}">
+                            <div class="menu-icon">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <span>Órdenes de Servicio</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'garantias:lista' %}">
+                            <div class="menu-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <span>Garantías</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Sección: Inventario -->
+            <div class="sidebar-section">
+                <h4 class="sidebar-section-title">
+                    <i class="fas fa-boxes"></i>
+                    Inventario
+                </h4>
+                <ul class="sidebar-menu">
+                    <li>
+                        <a href="{% url 'productos:lista' %}">
+                            <div class="menu-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <span>Productos</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'equipos:lista' %}">
+                            <div class="menu-icon">
+                                <i class="fas fa-desktop"></i>
+                            </div>
+                            <span>Equipos</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'proveedores:lista' %}">
+                            <div class="menu-icon">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <span>Proveedores</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Sección: Finanzas -->
+            <div class="sidebar-section">
+                <h4 class="sidebar-section-title">
+                    <i class="fas fa-dollar-sign"></i>
+                    Finanzas
+                </h4>
+                <ul class="sidebar-menu">
+                    <li>
+                        <a href="{% url 'compras:lista' %}">
+                            <div class="menu-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <span>Compras</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'ventas:lista' %}">
+                            <div class="menu-icon">
+                                <i class="fas fa-cash-register"></i>
+                            </div>
+                            <span>Ventas</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'facturacion:lista' %}">
+                            <div class="menu-icon">
+                                <i class="fas fa-file-invoice"></i>
+                            </div>
+                            <span>Facturación</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-details">
+                    <p class="user-name">Usuario</p>
+                    <p class="user-role">Administrador</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1><span>Digit</span>Soft</h1>
+                <p>Soluciones Tecnológicas</p>
+            </div>
+            <nav>
+                <!-- Botón de menú lateral más visible -->
+                <button class="sidebar-toggle-btn" onclick="openSidebarDirect()" type="button" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 0.95rem; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+                    <i class="fas fa-bars" style="font-size: 1.2rem;"></i>
+                    <span>Menú de Gestión</span>
+                </button>
+
+                <ul id="navMenu">
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#servicios">Servicios</a></li>
+                    <li><a href="#productos">Productos</a></li>
+                    <li><a href="#nosotros">Nosotros</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                    <li><a href="#" id="ingresoBtn">Ingreso</a></li>
+                    <li style="display: inline-block;">
+                        <a href="#" id="cartBtn" class="cart-header-btn" style="display: inline-flex !important;">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Carrito</span>
+                            <span id="cartBadge" class="cart-badge-header" style="display: none;">0</span>
+                        </a>
+                    </li>
+                </ul>
+                <div class="menu-toggle" id="mobileMenu">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Modal de Inicio de Sesión -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="login-left">
+                <img src="{% static 'images/logo.jpg' %}" alt="Logo Digit Soft">
+            </div>
+            <div class="login-right">
+                <h2>Iniciar Sesión</h2>
+                <form id="login-form" method="post" action="{% url 'usuarios:login' %}">
+                    {% csrf_token %}
+                    <label for="username">Correo Electrónico</label>
+                    <input type="email" id="username" name="username" required placeholder="ejemplo@correo.com">
+
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" required placeholder="Mínimo 8 caracteres">
+
+                    <label>Tipo de Usuario</label>
+                    <div class="role-selector">
+                        <label class="role-option" id="client-option">
+                            <input type="radio" name="role" value="client" checked>
+                            Cliente
+                        </label>
+                        <label class="role-option" id="admin-option">
+                            <input type="radio" name="role" value="admin">
+                            Administrador
+                        </label>
+                        <label class="role-option" id="tech-option">
+                            <input type="radio" name="role" value="technician">
+                            Técnico
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-login">Ingresar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero">
+        <div class="hero-background">
+            <div class="hero-overlay" id="heroOverlay"></div>
+            <div class="animated-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+            </div>
+        </div>
+
+        <!-- Controles de Brillo -->
+        <div class="brightness-controls">
+            <button class="brightness-btn" id="brightnessDecrease" title="Oscurecer fondo" aria-label="Oscurecer fondo">
+                <i class="fas fa-sun"></i>
+                <i class="fas fa-minus"></i>
+            </button>
+            <div class="brightness-indicator">
+                <div class="brightness-level" id="brightnessLevel"></div>
+            </div>
+            <button class="brightness-btn" id="brightnessIncrease" title="Aclarar fondo" aria-label="Aclarar fondo">
+                <i class="fas fa-sun"></i>
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="highlight">Digit</span>Soft
+                </h1>
+                <h2 class="hero-subtitle">Soluciones Informáticas Integrales</h2>
+                <p class="hero-description">Expertos en mantenimiento técnico, desarrollo de software y venta de equipos de computación</p>
+                <div class="hero-buttons">
+                    <a href="#contacto" class="btn btn-primary">
+                        <i class="fas fa-phone"></i> Contáctanos
+                    </a>
+                    <a href="#servicios" class="btn btn-secondary">
+                        <i class="fas fa-info-circle"></i> Conoce Más
+                    </a>
+                </div>
+                <div class="hero-features">
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>+6 Años de Experiencia</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>+1500 Clientes Satisfechos</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Soporte 24/7</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="servicios" class="services">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Nuestros Servicios</h2>
+                <p class="section-subtitle">Soluciones tecnológicas completas para tu empresa</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="service-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h3>Infraestructura</h3>
+                    <ul class="service-list">
+                        <li><i class="fas fa-check"></i> Hosting y Dominios</li>
+                        <li><i class="fas fa-check"></i> Correo Corporativo</li>
+                        <li><i class="fas fa-check"></i> Configuración de Servidores</li>
+                        <li><i class="fas fa-check"></i> Cableado Estructurado</li>
+                    </ul>
+                    <a href="#contacto" class="service-link">Solicitar <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="service-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="service-icon">
+                        <i class="fas fa-wrench"></i>
+                    </div>
+                    <h3>Soporte Técnico</h3>
+                    <ul class="service-list">
+                        <li><i class="fas fa-check"></i> CCTV y Cámaras</li>
+                        <li><i class="fas fa-check"></i> Presencial y Remoto</li>
+                        <li><i class="fas fa-check"></i> Backups y Respaldos</li>
+                        <li><i class="fas fa-check"></i> Mantenimiento Preventivo</li>
+                    </ul>
+                    <a href="#contacto" class="service-link">Solicitar <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="service-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="service-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3>Software</h3>
+                    <ul class="service-list">
+                        <li><i class="fas fa-check"></i> Desarrollo a la Medida</li>
+                        <li><i class="fas fa-check"></i> Servicios Cloud</li>
+                        <li><i class="fas fa-check"></i> Data Analytics</li>
+                        <li><i class="fas fa-check"></i> Business Intelligence</li>
+                    </ul>
+                    <a href="#contacto" class="service-link">Solicitar <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="service-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="service-icon">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <h3>Diseño Web</h3>
+                    <ul class="service-list">
+                        <li><i class="fas fa-check"></i> Landing Page y Blogs</li>
+                        <li><i class="fas fa-check"></i> Sitios Corporativos</li>
+                        <li><i class="fas fa-check"></i> Tiendas Online</li>
+                        <li><i class="fas fa-check"></i> Posicionamiento SEO</li>
+                    </ul>
+                    <a href="#contacto" class="service-link">Solicitar <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="service-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="service-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3>Venta de Equipos</h3>
+                    <ul class="service-list">
+                        <li><i class="fas fa-check"></i> PC y Portátiles</li>
+                        <li><i class="fas fa-check"></i> Impresoras y Cámaras</li>
+                        <li><i class="fas fa-check"></i> Accesorios PC</li>
+                        <li><i class="fas fa-check"></i> UPS y Biométricos</li>
+                    </ul>
+                    <a href="#contacto" class="service-link">Solicitar <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="service-card" data-aos="fade-up" data-aos-delay="600">
+                    <div class="service-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>Soporte Remoto</h3>
+                    <ul class="service-list">
+                        <li><i class="fas fa-check"></i> Asistencia Inmediata</li>
+                        <li><i class="fas fa-check"></i> Sin Desplazamiento</li>
+                        <li><i class="fas fa-check"></i> Disponibilidad 24/7</li>
+                        <li><i class="fas fa-check"></i> Resolución Rápida</li>
+                    </ul>
+                    <a href="#contacto" class="service-link">Solicitar <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="productos" class="products">
+        <div class="container">
+            <h2 class="section-title">Nuestros Productos</h2>
+
+            <!-- Filtros dinámicos basados en categorías reales -->
+            <div class="product-filters">
+                <button class="filter-btn active" data-filter="all">Todos</button>
+                {% for categoria_data in categorias_con_productos %}
+                <button class="filter-btn" data-filter="{{ categoria_data.categoria.nombre|lower }}">{{ categoria_data.categoria.nombre }}</button>
+                {% endfor %}
+            </div>
+
+            <!-- Grid de productos reales desde la base de datos -->
+            <div class="products-grid" id="productsGridReal">
+                {% for categoria_data in categorias_con_productos %}
+                    {% for producto in categoria_data.productos %}
+                    <div class="product-card" data-filter="{{ producto.categoria.nombre|lower }}" data-producto-id="{{ producto.id }}">
+
+                        <!-- Badge de destacado -->
+                        {% if producto.destacado %}
+                        <div class="badge-destacado">⭐ Destacado</div>
+                        {% endif %}
+
+                        <!-- Reacciones -->
+                        <div class="product-reactions">
+                            <button class="reaction-btn reaction-like"
+                                    data-producto-id="{{ producto.id }}"
+                                    data-tipo="like"
+                                    title="Me gusta">
+                                <i class="fas fa-thumbs-up"></i>
+                                <span class="reaction-count" id="like-{{ producto.id }}">0</span>
+                            </button>
+                            <button class="reaction-btn reaction-dislike"
+                                    data-producto-id="{{ producto.id }}"
+                                    data-tipo="dislike"
+                                    title="No me gusta">
+                                <i class="fas fa-thumbs-down"></i>
+                                <span class="reaction-count" id="dislike-{{ producto.id }}">0</span>
+                            </button>
+                        </div>
+
+                        <!-- Imagen del producto -->
+                        <div class="product-image producto-ver-detalle" data-producto-id="{{ producto.id }}">
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre_producto }}">
+                            {% else %}
+                                <div class="no-image"><i class="fas fa-image"></i></div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Información del producto -->
+                        <div class="product-info">
+                            <span class="product-category">{{ producto.categoria.nombre|default:"General" }}</span>
+                            <h3 class="product-name producto-ver-detalle" data-producto-id="{{ producto.id }}">{{ producto.nombre_producto }}</h3>
+
+                            <!-- Especificaciones técnicas -->
+                            <div class="product-specs">
+                                {% if producto.procesador %}
+                                <span><i class="fas fa-microchip"></i> {{ producto.procesador }}</span>
+                                {% endif %}
+                                {% if producto.memoria_ram %}
+                                <span><i class="fas fa-memory"></i> {{ producto.memoria_ram }}</span>
+                                {% endif %}
+                                {% if producto.memoria_rom %}
+                                <span><i class="fas fa-hdd"></i> {{ producto.memoria_rom }}</span>
+                                {% endif %}
+                                {% if producto.marca %}
+                                <span><i class="fas fa-industry"></i> {{ producto.marca }}</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Footer del producto -->
+                            <div class="product-footer">
+                                <div class="product-price">
+                                    <span class="price">${{ producto.precio_venta|floatformat:2 }}</span>
+                                    <span class="stock"><i class="fas fa-box"></i> {{ producto.stock_actual }} disponibles</span>
+                                </div>
+                                <div class="product-actions">
+                                    <button class="btn-ver-detalle"
+                                            data-producto-id="{{ producto.id }}"
+                                            title="Ver detalles">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                    <button class="btn-add-cart"
+                                            data-producto-id="{{ producto.id }}"
+                                            title="Agregar al carrito"
+                                            data-producto-nombre="{{ producto.nombre_producto }}"
+                                            data-producto-precio="{{ producto.precio_venta }}"
+                                            data-producto-stock="{{ producto.stock_actual }}"
+                                            data-producto-categoria="{{ producto.categoria.nombre|default:'General' }}"
+                                            data-producto-imagen="{% if producto.imagen_principal %}{{ producto.imagen_principal.url }}{% else %}/static/images/logo.jpg{% endif %}">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% empty %}
+                    <div class="no-products">
+                        <i class="fas fa-box-open" style="font-size: 4rem; color: #ccc; margin-bottom: 1rem;"></i>
+                        <p>No hay productos disponibles en este momento.</p>
+                        <p>Por favor, regresa más tarde o contacta con nosotros.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="nosotros" class="about">
+        <div class="container">
+            <div class="about-content">
+                <h2 class="section-title">Sobre Nosotros</h2>
+                <p>Digit Soft es una empresa especializada en soluciones informáticas con más de 6 años de experiencia
+                    en el mercado. Nos dedicamos a brindar servicios técnicos de calidad y ofrecer productos
+                    tecnológicos que se adapten a las necesidades de nuestros clientes.</p>
+                <p>Nuestro equipo está conformado por profesionales altamente capacitados y comprometidos con la
+                    excelencia en el servicio.</p>
+
+                <h2 class="section-title">Misión</h2>
+                <p>Nuestra misión es trascender las expectativas, construyendo puentes que conecten las ideas con la
+                    realidad. Desde el desarrollo de software a medida hasta el diseño web que cautiva.</p>
+
+                <h2 class="section-title">Visión</h2>
+                <p>Nuestra visión es ser más que un simple proveedor de servicios tecnológicos, queremos ser el puente
+                    que une desafíos con soluciones.</p>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <h3>+<span class="counter" data-target="1500">0</span></h3>
+                        <p>Clientes satisfechos</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>+<span class="counter" data-target="6">0</span></h3>
+                        <p>Años de experiencia</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3><span class="counter" data-target="98">0</span>%</h3>
+                        <p>Satisfacción del cliente</p>
+                    </div>
+                </div>
+            </div>
+            <div class="about-image">
+                <img src="{% static 'images/fachada-digit-soft.jpg' %}" alt="Equipo de Digit Soft">
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonios" class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Lo Que Dicen Nuestros Clientes</h2>
+                <p class="section-subtitle">Experiencias reales de clientes satisfechos</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">"Excelente servicio técnico. Solucionaron mi problema en tiempo récord y el precio fue muy razonable. Totalmente recomendados."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="author-info">
+                            <h4>María González</h4>
+                            <p>Empresaria</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">"El desarrollo del software para mi negocio superó mis expectativas. Muy profesionales y atentos a los detalles."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="author-info">
+                            <h4>Carlos Rodríguez</h4>
+                            <p>Gerente de Ventas</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">"Compré mi portátil con ellos y el servicio post-venta ha sido increíble. Siempre dispuestos a ayudar."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="author-info">
+                            <h4>Ana Martínez</h4>
+                            <p>Diseñadora Gráfica</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contacto" class="contact">
+        <div class="container">
+            <h2 class="section-title">Contáctanos</h2>
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>Información de Contacto</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> Calle 15 # 14-26, Duitama - Boyacá</p>
+                    <p><i class="fas fa-phone"></i> (+57) 3215434380, (+57) 3148004120, (+57) 3214696917</p>
+                    <p><i class="fas fa-envelope"></i> info@digitsoft.com.co</p>
+                    <p><i class="fas fa-clock"></i> Lunes a Viernes: 9:00 a.m. - 7:00 p.m.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <h3>Envíanos un Mensaje</h3>
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name" class="sr-only">Nombre completo</label>
+                            <input type="text" id="name" placeholder="Nombre completo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="sr-only">Correo electrónico</label>
+                            <input type="email" id="email" placeholder="Correo electrónico" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone" class="sr-only">Teléfono</label>
+                            <input type="tel" id="phone" placeholder="Teléfono">
+                        </div>
+                        <div class="form-group">
+                            <label for="message" class="sr-only">Tu mensaje</label>
+                            <textarea id="message" rows="5" placeholder="Tu mensaje" required></textarea>
+                        </div>
+                        <button type="submit" class="btn">Enviar Mensaje</button>
+                    </form>
+                </div>
+                <div class="contact-map">
+                    <h3>Ubicación</h3>
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.102254086991!2d-73.0368986847344!3d5.828329601361347!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e6a3c1e1c1c1c1d%3A0x1c1c1c1c1c1c1c1d!2sCalle%2015%20%2314-26%2C%20Duitama%2C%20Boyac%C3%A1!5e0!3m2!1ses!2sco!4v1620000000000!5m2!1ses!2sco"
+                        allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Digit Soft</h3>
+                    <p>Soluciones informáticas integrales para hogares y empresas. Calidad, confianza y profesionalismo.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Enlaces Rápidos</h3>
+                    <ul>
+                        <li><a href="#inicio">Inicio</a></li>
+                        <li><a href="#servicios">Servicios</a></li>
+                        <li><a href="#productos">Productos</a></li>
+                        <li><a href="#nosotros">Nosotros</a></li>
+                        <li><a href="#contacto">Contacto</a></li>
+                        <li><a href="{% url 'usuarios:login' %}">Ingreso</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Servicios</h3>
+                    <ul>
+                        <li><a href="#">Infraestructura</a></li>
+                        <li><a href="#">Soporte Técnico</a></li>
+                        <li><a href="#">Software</a></li>
+                        <li><a href="#">Diseño Web</a></li>
+                        <li><a href="#">Venta</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Suscríbete</h3>
+                    <p>Recibe nuestras promociones y noticias.</p>
+                    <form id="newsletterForm">
+                        <label for="newsletter-email" class="sr-only">Tu correo electrónico</label>
+                        <input type="email" id="newsletter-email" placeholder="Tu correo electrónico" required>
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2025 Digit Soft. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- AOS Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+
+    <!-- Landing Page JS -->
+    <script src="{% static 'js/landing.js' %}"></script>
+
+    <!-- Accessibility JS -->
+    <script src="{% static 'js/accessibility.js' %}"></script>
+
+    <!-- Productos y Carrito JS -->
+    <script src="{% static 'js/productos-landing.js' %}"></script>
+
+    <!-- Inicializador del Carrito -->
+    <script src="{% static 'js/carrito-init.js' %}"></script>
+
+    <!-- Script para inicializar carrito y detectar botones -->
+    <script>
+        console.log('🔄 Inicializando sistema de carrito...');
+
+        // Esperar a que el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ DOM cargado');
+
+            // Esperar un poco más para asegurar que carrito esté inicializado
+            setTimeout(function() {
+                console.log('🔄 Configurando botón del carrito...');
+
+                // Conectar botón del carrito en el header
+                const cartHeaderBtn = document.getElementById('cartBtn');
+                const cartBadge = document.getElementById('cartBadge');
+
+                if (cartHeaderBtn) {
+                    console.log('✅ Botón del carrito encontrado en header');
+
+                    cartHeaderBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        console.log('🛒 Click en botón del carrito');
+
+                        if (typeof carrito !== 'undefined' && carrito) {
+                            console.log('✅ Carrito disponible, mostrando...');
+                            carrito.mostrarCarrito();
+                        } else {
+                            console.error('❌ Carrito no inicializado');
+                            console.log('Tipo de carrito:', typeof carrito);
+                            alert('El carrito aún no está listo. Recarga la página e intenta de nuevo.');
+                        }
+                    });
+                } else {
+                    console.error('❌ No se encontró el botón del carrito');
+                }
+
+            // Función para actualizar el badge
+            function actualizarBadgeCarrito() {
+                if (cartBadge && typeof carrito !== 'undefined' && carrito) {
+                    const cantidad = carrito.getCantidadTotal();
+                    cartBadge.textContent = cantidad;
+                    if (cantidad > 0) {
+                        cartBadge.classList.add('show');
+                        cartBadge.style.display = 'flex';
+                    } else {
+                        cartBadge.classList.remove('show');
+                        cartBadge.style.display = 'none';
+                    }
+                }
+            }
+
+            // Actualizar badge cada segundo
+            setInterval(actualizarBadgeCarrito, 1000);
+
+            // Buscar todos los botones de carrito en productos reales
+            setTimeout(function() {
+                console.log('🔍 Configurando botones de carrito para productos reales...');
+
+                // Conectar botones de agregar al carrito
+                const botonesAgregar = document.querySelectorAll('.btn-add-cart');
+                console.log(`📦 Encontrados ${botonesAgregar.length} botones de agregar al carrito`);
+
+                botonesAgregar.forEach((boton) => {
+                    boton.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        console.log('🛒 Click en botón de agregar al carrito');
+
+                        // Obtener datos del producto desde los atributos de datos
+                        const productoId = this.dataset.productoId;
+                        const nombre = this.dataset.productoNombre || 'Producto';
+                        const precioRaw = parseFloat(this.dataset.productoPrecio);
+                        const precio = isNaN(precioRaw) ? 0 : precioRaw;
+                        const stockRaw = parseInt(this.dataset.productoStock);
+                        const stock = isNaN(stockRaw) ? 999 : stockRaw;
+                        const categoria = this.dataset.productoCategoria || 'General';
+                        const imagen = this.dataset.productoImagen || '/static/images/logo.jpg';
+
+                        // Validación mínima: solo verificar que existe ID
+                        if (!productoId) {
+                            console.error('❌ Producto sin ID:', {
+                                boton: this,
+                                dataset: this.dataset
+                            });
+                            return;
+                        }
+
+                        // Validar que al menos tenga nombre O precio válido
+                        if (!nombre || nombre === 'Producto' && precio === 0) {
+                            console.error('❌ Datos del producto incompletos:', {
+                                id: productoId,
+                                nombre: nombre,
+                                precio: precio,
+                                stock: stock,
+                                precioRaw: this.dataset.productoPrecio,
+                                nombreRaw: this.dataset.productoNombre
+                            });
+                            return;
+                        }
+
+                        const datosProducto = {
+                            id: productoId,
+                            nombre: nombre,
+                            precio: precio,
+                            stock: stock,
+                            categoria: categoria,
+                            imagen: imagen
+                        };
+
+                        console.log('📦 Producto a agregar:', datosProducto);
+
+                        if (typeof carrito !== 'undefined' && carrito) {
+                            carrito.agregar(datosProducto);
+                            console.log('✅ Producto agregado al carrito');
+                            actualizarBadgeCarrito();
+
+                            // Mostrar animación de éxito
+                            this.style.transform = 'scale(1.2)';
+                            this.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                            setTimeout(() => {
+                                this.style.transform = 'scale(1)';
+                            }, 200);
+                        } else {
+                            console.error('❌ Carrito no disponible');
+                            alert('Error: El carrito no está listo. Recarga la página e intenta de nuevo.');
+                        }
+                    });
+                });
+
+                // Conectar botones de ver detalles
+                const botonesDetalle = document.querySelectorAll('.btn-ver-detalle, .producto-ver-detalle');
+                console.log(`📋 Encontrados ${botonesDetalle.length} botones de ver detalles`);
+
+                botonesDetalle.forEach((boton) => {
+                    boton.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const productoId = this.dataset.productoId;
+                        if (productoId) {
+                            console.log(`📋 Viendo detalles del producto ${productoId}`);
+                            window.location.href = `/productos/detalle/${productoId}/`;
+                        }
+                    });
+                });
+
+                // Conectar botones de reacciones
+                const botonesReaccion = document.querySelectorAll('.reaction-btn');
+                console.log(`👍 Encontrados ${botonesReaccion.length} botones de reacción`);
+
+                botonesReaccion.forEach((boton) => {
+                    boton.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const productoId = this.dataset.productoId;
+                        const tipo = this.dataset.tipo;
+
+                        console.log(`👍 Reacción ${tipo} para producto ${productoId}`);
+
+                        // Animación visual
+                        this.style.transform = 'scale(1.3)';
+                        this.style.color = tipo === 'like' ? '#10b981' : '#ef4444';
+
+                        setTimeout(() => {
+                            this.style.transform = 'scale(1)';
+                            this.style.color = '';
+                        }, 300);
+
+                        // Incrementar contador visual
+                        const counter = this.querySelector('.reaction-count');
+                        if (counter) {
+                            const currentCount = parseInt(counter.textContent) || 0;
+                            counter.textContent = currentCount + 1;
+                        }
+                    });
+                });
+
+                // Configurar filtros de productos
+                const filterButtons = document.querySelectorAll('.filter-btn');
+                filterButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        // Remover active de todos los botones
+                        filterButtons.forEach(b => b.classList.remove('active'));
+                        // Agregar active al botón clickeado
+                        this.classList.add('active');
+
+                        const filter = this.dataset.filter;
+                        filtrarProductos(filter);
+                    });
+                });
+
+                function filtrarProductos(categoria) {
+                    const productos = document.querySelectorAll('.product-card');
+
+                    productos.forEach(producto => {
+                        const productoCategoria = producto.dataset.filter;
+
+                        if (categoria === 'all' || productoCategoria === categoria) {
+                            producto.style.display = 'block';
+                            // Animación de entrada
+                            producto.style.opacity = '0';
+                            producto.style.transform = 'translateY(20px)';
+                            setTimeout(() => {
+                                producto.style.transition = 'all 0.3s ease';
+                                producto.style.opacity = '1';
+                                producto.style.transform = 'translateY(0)';
+                            }, 100);
+                        } else {
+                            producto.style.display = 'none';
+                        }
+                    });
+
+                    console.log(`🔍 Filtrado por categoría: ${categoria}`);
+                }
+
+                console.log('✅ Sistema de productos configurado correctamente');
+            }, 2000);
+        });
+    });
+    </script>
+
+    <!-- DIAGNÓSTICO BOTÓN INGRESO -->
+    <script>
+        // Ejecutar después de que TODO esté cargado
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                console.log('╔════════════════════════════════════╗');
+                console.log('║  DIAGNÓSTICO BOTÓN INGRESO         ║');
+                console.log('╠════════════════════════════════════╣');
+
+                const btnIngreso = document.getElementById('ingresoBtn');
+                const modal = document.getElementById('loginModal');
+
+                console.log('║ Botón encontrado:', btnIngreso ? '✅ SI' : '❌ NO');
+                console.log('║ Modal encontrado:', modal ? '✅ SI' : '❌ NO');
+
+                if (btnIngreso) {
+                    console.log('║ ID del botón:', btnIngreso.id);
+                    console.log('║ Texto del botón:', btnIngreso.textContent);
+                    console.log('║ Tiene listeners:', typeof getEventListeners !== 'undefined' ? '✅' : '⚠️ No disponible');
+
+                    // Agregar listener de prueba
+                    btnIngreso.addEventListener('click', function(e) {
+                        console.log('🎯 CLICK DETECTADO EN BOTÓN INGRESO!');
+                        console.log('   Evento:', e);
+                        console.log('   Target:', e.target);
+                    }, true); // true = capture phase
+
+                    console.log('║ Listener de prueba:', '✅ Agregado');
+                } else {
+                    console.log('║ ❌ ERROR: Botón no encontrado!');
+                    console.log('║ Buscando alternativas...');
+
+                    const todosLosLinks = document.querySelectorAll('a');
+                    console.log('║ Total enlaces:', todosLosLinks.length);
+
+                    todosLosLinks.forEach(function(link, index) {
+                        if (link.textContent.trim() === 'Ingreso') {
+                            console.log(`║ Enlace ${index}:`, link.textContent, '- ID:', link.id || 'SIN ID');
+                        }
+                    });
+                }
+
+                console.log('╚════════════════════════════════════╝');
+            }, 100);
+        });
+    </script>
+
+    <!-- FUNCIONES DIRECTAS PARA SIDEBAR - GARANTIZADO -->
+    <script>
+        // Funciones globales simples que SIEMPRE funcionan
+        function openSidebarDirect() {
+            console.log('🟢 ABRIENDO SIDEBAR...');
+            const sidebar = document.getElementById('mainSidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+
+            if (sidebar) {
+                sidebar.style.left = '0px';
+                console.log('✅ Sidebar movido a left: 0px');
+            } else {
+                console.error('❌ ERROR: Sidebar NO encontrado con ID mainSidebar');
+            }
+
+            if (overlay) {
+                overlay.style.display = 'block';
+                console.log('✅ Overlay mostrado');
+            } else {
+                console.error('❌ ERROR: Overlay NO encontrado');
+            }
+        }
+
+        function closeSidebarDirect() {
+            console.log('🔴 CERRANDO SIDEBAR...');
+            const sidebar = document.getElementById('mainSidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+
+            if (sidebar) {
+                sidebar.style.left = '-320px';
+                console.log('✅ Sidebar cerrado');
+            }
+
+            if (overlay) {
+                overlay.style.display = 'none';
+                console.log('✅ Overlay ocultado');
+            }
+        }
+
+        // Cerrar con tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeSidebarDirect();
+            }
+        });
+
+        // Diagnóstico automático al cargar
+        window.addEventListener('load', function() {
+            console.log('╔════════════════════════════════╗');
+            console.log('║   DIAGNÓSTICO DEL SIDEBAR      ║');
+            console.log('╠════════════════════════════════╣');
+            console.log('║ Sidebar:', !!document.getElementById('mainSidebar') ? '✅ SI' : '❌ NO');
+            console.log('║ Overlay:', !!document.querySelector('.sidebar-overlay') ? '✅ SI' : '❌ NO');
+            console.log('║ Botón:  ', !!document.querySelector('.sidebar-toggle-btn') ? '✅ SI' : '❌ NO');
+            console.log('╚════════════════════════════════╝');
+            console.log('👉 Haz clic en el botón AMARILLO de abajo para probar');
+        });
+    </script>
+
+    <!-- BOTÓN DE PRUEBA DEL MENÚ -->
+    <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 99999;">
+        <button onclick="openSidebarDirect()" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 15px 30px; cursor: pointer; font-weight: bold; font-size: 16px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; transition: all 0.3s ease;">
+            <span style="font-size: 20px;">🧪</span>
+            <span>Test Menú</span>
+        </button>
+    </div>
+
+    <!-- SCRIPT DE DIAGNÓSTICO DE PRODUCTOS -->
+    <script>
+        // Verificar productos en el DOM después de que todo esté cargado
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                console.log('🔍 DIAGNÓSTICO DE PRODUCTOS EN EL DOM');
+                console.log('=' * 50);
+
+                const productCards = document.querySelectorAll('.product-card');
+                console.log(`📦 Total de tarjetas de producto encontradas: ${productCards.length}`);
+
+                if (productCards.length === 0) {
+                    console.error('❌ NO SE ENCONTRARON PRODUCTOS EN EL DOM');
+                    console.log('🔍 Verificando el contenido del grid...');
+                    const grid = document.querySelector('.products-grid');
+                    if (grid) {
+                        console.log('Grid HTML:', grid.innerHTML.substring(0, 500));
+                    }
+                } else {
+                    console.log('✅ Productos encontrados en el DOM:');
+                    productCards.forEach((card, index) => {
+                        const nombre = card.querySelector('.product-name')?.textContent || 'Sin nombre';
+                        const precio = card.querySelector('.price')?.textContent || 'Sin precio';
+                        const categoria = card.querySelector('.product-category')?.textContent || 'Sin categoría';
+                        console.log(`   ${index + 1}. ${nombre} - ${precio} (${categoria})`);
+                    });
+                }
+
+                // Verificar botones de carrito
+                const botonesCarrito = document.querySelectorAll('.btn-add-cart');
+                console.log(`🛒 Botones de carrito encontrados: ${botonesCarrito.length}`);
+
+                if (productCards.length > 0 && botonesCarrito.length === 0) {
+                    console.warn('⚠️ Productos encontrados pero sin botones de carrito');
+                }
+
+                console.log('=' * 50);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,542 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Productos - DigitSoft E-commerce{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/productos-carrito.css' %}">
+<link rel="stylesheet" href="{% static 'css/productos-reacciones.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    .ecommerce-products {
+        padding: 20px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .ecommerce-header {
+        text-align: center;
+        margin-bottom: 40px;
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .ecommerce-header h1 {
+        color: #2d3748;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .ecommerce-header p {
+        color: #718096;
+        font-size: 1.1rem;
+    }
+
+    .cart-header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    .products-stats {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 10px 15px;
+        background: #f7fafc;
+        border-radius: 10px;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #718096;
+    }
+
+    .cart-button-main {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 20px rgba(16, 185, 129, 0.3);
+        position: relative;
+    }
+
+    .cart-button-main:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    }
+
+    .cart-badge-main {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #ef4444;
+        color: white;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+        border: 2px solid white;
+    }
+
+    .cart-badge-main.show {
+        display: flex;
+    }
+
+    .product-filters-ecommerce {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn-ecommerce {
+        background: white;
+        border: 2px solid #e2e8f0;
+        color: #4a5568;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .filter-btn-ecommerce:hover,
+    .filter-btn-ecommerce.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .products-grid-ecommerce {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+        margin-top: 20px;
+    }
+
+    .product-card-ecommerce {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        border: 2px solid transparent;
+    }
+
+    .product-card-ecommerce:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        border-color: #667eea;
+    }
+
+    .product-card-ecommerce.destacado {
+        border-color: #f59e0b;
+        box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2);
+    }
+
+    .product-image-ecommerce {
+        height: 220px;
+        overflow: hidden;
+        position: relative;
+        background: #f7fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .product-image-ecommerce img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .product-card-ecommerce:hover .product-image-ecommerce img {
+        transform: scale(1.1);
+    }
+
+    .no-image-ecommerce {
+        font-size: 4rem;
+        color: #cbd5e0;
+    }
+
+    .product-info-ecommerce {
+        padding: 20px;
+    }
+
+    .product-category-ecommerce {
+        background: #ede9fe;
+        color: #7c3aed;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    .product-name-ecommerce {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin: 10px 0;
+        min-height: 50px;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .product-name-ecommerce:hover {
+        color: #667eea;
+    }
+
+    .product-specs-ecommerce {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 15px 0;
+        font-size: 0.9rem;
+        color: #718096;
+        min-height: 80px;
+    }
+
+    .product-specs-ecommerce span {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .product-specs-ecommerce i {
+        color: #667eea;
+        width: 16px;
+    }
+
+    .product-footer-ecommerce {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 15px;
+        border-top: 1px solid #e2e8f0;
+        margin-top: 15px;
+    }
+
+    .product-price-ecommerce {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .price-ecommerce {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #10b981;
+    }
+
+    .stock-ecommerce {
+        font-size: 0.8rem;
+        color: #718096;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .product-actions-ecommerce {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-ver-detalle-ecommerce {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 15px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-ver-detalle-ecommerce:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-add-cart-ecommerce {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        padding: 12px 15px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-add-cart-ecommerce:hover {
+        transform: translateY(-2px) rotate(5deg);
+        box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+    }
+
+    .product-reactions-ecommerce {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: white;
+        border-radius: 20px;
+        padding: 5px 10px;
+        display: flex;
+        gap: 10px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        z-index: 10;
+    }
+
+    .reaction-btn-ecommerce {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 3px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        color: #718096;
+    }
+
+    .reaction-btn-ecommerce:hover {
+        transform: scale(1.2);
+    }
+
+    .reaction-count-ecommerce {
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .badge-destacado-ecommerce {
+        position: absolute;
+        top: -5px;
+        left: 15px;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        z-index: 5;
+        box-shadow: 0 3px 10px rgba(245, 158, 11, 0.4);
+    }
+
+    .no-products-ecommerce {
+        text-align: center;
+        padding: 60px;
+        color: #718096;
+        grid-column: 1 / -1;
+    }
+
+    .no-products-ecommerce i {
+        font-size: 4rem;
+        color: #cbd5e0;
+        margin-bottom: 20px;
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .products-grid-ecommerce {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .cart-header-section {
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .products-stats {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ecommerce-products">
+    <div class="ecommerce-header">
+        <h1><i class="fas fa-store"></i> Tienda DigitSoft</h1>
+        <p>Descubre nuestros productos tecnológicos de última generación</p>
+    </div>
+
+    <div class="cart-header-section">
+        <div class="products-stats">
+            <div class="stat-item">
+                <div class="stat-number" id="totalProductos">{{ total_productos }}</div>
+                <div class="stat-label">Productos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ categorias.count }}</div>
+                <div class="stat-label">Categorías</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ productos_destacados.count }}</div>
+                <div class="stat-label">Destacados</div>
+            </div>
+        </div>
+
+        <button class="cart-button-main" id="cartButtonMain">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Ver Carrito</span>
+            <span class="cart-badge-main" id="cartBadgeMain">0</span>
+        </button>
+    </div>
+
+    <div class="product-filters-ecommerce">
+        <button class="filter-btn-ecommerce active" data-categoria="all">
+            <i class="fas fa-th-large"></i> Todos
+        </button>
+        {% for categoria in categorias %}
+        <button class="filter-btn-ecommerce" data-categoria="{{ categoria.nombre|lower }}">
+            <i class="fas fa-tag"></i> {{ categoria.nombre }}
+        </button>
+        {% endfor %}
+    </div>
+
+    <div class="products-grid-ecommerce" id="productsGrid">
+        {% for producto in productos %}
+        <div class="product-card-ecommerce {% if producto.destacado %}destacado{% endif %}"
+             data-categoria="{{ producto.categoria.nombre|lower }}"
+             data-producto-id="{{ producto.id }}">
+
+            {% if producto.destacado %}
+            <div class="badge-destacado-ecommerce">⭐ Destacado</div>
+            {% endif %}
+
+            <div class="product-reactions-ecommerce">
+                <button class="reaction-btn-ecommerce reaction-like"
+                        data-producto-id="{{ producto.id }}"
+                        data-tipo="like"
+                        title="Me gusta">
+                    <i class="fas fa-thumbs-up"></i>
+                    <span class="reaction-count-ecommerce" id="like-{{ producto.id }}">0</span>
+                </button>
+                <button class="reaction-btn-ecommerce reaction-dislike"
+                        data-producto-id="{{ producto.id }}"
+                        data-tipo="dislike"
+                        title="No me gusta">
+                    <i class="fas fa-thumbs-down"></i>
+                    <span class="reaction-count-ecommerce" id="dislike-{{ producto.id }}">0</span>
+                </button>
+            </div>
+
+            <div class="product-image-ecommerce producto-ver-detalle" data-producto-id="{{ producto.id }}">
+                {% if producto.imagen %}
+                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre_producto }}">
+                {% else %}
+                    <i class="fas fa-image no-image-ecommerce"></i>
+                {% endif %}
+            </div>
+
+            <div class="product-info-ecommerce">
+                <span class="product-category-ecommerce">{{ producto.categoria.nombre|default:"General" }}</span>
+                <h3 class="product-name-ecommerce producto-ver-detalle" data-producto-id="{{ producto.id }}">
+                    {{ producto.nombre_producto }}
+                </h3>
+
+                <div class="product-specs-ecommerce">
+                    {% if producto.procesador %}
+                    <span><i class="fas fa-microchip"></i> {{ producto.procesador }}</span>
+                    {% endif %}
+                    {% if producto.memoria_ram %}
+                    <span><i class="fas fa-memory"></i> {{ producto.memoria_ram }}</span>
+                    {% endif %}
+                    {% if producto.memoria_rom %}
+                    <span><i class="fas fa-hdd"></i> {{ producto.memoria_rom }}</span>
+                    {% endif %}
+                    {% if producto.marca %}
+                    <span><i class="fas fa-industry"></i> {{ producto.marca }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="product-footer-ecommerce">
+                    <div class="product-price-ecommerce">
+                        <span class="price-ecommerce">${{ producto.precio_venta|floatformat:2 }}</span>
+                        <span class="stock-ecommerce">
+                            <i class="fas fa-box"></i> {{ producto.stock_actual }} disponibles
+                        </span>
+                    </div>
+
+                    <div class="product-actions-ecommerce">
+                        <button class="btn-ver-detalle-ecommerce"
+                                data-producto-id="{{ producto.id }}"
+                                title="Ver detalles">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                        <button class="btn-add-cart-ecommerce"
+                                data-producto-id="{{ producto.id }}"
+                                title="Agregar al carrito">
+                            <i class="fas fa-cart-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-products-ecommerce">
+            <i class="fas fa-box-open"></i>
+            <h3>No hay productos disponibles</h3>
+            <p>Actualmente no tenemos productos en esta categoría.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/productos-landing.js' %}"></script>
+<script src="{% static 'js/productos-ecommerce.js' %}"></script>
+<script>
+// ...existing code...
+</script>
+{% endblock %}
+

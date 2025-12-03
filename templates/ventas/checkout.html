@@ -1,0 +1,230 @@
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Procesando su pedido...</p>
+    </div>
+
+    <script src="{% static 'js/checkout.js' %}"></script>
+</body>
+</html>
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - DigitSoft</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+</head>
+<body>
+    <div class="checkout-container">
+        <header class="checkout-header">
+            <a href="/" class="logo">
+                <h1><span>Digit</span>Soft</h1>
+            </a>
+            <div class="checkout-steps">
+                <div class="step active">
+                    <span class="step-number">1</span>
+                    <span class="step-text">Carrito</span>
+                </div>
+                <div class="step active">
+                    <span class="step-number">2</span>
+                    <span class="step-text">Información</span>
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <span class="step-text">Confirmación</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="checkout-main">
+            <div class="checkout-grid">
+                <!-- Formulario de Información -->
+                <div class="checkout-form-section">
+                    <div class="section-card">
+                        <h2><i class="fas fa-user"></i> Información Personal</h2>
+                        <form id="checkoutForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="nombre">Nombre *</label>
+                                    <input type="text" id="nombre" name="nombre" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="apellido">Apellido</label>
+                                    <input type="text" id="apellido" name="apellido">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="cedula">Cédula/RUC *</label>
+                                    <input type="text" id="cedula" name="cedula" required maxlength="13">
+                                </div>
+                                <div class="form-group">
+                                    <label for="telefono">Teléfono *</label>
+                                    <input type="tel" id="telefono" name="telefono" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Email *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="direccion">Dirección *</label>
+                                <textarea id="direccion" name="direccion" rows="2" required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="notas">Notas del pedido (opcional)</label>
+                                <textarea id="notas" name="notas" rows="3" placeholder="Ej: Horario preferido de entrega, instrucciones especiales..."></textarea>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Facturación -->
+                    <div class="section-card">
+                        <h2><i class="fas fa-file-invoice"></i> Datos de Facturación</h2>
+
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="requiere_factura">
+                                <span>Requiero factura electrónica</span>
+                            </label>
+                        </div>
+
+                        <div id="facturacion_fields" style="display: none;">
+                            <div class="form-group">
+                                <label for="razon_social">Razón Social *</label>
+                                <input type="text" id="razon_social" name="razon_social">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ruc">RUC *</label>
+                                <input type="text" id="ruc" name="ruc" maxlength="13">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="direccion_factura">Dirección de Facturación *</label>
+                                <textarea id="direccion_factura" name="direccion_factura" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Método de Pago -->
+                    <div class="section-card">
+                        <h2><i class="fas fa-credit-card"></i> Método de Pago</h2>
+
+                        <div class="payment-methods">
+                            <label class="payment-option">
+                                <input type="radio" name="tipo_pago" value="EFECTIVO" checked>
+                                <div class="payment-card">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Efectivo</span>
+                                </div>
+                            </label>
+
+                            <label class="payment-option">
+                                <input type="radio" name="tipo_pago" value="TRANSFERENCIA">
+                                <div class="payment-card">
+                                    <i class="fas fa-exchange-alt"></i>
+                                    <span>Transferencia</span>
+                                </div>
+                            </label>
+
+                            <label class="payment-option">
+                                <input type="radio" name="tipo_pago" value="TARJETA">
+                                <div class="payment-card">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Tarjeta</span>
+                                </div>
+                            </label>
+
+                            <label class="payment-option">
+                                <input type="radio" name="tipo_pago" value="DEPOSITO">
+                                <div class="payment-card">
+                                    <i class="fas fa-university"></i>
+                                    <span>Depósito</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="info-box">
+                            <i class="fas fa-info-circle"></i>
+                            <p>La confirmación del pago se realizará por WhatsApp después de completar el pedido.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen del Pedido -->
+                <div class="checkout-summary-section">
+                    <div class="summary-card sticky">
+                        <h2><i class="fas fa-shopping-cart"></i> Resumen del Pedido</h2>
+
+                        <div id="orden-items" class="orden-items">
+                            <!-- Los items se cargarán dinámicamente -->
+                        </div>
+
+                        <div class="orden-totals">
+                            <div class="total-row">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">$0.00</span>
+                            </div>
+                            <div class="total-row">
+                                <span>IVA (12%):</span>
+                                <span id="iva">$0.00</span>
+                            </div>
+                            <div class="total-row total-final">
+                                <span>TOTAL:</span>
+                                <span id="total">$0.00</span>
+                            </div>
+                        </div>
+
+                        <button type="button" id="btnFinalizarCompra" class="btn-finalizar">
+                            <i class="fas fa-check-circle"></i>
+                            Finalizar Compra
+                        </button>
+
+                        <a href="/" class="btn-continuar">
+                            <i class="fas fa-arrow-left"></i>
+                            Seguir Comprando
+                        </a>
+
+                        <div class="seguridad-info">
+                            <i class="fas fa-lock"></i>
+                            <span>Compra 100% segura</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div id="confirmacionModal" class="modal" style="display: none;">
+        <div class="modal-content success-modal">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>¡Pedido Realizado con Éxito!</h2>
+            <p id="mensajeConfirmacion"></p>
+            <div class="orden-numero">
+                <strong>Número de Orden:</strong> <span id="numeroOrden"></span>
+            </div>
+            <div class="modal-actions">
+                <a href="#" id="btnVerFactura" class="btn btn-primary" style="display: none;">
+                    <i class="fas fa-file-invoice"></i>
+                    Ver Factura
+                </a>
+                <a href="/" class="btn btn-secondary">
+                    <i class="fas fa-home"></i>
+                    Volver al Inicio
+

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpiar LocalStorage - Digit Soft</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .error-box {
+            background: #fee;
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .error-title {
+            color: #ef4444;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .error-message {
+            color: #666;
+            font-size: 14px;
+            font-family: monospace;
+        }
+
+        .info-box {
+            background: #e0f2fe;
+            border-left: 4px solid #0ea5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .info-box strong {
+            color: #0369a1;
+        }
+
+        .status {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .status-value {
+            color: #333;
+            font-weight: bold;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .result {
+            display: none;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .result.success {
+            background: #d1fae5;
+            color: #065f46;
+            display: block;
+        }
+
+        .result.error {
+            background: #fee2e2;
+            color: #991b1b;
+            display: block;
+        }
+
+        .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .details {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: left;
+        }
+
+        .details-item {
+            margin: 8px 0;
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Limpiar LocalStorage</h1>
+        <p class="subtitle">Solución para el error de almacenamiento lleno</p>
+
+        <div class="error-box">
+            <div class="error-title">❌ Error Detectado:</div>
+            <div class="error-message">Failed to execute 'setItem' on 'Storage': Setting the value of 'carrito' exceeded the quota.</div>
+        </div>
+
+        <div class="info-box">
+            <strong>ℹ️ ¿Qué significa esto?</strong>
+            <p style="margin-top: 8px; color: #374151;">
+                El almacenamiento local del navegador está lleno (límite: ~5-10 MB).
+                Esto impide guardar nuevos datos en el carrito.
+            </p>
+        </div>
+
+        <div class="status" id="storageStatus">
+            <div class="status-item">
+                <span class="status-label">Items en localStorage:</span>
+                <span class="status-value" id="itemCount">-</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Tamaño total:</span>
+                <span class="status-value" id="totalSize">-</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Estado:</span>
+                <span class="status-value" id="status">-</span>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="limpiarTodo()">
+            🗑️ Limpiar LocalStorage Completo
+        </button>
+
+        <button class="btn btn-secondary" onclick="limpiarSoloCarrito()">
+            🛒 Limpiar Solo el Carrito
+        </button>
+
+        <button class="btn btn-success" onclick="irAlSitio()">
+            🚀 Ir al Sitio Principal
+        </button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        // Actualizar estado al cargar
+        window.addEventListener('load', function() {
+            actualizarEstado();
+        });
+
+        function actualizarEstado() {
+            try {
+                let totalSize = 0;
+                let itemCount = localStorage.length;
+
+                for (let key in localStorage) {
+                    if (localStorage.hasOwnProperty(key)) {
+                        totalSize += localStorage[key].length + key.length;
+                    }
+                }
+
+                document.getElementById('itemCount').textContent = itemCount;
+                document.getElementById('totalSize').textContent = (totalSize / 1024).toFixed(2) + ' KB';
+
+                let statusText = 'Normal';
+                let statusColor = '#10b981';
+
+                if (totalSize > 4 * 1024 * 1024) {
+                    statusText = '⚠️ Muy Lleno';
+                    statusColor = '#ef4444';
+                } else if (totalSize > 2 * 1024 * 1024) {
+                    statusText = '⚠️ Lleno';
+                    statusColor = '#f59e0b';
+                }
+
+                const statusEl = document.getElementById('status');
+                statusEl.textContent = statusText;
+                statusEl.style.color = statusColor;
+
+            } catch (error) {
+                console.error('Error al verificar estado:', error);
+            }
+        }
+
+        function limpiarTodo() {
+            if (confirm('¿Estás seguro de que quieres limpiar TODO el localStorage?\n\nEsto eliminará:\n• El carrito de compras\n• Preferencias guardadas\n• Datos de sesión\n• Cualquier otro dato almacenado')) {
+                try {
+                    const itemsAntes = localStorage.length;
+                    localStorage.clear();
+
+                    mostrarResultado(
+                        'success',
+                        '✅ ¡Limpieza Exitosa!',
+                        `Se eliminaron ${itemsAntes} items del localStorage.`,
+                        true
+                    );
+
+                    actualizarEstado();
+                } catch (error) {
+                    mostrarResultado(
+                        'error',
+                        '❌ Error al Limpiar',
+                        error.message
+                    );
+                }
+            }
+        }
+
+        function limpiarSoloCarrito() {
+            if (confirm('¿Quieres vaciar solo el carrito de compras?\n\nEsto eliminará todos los productos del carrito pero mantendrá otros datos.')) {
+                try {
+                    const carritoAntes = localStorage.getItem('carrito');
+                    const itemsCarrito = carritoAntes ? JSON.parse(carritoAntes).length : 0;
+
+                    localStorage.removeItem('carrito');
+
+                    mostrarResultado(
+                        'success',
+                        '✅ Carrito Vaciado',
+                        `Se eliminaron ${itemsCarrito} productos del carrito.`,
+                        true
+                    );
+
+                    actualizarEstado();
+                } catch (error) {
+                    mostrarResultado(
+                        'error',
+                        '❌ Error al Vaciar Carrito',
+                        error.message
+                    );
+                }
+            }
+        }
+
+        function irAlSitio() {
+            window.location.href = 'http://127.0.0.1:8000/';
+        }
+
+        function mostrarResultado(tipo, titulo, mensaje, recarga = false) {
+            const result = document.getElementById('result');
+            result.className = `result ${tipo}`;
+
+            let html = `<div class="icon">${tipo === 'success' ? '✅' : '❌'}</div>`;
+            html += `<h2>${titulo}</h2>`;
+            html += `<p>${mensaje}</p>`;
+
+            if (recarga) {
+                html += `<div class="details">`;
+                html += `<div class="details-item">✓ LocalStorage limpiado</div>`;
+                html += `<div class="details-item">✓ Espacio liberado</div>`;
+                html += `<div class="details-item">✓ El carrito ahora funcionará correctamente</div>`;
+                html += `</div>`;
+                html += `<button class="btn btn-success" onclick="irAlSitio()" style="margin-top: 15px;">`;
+                html += `🚀 Ir al Sitio (Recomendado)`;
+                html += `</button>`;
+            }
+
+            result.innerHTML = html;
+            result.style.display = 'block';
+
+            // Scroll al resultado
+            result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+</body>
+</html>
+

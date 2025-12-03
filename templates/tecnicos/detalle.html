@@ -1,0 +1,126 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Detalle Técnico - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/tecnicos.css' %}">
+<link rel="stylesheet" href="{% static 'css/theme-switcher.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="tecnicos-container">
+    <!-- Encabezado -->
+    <div class="tecnicos-header">
+        <div class="header-left">
+            <h1><i class="fas fa-user-cog"></i> Detalle del Técnico</h1>
+            <p class="text-muted">Información completa del técnico</p>
+        </div>
+        <div class="header-right">
+            <a href="{% url 'tecnicos:editar' tecnico.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a href="{% url 'tecnicos:lista' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <!-- Detalle del Técnico -->
+    <div class="detalle-container">
+        <div class="detalle-card">
+            <div class="detalle-header">
+                <div class="detalle-avatar">
+                    <span>{{ tecnico.nombres.0 }}{{ tecnico.apellidos.0 }}</span>
+                </div>
+                <div class="detalle-title">
+                    <h2>{{ tecnico.nombre_completo }}</h2>
+                    {% if tecnico.activo %}
+                        <span class="badge badge-activo">
+                            <i class="fas fa-check-circle"></i> Activo
+                        </span>
+                    {% else %}
+                        <span class="badge badge-inactivo">
+                            <i class="fas fa-times-circle"></i> Inactivo
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="detalle-body">
+                <div class="detalle-section">
+                    <h3><i class="fas fa-user"></i> Información Personal</h3>
+                    <div class="detalle-grid">
+                        <div class="detalle-item">
+                            <span class="label">Nombres:</span>
+                            <span class="value">{{ tecnico.nombres }}</span>
+                        </div>
+                        <div class="detalle-item">
+                            <span class="label">Apellidos:</span>
+                            <span class="value">{{ tecnico.apellidos }}</span>
+                        </div>
+                        <div class="detalle-item">
+                            <span class="label">Documento:</span>
+                            <span class="value">{{ tecnico.numero_documento }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detalle-section">
+                    <h3><i class="fas fa-address-book"></i> Información de Contacto</h3>
+                    <div class="detalle-grid">
+                        <div class="detalle-item">
+                            <span class="label"><i class="fas fa-phone"></i> Teléfono:</span>
+                            <span class="value">{{ tecnico.telefono }}</span>
+                        </div>
+                        <div class="detalle-item">
+                            <span class="label"><i class="fas fa-envelope"></i> Correo:</span>
+                            <span class="value">{{ tecnico.correo }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detalle-section">
+                    <h3><i class="fas fa-briefcase"></i> Información Profesional</h3>
+                    <div class="detalle-grid">
+                        <div class="detalle-item">
+                            <span class="label">Profesión:</span>
+                            <span class="value">
+                                <span class="badge badge-profesion">{{ tecnico.profesion }}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detalle-section">
+                    <h3><i class="fas fa-clock"></i> Información del Sistema</h3>
+                    <div class="detalle-grid">
+                        <div class="detalle-item">
+                            <span class="label">Fecha de Registro:</span>
+                            <span class="value">{{ tecnico.fecha_registro|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <div class="detalle-item">
+                            <span class="label">Última Actualización:</span>
+                            <span class="value">{{ tecnico.fecha_actualizacion|date:"d/m/Y H:i" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detalle-footer">
+                <a href="{% url 'tecnicos:editar' tecnico.pk %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Editar Técnico
+                </a>
+                <a href="{% url 'tecnicos:eliminar' tecnico.pk %}" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Eliminar Técnico
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/theme-switcher.js' %}"></script>
+{% endblock %}
+

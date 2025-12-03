@@ -1,0 +1,891 @@
+    padding-top: 2rem;
+}
+
+/* ============================================
+   Alertas
+   ============================================ */
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alert-success {
+    background: rgba(46, 204, 113, 0.1);
+    color: var(--tecnicos-success);
+    border: 1px solid var(--tecnicos-success);
+}
+
+.alert-danger {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--tecnicos-danger);
+    border: 1px solid var(--tecnicos-danger);
+}
+
+.alert .btn-close {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: inherit;
+}
+
+/* ============================================
+   Detalle del Técnico
+   ============================================ */
+.detalle-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.detalle-card {
+    background: var(--tecnicos-card-bg);
+    border-radius: 12px;
+    box-shadow: 0 2px 10px var(--tecnicos-shadow);
+    overflow: hidden;
+}
+
+.detalle-header {
+    background: linear-gradient(135deg, var(--tecnicos-primary) 0%, #764ba2 100%);
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.detalle-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.detalle-title h2 {
+    color: white;
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.detalle-body {
+    padding: 2rem;
+}
+
+.detalle-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--tecnicos-border);
+}
+
+.detalle-section:last-child {
+    border-bottom: none;
+}
+
+.detalle-section h3 {
+    color: var(--tecnicos-text);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.detalle-section h3 i {
+    color: var(--tecnicos-primary);
+}
+
+.detalle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.detalle-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.detalle-item .label {
+    color: var(--tecnicos-text-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.detalle-item .value {
+    color: var(--tecnicos-text);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.detalle-footer {
+    padding: 1.5rem 2rem;
+    background: var(--tecnicos-bg);
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+/* ============================================
+   Eliminar Técnico
+   ============================================ */
+.delete-container {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.delete-card {
+    background: var(--tecnicos-card-bg);
+    border-radius: 12px;
+    padding: 3rem;
+    box-shadow: 0 2px 10px var(--tecnicos-shadow);
+    text-align: center;
+}
+
+.delete-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(231, 76, 60, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+}
+
+.delete-icon i {
+    font-size: 3rem;
+    color: var(--tecnicos-danger);
+}
+
+.delete-card h2 {
+    color: var(--tecnicos-text);
+    margin-bottom: 2rem;
+}
+
+.delete-info {
+    background: var(--tecnicos-bg);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--tecnicos-border);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: var(--tecnicos-text-muted);
+    font-weight: 500;
+}
+
+.info-value {
+    color: var(--tecnicos-text);
+    font-weight: 600;
+}
+
+.delete-warning {
+    background: rgba(243, 156, 18, 0.1);
+    border: 1px solid var(--tecnicos-warning);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.delete-warning i {
+    color: var(--tecnicos-warning);
+    font-size: 1.2rem;
+    margin-top: 0.2rem;
+}
+
+.delete-warning p {
+    margin: 0;
+    color: var(--tecnicos-text);
+    text-align: left;
+}
+
+.delete-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 768px) {
+    .tecnicos-container {
+        padding: 1rem;
+    }
+
+    .tecnicos-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stats-container {
+        grid-template-columns: 1fr;
+    }
+
+    .search-form {
+        flex-direction: column;
+    }
+
+    .search-group,
+    .filter-group {
+        width: 100%;
+    }
+
+    .tecnicos-table {
+        font-size: 0.85rem;
+    }
+
+    .tecnicos-table thead {
+        display: none;
+    }
+
+    .tecnicos-table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid var(--tecnicos-border);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .tecnicos-table tbody td {
+        display: block;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--tecnicos-border);
+    }
+
+    .tecnicos-table tbody td:last-child {
+        border-bottom: none;
+    }
+
+    .tecnicos-table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        display: inline-block;
+        margin-right: 0.5rem;
+        color: var(--tecnicos-text-muted);
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .detalle-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .delete-actions {
+        flex-direction: column;
+    }
+}
+/* ============================================
+   DIGT SOFT - Estilos del Módulo de Técnicos
+   Incluye soporte para tema claro/oscuro
+   ============================================ */
+
+/* Variables para tema claro */
+:root {
+    --tecnicos-bg: #f8f9fa;
+    --tecnicos-card-bg: #ffffff;
+    --tecnicos-text: #2c3e50;
+    --tecnicos-text-muted: #6c757d;
+    --tecnicos-border: #dee2e6;
+    --tecnicos-shadow: rgba(0, 0, 0, 0.1);
+    --tecnicos-hover: #f1f3f5;
+    --tecnicos-primary: #667eea;
+    --tecnicos-success: #2ecc71;
+    --tecnicos-danger: #e74c3c;
+    --tecnicos-warning: #f39c12;
+    --tecnicos-info: #3498db;
+}
+
+/* Variables para tema oscuro */
+[data-theme="dark"] {
+    --tecnicos-bg: #1a1a2e;
+    --tecnicos-card-bg: #16213e;
+    --tecnicos-text: #eaeaea;
+    --tecnicos-text-muted: #a0a0a0;
+    --tecnicos-border: #2d3748;
+    --tecnicos-shadow: rgba(0, 0, 0, 0.3);
+    --tecnicos-hover: #1f2937;
+    --tecnicos-primary: #667eea;
+    --tecnicos-success: #2ecc71;
+    --tecnicos-danger: #e74c3c;
+    --tecnicos-warning: #f39c12;
+    --tecnicos-info: #3498db;
+}
+
+/* ============================================
+   Contenedor Principal
+   ============================================ */
+.tecnicos-container {
+    padding: 2rem;
+    background: var(--tecnicos-bg);
+    min-height: 100vh;
+    transition: background-color 0.3s ease;
+}
+
+/* ============================================
+   Encabezado
+   ============================================ */
+.tecnicos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.tecnicos-header h1 {
+    color: var(--tecnicos-text);
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tecnicos-header h1 i {
+    color: var(--tecnicos-primary);
+}
+
+.tecnicos-header p {
+    color: var(--tecnicos-text-muted);
+    margin: 0.5rem 0 0 0;
+}
+
+/* ============================================
+   Estadísticas
+   ============================================ */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--tecnicos-card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: 0 2px 10px var(--tecnicos-shadow);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px var(--tecnicos-shadow);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+}
+
+.stat-info h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--tecnicos-text);
+}
+
+.stat-info p {
+    margin: 0;
+    color: var(--tecnicos-text-muted);
+    font-size: 0.9rem;
+}
+
+/* ============================================
+   Búsqueda y Filtros
+   ============================================ */
+.search-filter-container {
+    background: var(--tecnicos-card-bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px var(--tecnicos-shadow);
+}
+
+.search-form {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.search-group {
+    flex: 1;
+    min-width: 300px;
+    position: relative;
+}
+
+.search-group i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--tecnicos-text-muted);
+}
+
+.search-group input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid var(--tecnicos-border);
+    border-radius: 8px;
+    background: var(--tecnicos-bg);
+    color: var(--tecnicos-text);
+    transition: all 0.3s ease;
+}
+
+.search-group input:focus {
+    outline: none;
+    border-color: var(--tecnicos-primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    color: var(--tecnicos-text);
+    font-weight: 500;
+    margin: 0;
+}
+
+.filter-group select {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--tecnicos-border);
+    border-radius: 8px;
+    background: var(--tecnicos-bg);
+    color: var(--tecnicos-text);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-group select:focus {
+    outline: none;
+    border-color: var(--tecnicos-primary);
+}
+
+/* ============================================
+   Botones
+   ============================================ */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--tecnicos-primary) 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+    background: var(--tecnicos-text-muted);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-search {
+    background: var(--tecnicos-info);
+    color: white;
+}
+
+.btn-search:hover {
+    background: #2980b9;
+}
+
+.btn-clear {
+    background: var(--tecnicos-text-muted);
+    color: white;
+}
+
+.btn-clear:hover {
+    background: #5a6268;
+}
+
+.btn-warning {
+    background: var(--tecnicos-warning);
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #e67e22;
+}
+
+.btn-danger {
+    background: var(--tecnicos-danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+/* ============================================
+   Tabla de Técnicos
+   ============================================ */
+.table-container {
+    background: var(--tecnicos-card-bg);
+    border-radius: 12px;
+    box-shadow: 0 2px 10px var(--tecnicos-shadow);
+    overflow: hidden;
+}
+
+.tecnicos-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tecnicos-table thead {
+    background: linear-gradient(135deg, var(--tecnicos-primary) 0%, #764ba2 100%);
+}
+
+.tecnicos-table thead th {
+    padding: 1rem;
+    text-align: left;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.tecnicos-table tbody tr {
+    border-bottom: 1px solid var(--tecnicos-border);
+    transition: all 0.3s ease;
+}
+
+.tecnicos-table tbody tr:hover {
+    background: var(--tecnicos-hover);
+}
+
+.tecnicos-table tbody td {
+    padding: 1rem;
+    color: var(--tecnicos-text);
+}
+
+.nombre-cell {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.nombre-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--tecnicos-primary) 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* ============================================
+   Badges
+   ============================================ */
+.badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.badge-activo {
+    background: rgba(46, 204, 113, 0.1);
+    color: var(--tecnicos-success);
+    border: 1px solid var(--tecnicos-success);
+}
+
+.badge-inactivo {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--tecnicos-danger);
+    border: 1px solid var(--tecnicos-danger);
+}
+
+.badge-profesion {
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--tecnicos-primary);
+    border: 1px solid var(--tecnicos-primary);
+}
+
+/* ============================================
+   Acciones
+   ============================================ */
+.actions-cell {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-action {
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-view {
+    background: rgba(52, 152, 219, 0.1);
+    color: var(--tecnicos-info);
+}
+
+.btn-view:hover {
+    background: var(--tecnicos-info);
+    color: white;
+    transform: scale(1.1);
+}
+
+.btn-edit {
+    background: rgba(243, 156, 18, 0.1);
+    color: var(--tecnicos-warning);
+}
+
+.btn-edit:hover {
+    background: var(--tecnicos-warning);
+    color: white;
+    transform: scale(1.1);
+}
+
+.btn-delete {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--tecnicos-danger);
+}
+
+.btn-delete:hover {
+    background: var(--tecnicos-danger);
+    color: white;
+    transform: scale(1.1);
+}
+
+/* ============================================
+   Paginación
+   ============================================ */
+.pagination-container {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+.pagination {
+    display: flex;
+    list-style: none;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+}
+
+.page-item .page-link {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--tecnicos-border);
+    background: var(--tecnicos-card-bg);
+    color: var(--tecnicos-text);
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.page-item .page-link:hover {
+    background: var(--tecnicos-primary);
+    color: white;
+    border-color: var(--tecnicos-primary);
+}
+
+.page-item.active .page-link {
+    background: var(--tecnicos-primary);
+    color: white;
+    border-color: var(--tecnicos-primary);
+}
+
+/* ============================================
+   Estado Vacío
+   ============================================ */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--tecnicos-text-muted);
+}
+
+.empty-state i {
+    font-size: 5rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--tecnicos-text);
+}
+
+/* ============================================
+   Formularios
+   ============================================ */
+.form-container {
+    background: var(--tecnicos-card-bg);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px var(--tecnicos-shadow);
+}
+
+.form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--tecnicos-border);
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+}
+
+.form-section h3 {
+    color: var(--tecnicos-text);
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-section h3 i {
+    color: var(--tecnicos-primary);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    color: var(--tecnicos-text);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.required {
+    color: var(--tecnicos-danger);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.75rem;
+    border: 1px solid var(--tecnicos-border);
+    border-radius: 8px;
+    background: var(--tecnicos-bg);
+    color: var(--tecnicos-text);
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--tecnicos-primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-check-group {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-check-input {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.error-message {
+    color: var(--tecnicos-danger);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+

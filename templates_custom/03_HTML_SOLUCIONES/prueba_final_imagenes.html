@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>✅ PRUEBA FINAL - IMÁGENES</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .step {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .step h2 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.2rem;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+        .btn-clear {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+        .btn-test {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        .btn-shop {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ PRUEBA FINAL - IMÁGENES EN CARRITO</h1>
+
+        <div class="status" id="status">
+            Verificando estado...
+        </div>
+
+        <div class="step">
+            <h2>📋 PASO 1: Limpia el Carrito</h2>
+            <p>Elimina los datos antiguos del carrito para empezar de cero.</p>
+            <button class="btn-clear" onclick="limpiarTodo()">
+                🗑️ Limpiar Carrito y Recargar
+            </button>
+        </div>
+
+        <div class="step">
+            <h2>🧪 PASO 2: Verifica el Sistema</h2>
+            <p>Abre la consola del navegador (F12) y ejecuta:</p>
+            <code>console.log('Funciones:', {render: typeof window.renderCartItems, badge: typeof window.updateCartBadge});</code>
+        </div>
+
+        <div class="step">
+            <h2>🛒 PASO 3: Ve a la Tienda</h2>
+            <p>Agrega productos y verifica que las imágenes aparezcan en el carrito.</p>
+            <button class="btn-shop" onclick="irATienda()">
+                🏪 Ir a la Tienda
+            </button>
+        </div>
+
+        <div class="step">
+            <h2>✅ ¿Qué Deberías Ver?</h2>
+            <ul>
+                <li>✅ Imagen del producto (85x85px)</li>
+                <li>✅ Nombre del producto</li>
+                <li>✅ Precio en naranja</li>
+                <li>✅ Botones +/- para cantidad</li>
+                <li>✅ Botón eliminar (🗑️)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function actualizarEstado() {
+            const carritoViejo = localStorage.getItem('carrito');
+            const carritoNuevo = localStorage.getItem('carrito_v1');
+            const status = document.getElementById('status');
+
+            let mensaje = '';
+            let clase = '';
+
+            if (!carritoViejo && !carritoNuevo) {
+                mensaje = '✅ Carrito limpio - Listo para probar';
+                clase = 'success';
+            } else if (carritoViejo || carritoNuevo) {
+                const itemsViejo = carritoViejo ? JSON.parse(carritoViejo).length : 0;
+                const itemsNuevo = carritoNuevo ? Object.keys(JSON.parse(carritoNuevo)).length : 0;
+                mensaje = `⚠️ Hay datos: ${itemsViejo} items (viejo), ${itemsNuevo} items (nuevo) - Limpia primero`;
+                clase = 'warning';
+            }
+
+            status.textContent = mensaje;
+            status.className = 'status ' + clase;
+        }
+
+        function limpiarTodo() {
+            if (confirm('¿Limpiar el carrito y recargar la página?')) {
+                localStorage.removeItem('carrito');
+                localStorage.removeItem('carrito_v1');
+                localStorage.removeItem('cart');
+                alert('✅ Carrito limpiado. Recargando...');
+                location.reload();
+            }
+        }
+
+        function irATienda() {
+            window.location.href = '/ecommerce/productos/';
+        }
+
+        // Actualizar al cargar
+        actualizarEstado();
+
+        // Actualizar cada 2 segundos
+        setInterval(actualizarEstado, 2000);
+    </script>
+</body>
+</html>
+

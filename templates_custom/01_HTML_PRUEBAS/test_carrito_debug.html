@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba del Carrito - Digit Soft</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+
+        .status {
+            background: #10b981;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .console-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 500px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #4a90e2;
+        }
+
+        .log-success {
+            border-left-color: #10b981;
+            color: #10b981;
+        }
+
+        .log-error {
+            border-left-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .log-info {
+            border-left-color: #f59e0b;
+            color: #f59e0b;
+        }
+
+        .instructions {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f0f9ff;
+            border-radius: 5px;
+        }
+
+        .btn {
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: #059669;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛒 Prueba del Sistema de Carrito - Digit Soft</h1>
+        <div class="status">✅ Sistema Actualizado con Validaciones Mejoradas</div>
+    </div>
+
+    <div class="instructions">
+        <h2>📋 Instrucciones de Prueba</h2>
+
+        <div class="step">
+            <strong>Paso 1:</strong> Abre la página principal del sitio en otra pestaña:
+            <br>
+            <a href="http://127.0.0.1:8000/" target="_blank">http://127.0.0.1:8000/</a>
+        </div>
+
+        <div class="step">
+            <strong>Paso 2:</strong> Abre la Consola del Navegador (F12)
+        </div>
+
+        <div class="step">
+            <strong>Paso 3:</strong> Ve a la sección de "Productos"
+        </div>
+
+        <div class="step">
+            <strong>Paso 4:</strong> Haz clic en el botón 🛒 de cualquier producto
+        </div>
+
+        <div class="step">
+            <strong>Paso 5:</strong> Observa los logs en la consola
+        </div>
+
+        <h3>🔍 Logs Esperados en la Consola</h3>
+        <div class="console-output">
+            <div class="log-entry log-info">🛒 Intentando agregar producto ID: 1</div>
+            <div class="log-entry log-info">🔍 Buscando producto ID: 1</div>
+            <div class="log-entry log-info">📦 Productos disponibles: 20</div>
+            <div class="log-entry log-success">✅ Producto encontrado: {id: 1, nombre: "...", precio: 850000, ...}</div>
+            <div class="log-entry log-info">🛒 Método agregar llamado con: {id: 1, nombre: "...", ...}</div>
+            <div class="log-entry log-success">✅ Producto agregado correctamente al carrito</div>
+        </div>
+
+        <h3>❌ Posibles Errores y Soluciones</h3>
+
+        <div class="step">
+            <strong>Error:</strong> "ProductosManager no está inicializado"
+            <br>
+            <strong>Solución:</strong> Recarga la página (F5) y espera a que cargue completamente
+        </div>
+
+        <div class="step">
+            <strong>Error:</strong> "Producto no encontrado"
+            <br>
+            <strong>Solución:</strong> Verifica que hay productos en la base de datos con stock > 0
+        </div>
+
+        <div class="step">
+            <strong>Error:</strong> "Producto sin stock disponible"
+            <br>
+            <strong>Solución:</strong> Ve al panel de administración y actualiza el stock del producto
+        </div>
+
+        <h3>🧪 Comandos de Debug</h3>
+        <p>Puedes ejecutar estos comandos en la consola del navegador:</p>
+        <div class="console-output">
+            <div class="log-entry">// Ver productos cargados</div>
+            <div class="log-entry">console.log(productosManager.productos);</div>
+            <br>
+            <div class="log-entry">// Ver items en el carrito</div>
+            <div class="log-entry">console.log(carrito.items);</div>
+            <br>
+            <div class="log-entry">// Ver cantidad total</div>
+            <div class="log-entry">console.log(carrito.getCantidadTotal());</div>
+            <br>
+            <div class="log-entry">// Agregar producto manualmente</div>
+            <div class="log-entry">agregarAlCarrito(1);</div>
+        </div>
+    </div>
+
+    <div class="header">
+        <h2>🔧 Cambios Realizados</h2>
+        <ul>
+            <li>✅ Validación completa de datos del producto antes de agregar al carrito</li>
+            <li>✅ Logging detallado en cada paso del proceso</li>
+            <li>✅ Manejo de errores con mensajes descriptivos</li>
+            <li>✅ Verificación de inicialización de componentes</li>
+            <li>✅ Deshabilitado carrito-init.js para evitar conflictos</li>
+        </ul>
+
+        <div style="margin-top: 20px;">
+            <button class="btn" onclick="window.open('http://127.0.0.1:8000/', '_blank')">
+                🚀 Abrir Sitio Principal
+            </button>
+            <button class="btn btn-secondary" onclick="window.open('http://127.0.0.1:8000/admin/', '_blank')">
+                ⚙️ Panel de Administración
+            </button>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h2>📝 Checklist de Verificación</h2>
+        <label><input type="checkbox"> El servidor Django está corriendo</label><br>
+        <label><input type="checkbox"> La página principal carga correctamente</label><br>
+        <label><input type="checkbox"> Los productos se muestran en la sección de productos</label><br>
+        <label><input type="checkbox"> La consola del navegador está abierta (F12)</label><br>
+        <label><input type="checkbox"> No hay errores 404 en la consola</label><br>
+        <label><input type="checkbox"> Los productos tienen precio y stock > 0</label><br>
+    </div>
+</body>
+</html>
+

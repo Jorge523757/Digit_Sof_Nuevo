@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpiar Carrito - Digit Soft</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .info {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .warning {
+            background: #fff7ed;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .success {
+            background: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .btn-clear {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-clear:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-clear:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .status {
+            text-align: center;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="text-align: center;">
+            <div class="icon">🧹</div>
+            <h1>Limpiar Carrito</h1>
+        </div>
+
+        <div class="info">
+            <strong>ℹ️ Información:</strong>
+            <p>Esta herramienta te permite limpiar el carrito de compras y reiniciar el sistema de imágenes.</p>
+        </div>
+
+        <div class="status" id="status">
+            <h3 style="margin-bottom: 15px;">Estado Actual</h3>
+            <div class="status-item">
+                <span>Items en carrito:</span>
+                <span id="itemCount" style="font-weight: 600;">-</span>
+            </div>
+            <div class="status-item">
+                <span>localStorage:</span>
+                <span id="storageStatus">-</span>
+            </div>
+            <div class="status-item">
+                <span>Total aproximado:</span>
+                <span id="totalAmount" style="font-weight: 600; color: #FF6B00;">-</span>
+            </div>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Advertencia:</strong>
+            <p>Esta acción eliminará todos los productos del carrito. Esta acción no se puede deshacer.</p>
+        </div>
+
+        <div class="success" id="successMessage">
+            <strong>✅ ¡Listo!</strong>
+            <p>El carrito ha sido limpiado correctamente. Las imágenes funcionarán correctamente al agregar nuevos productos.</p>
+        </div>
+
+        <button class="btn-clear" id="btnClear" onclick="limpiarCarrito()">
+            🗑️ Limpiar Carrito Completamente
+        </button>
+
+        <button class="btn-back" onclick="volverATienda()">
+            🏪 Volver a la Tienda
+        </button>
+
+        <div style="text-align: center; margin-top: 20px; color: #6b7280; font-size: 0.9rem;">
+            <p>💡 Tip: Usa esto si las imágenes no aparecen correctamente en el carrito</p>
+        </div>
+    </div>
+
+    <script>
+        // Actualizar estado al cargar
+        window.addEventListener('DOMContentLoaded', actualizarEstado);
+
+        function actualizarEstado() {
+            const carrito = JSON.parse(localStorage.getItem('carrito_v1') || '{}');
+            const items = Object.values(carrito);
+
+            // Contar items
+            document.getElementById('itemCount').textContent = items.length;
+
+            // Estado del localStorage
+            const storageStatus = document.getElementById('storageStatus');
+            if (items.length > 0) {
+                storageStatus.innerHTML = '<span class="badge badge-danger">Con datos</span>';
+            } else {
+                storageStatus.innerHTML = '<span class="badge badge-success">Vacío</span>';
+            }
+
+            // Calcular total
+            let total = 0;
+            items.forEach(item => {
+                const precio = parseFloat(item.price || item.precio || 0);
+                const cantidad = parseInt(item.qty || item.cantidad || 1);
+                total += precio * cantidad;
+            });
+
+            document.getElementById('totalAmount').textContent =
+                total > 0 ? '$' + total.toLocaleString('es-CO') : '$0';
+
+            // Deshabilitar botón si ya está vacío
+            const btnClear = document.getElementById('btnClear');
+            if (items.length === 0) {
+                btnClear.disabled = true;
+                btnClear.textContent = '✅ El carrito ya está vacío';
+            }
+        }
+
+        function limpiarCarrito() {
+            if (!confirm('¿Estás seguro de que quieres eliminar todos los productos del carrito?')) {
+                return;
+            }
+
+            try {
+                // Limpiar carrito v1
+                localStorage.removeItem('carrito_v1');
+
+                // También limpiar versiones antiguas si existen
+                localStorage.removeItem('cart');
+                localStorage.removeItem('carrito');
+
+                console.log('✅ Carrito limpiado correctamente');
+
+                // Mostrar mensaje de éxito
+                document.getElementById('successMessage').style.display = 'block';
+                document.querySelector('.warning').style.display = 'none';
+
+                // Actualizar estado
+                actualizarEstado();
+
+                // Ocultar mensaje después de 5 segundos
+                setTimeout(() => {
+                    document.getElementById('successMessage').style.display = 'none';
+                }, 5000);
+
+            } catch (error) {
+                console.error('❌ Error al limpiar carrito:', error);
+                alert('Error al limpiar el carrito. Revisa la consola para más detalles.');
+            }
+        }
+
+        function volverATienda() {
+            // Intentar volver a la página de productos
+            window.location.href = '/ecommerce/productos/';
+        }
+    </script>
+</body>
+</html>
+

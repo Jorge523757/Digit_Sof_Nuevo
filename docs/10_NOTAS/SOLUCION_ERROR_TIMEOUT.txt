@@ -1,0 +1,151 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║   🚨 ERROR: No se puede acceder a este sitio                  ║
+║   ERR_CONNECTION_TIMED_OUT                                    ║
+║                                                               ║
+║   CAUSA: El Firewall de Windows está bloqueando              ║
+║          las conexiones al puerto 8000                        ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+
+═══════════════════════════════════════════════════════════════
+  ✅ SOLUCIÓN RÁPIDA (3 PASOS)
+═══════════════════════════════════════════════════════════════
+
+PASO 1: Busca este archivo en tu carpeta del proyecto
+────────────────────────────────────────────────────────────
+
+    📄 SOLUCIONAR_ACCESO_MOVIL_ADMIN.bat
+
+
+PASO 2: Ejecutalo como ADMINISTRADOR
+────────────────────────────────────────────────────────────
+
+    1. Click DERECHO sobre el archivo
+    2. Selecciona: "Ejecutar como administrador"
+    3. Acepta el diálogo de seguridad (UAC)
+
+    ⚠️  IMPORTANTE: DEBE ser como administrador
+        Si no lo haces así, NO funcionará
+
+
+PASO 3: Espera que diga "SERVIDOR ACTIVO"
+────────────────────────────────────────────────────────────
+
+    Una vez que veas el mensaje, en tu móvil:
+
+    🌐 Escribe: http://192.168.137.221:8000/
+
+
+═══════════════════════════════════════════════════════════════
+  🔥 SOLUCIÓN ALTERNATIVA (Si no puedes ejecutar como Admin)
+═══════════════════════════════════════════════════════════════
+
+OPCIÓN A: Desactiva el Firewall temporalmente
+──────────────────────────────────────────────
+
+    1. Presiona: Windows + I (Configuración)
+    2. Ve a: Privacidad y seguridad
+    3. Click en: Seguridad de Windows
+    4. Click en: Firewall y protección de red
+    5. En "Red privada", desactiva el firewall
+    6. Inicia el servidor: python manage.py runserver 0.0.0.0:8000
+    7. Prueba en el móvil: http://192.168.137.221:8000/
+
+    ⚠️  Recuerda activarlo después de las pruebas
+
+
+OPCIÓN B: Configura el Firewall manualmente
+────────────────────────────────────────────
+
+    1. Presiona: Windows + R
+    2. Escribe: wf.msc y Enter
+    3. Click en "Reglas de entrada" (izquierda)
+    4. Click en "Nueva regla..." (derecha)
+    5. Selecciona "Puerto" → Siguiente
+    6. Marca "TCP" y escribe "8000" → Siguiente
+    7. Marca "Permitir la conexión" → Siguiente
+    8. Marca TODAS las casillas → Siguiente
+    9. Nombre: "Django DigitSoft" → Finalizar
+
+
+═══════════════════════════════════════════════════════════════
+  🔍 VERIFICACIÓN
+═══════════════════════════════════════════════════════════════
+
+Antes de probar en el móvil, verifica en tu PC:
+────────────────────────────────────────────────
+
+    1. Abre el navegador EN TU PC
+    2. Escribe: http://192.168.137.221:8000/
+    3. Si carga la página → Funciona, prueba en móvil
+    4. Si NO carga → El problema persiste
+
+
+═══════════════════════════════════════════════════════════════
+  📋 CHECKLIST
+═══════════════════════════════════════════════════════════════
+
+Verifica estos 4 puntos:
+
+    ☐ Servidor corriendo (ventana de comandos abierta)
+    ☐ Dice: "Starting development server at http://0.0.0.0:8000/"
+    ☐ Firewall configurado (ejecutaste el .bat como Admin)
+    ☐ Móvil en el MISMO WiFi que la PC
+
+
+═══════════════════════════════════════════════════════════════
+  ❓ PREGUNTAS FRECUENTES
+═══════════════════════════════════════════════════════════════
+
+P: ¿Por qué sale "ERR_CONNECTION_TIMED_OUT"?
+R: El firewall está bloqueando el puerto 8000
+
+P: ¿Qué hago si no tengo permisos de administrador?
+R: Desactiva el firewall temporalmente (OPCIÓN A arriba)
+
+P: ¿Funciona en localhost pero no en el móvil?
+R: Es definitivamente el firewall. Usa el script como Admin
+
+P: ¿Debo usar http:// o https://?
+R: SOLO http:// (sin la "s")
+
+P: ¿Necesito el :8000?
+R: SÍ, es obligatorio incluir el puerto
+
+
+═══════════════════════════════════════════════════════════════
+  🎯 RESUMEN ULTRA RÁPIDO
+═══════════════════════════════════════════════════════════════
+
+    1️⃣  Click derecho en: SOLUCIONAR_ACCESO_MOVIL_ADMIN.bat
+
+    2️⃣  Ejecutar como administrador
+
+    3️⃣  En el móvil: http://192.168.137.221:8000/
+
+    ✅ ¡LISTO!
+
+
+═══════════════════════════════════════════════════════════════
+  📞 URLs PARA TU MÓVIL (una vez que funcione)
+═══════════════════════════════════════════════════════════════
+
+    🏠 Inicio:     http://192.168.137.221:8000/
+    🛒 Tienda:     http://192.168.137.221:8000/tienda/
+    🛒 Carrito:    http://192.168.137.221:8000/tienda/carrito/
+    📊 Dashboard:  http://192.168.137.221:8000/dashboard/
+
+
+═══════════════════════════════════════════════════════════════
+
+💡 TIP: Guarda esta URL en los favoritos de tu móvil para
+        acceso rápido la próxima vez.
+
+═══════════════════════════════════════════════════════════════
+
+
+CREADO: 20/11/2025
+ESTADO: ✅ Solución probada y funcional
+

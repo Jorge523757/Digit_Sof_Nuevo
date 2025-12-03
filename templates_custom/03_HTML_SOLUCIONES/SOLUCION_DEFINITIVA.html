@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 SOLUCIÓN DEFINITIVA - Digit Soft</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 30px 90px rgba(0,0,0,0.4);
+            padding: 50px;
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            color: #1f2937;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 3px solid #fdcb6e;
+        }
+
+        .warning-box h3 {
+            color: #2d3436;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .warning-box p {
+            color: #2d3436;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        .btn-giant {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 25px 60px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(238, 90, 111, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .btn-giant:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(238, 90, 111, 0.6);
+        }
+
+        .btn-giant:active {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 15px 40px rgba(9, 132, 227, 0.6);
+        }
+
+        #resultado {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f1f5f9;
+            border-radius: 16px;
+            display: none;
+            text-align: left;
+        }
+
+        #resultado.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            color: #10b981;
+            font-size: 3rem;
+            margin: 20px 0;
+        }
+
+        .result-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .countdown {
+            font-size: 4rem;
+            color: #667eea;
+            font-weight: 800;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🔥</div>
+        <h1>SOLUCIÓN DEFINITIVA</h1>
+        <p class="subtitle">Limpieza total del carrito en 1 click</p>
+
+        <div class="warning-box">
+            <h3>⚠️ ¿Qué hace este botón?</h3>
+            <p>
+                <strong>ELIMINA TODO</strong> el carrito del navegador.<br>
+                Después podrás agregar productos SIN duplicados.<br>
+                Es la solución más rápida y efectiva.
+            </p>
+        </div>
+
+        <button class="btn-giant" onclick="limpiarTodo()">
+            🗑️ LIMPIAR TODO Y EMPEZAR DE CERO
+        </button>
+
+        <button class="btn-giant btn-secondary" onclick="irATienda()">
+            🏠 IR A LA TIENDA
+        </button>
+
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        function limpiarTodo() {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = '<div class="countdown">3</div><p style="font-size: 1.5rem; color: #6b7280;">Limpiando en...</p>';
+            resultado.classList.add('show');
+
+            let count = 3;
+            const countdown = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    document.querySelector('.countdown').textContent = count;
+                } else {
+                    clearInterval(countdown);
+                    ejecutarLimpieza();
+                }
+            }, 1000);
+        }
+
+        function ejecutarLimpieza() {
+            const resultado = document.getElementById('resultado');
+
+            try {
+                // PASO 1: Limpiar localStorage
+                localStorage.clear();
+
+                // PASO 2: Limpiar sessionStorage
+                sessionStorage.clear();
+
+                // PASO 3: Limpiar cookies del carrito
+                document.cookie.split(";").forEach(function(c) {
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                });
+
+                // PASO 4: Verificar limpieza
+                const carritoLimpio = localStorage.getItem('carrito') === null;
+
+                resultado.innerHTML = `
+                    <div class="success-icon">✅</div>
+                    <h2 style="color: #10b981; margin-bottom: 20px;">¡LIMPIEZA COMPLETADA!</h2>
+
+                    <div class="result-item">
+                        <strong>✅ localStorage:</strong> ${carritoLimpio ? 'LIMPIO' : 'ERROR'}
+                    </div>
+                    <div class="result-item">
+                        <strong>✅ sessionStorage:</strong> LIMPIO
+                    </div>
+                    <div class="result-item">
+                        <strong>✅ Cookies:</strong> LIMPIO
+                    </div>
+
+                    <div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #a8e6cf 0%, #3ecd8d 100%); border-radius: 12px; color: white;">
+                        <h3 style="margin-bottom: 10px;">🎉 ¡TODO LISTO!</h3>
+                        <p style="font-size: 1.1rem; line-height: 1.8;">
+                            El carrito ha sido <strong>completamente limpiado</strong>.<br>
+                            Ahora puedes agregar productos <strong>sin duplicados</strong>.<br>
+                            Redirigiendo a la tienda en <span id="redirect-count">3</span> segundos...
+                        </p>
+                    </div>
+                `;
+
+                // Redirigir después de 3 segundos
+                let redirectCount = 3;
+                const redirectInterval = setInterval(() => {
+                    redirectCount--;
+                    const countElement = document.getElementById('redirect-count');
+                    if (countElement) {
+                        countElement.textContent = redirectCount;
+                    }
+
+                    if (redirectCount <= 0) {
+                        clearInterval(redirectInterval);
+                        window.location.href = '/ecommerce/productos/';
+                    }
+                }, 1000);
+
+            } catch (error) {
+                resultado.innerHTML = `
+                    <div style="color: #ef4444; font-size: 2rem; margin: 20px 0;">❌</div>
+                    <h3 style="color: #ef4444;">Error al limpiar</h3>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+
+        function irATienda() {
+            window.location.href = '/ecommerce/productos/';
+        }
+
+        // Auto ejecutar al cargar
+        window.onload = function() {
+            // Mostrar estado actual
+            const carrito = localStorage.getItem('carrito');
+            if (carrito) {
+                try {
+                    const items = JSON.parse(carrito);
+                    const count = Object.keys(items).length;
+                    if (count > 0) {
+                        document.querySelector('.warning-box p').innerHTML += `<br><br><strong style="color: #d63031;">⚠️ DETECTADO: ${count} item(s) en el carrito</strong>`;
+                    }
+                } catch (e) {
+                    console.error('Error al leer carrito:', e);
+                }
+            }
+        };
+    </script>
+</body>
+</html>
+

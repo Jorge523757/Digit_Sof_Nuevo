@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Acerca de - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 100px 0 60px;
+        margin-top: 56px;
+    }
+
+    .about-section {
+        padding: 80px 0;
+    }
+
+    .team-card {
+        text-align: center;
+        padding: 30px;
+        border-radius: 15px;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+    }
+
+    .team-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+
+    .team-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block body_content %}
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="{% url 'core:home' %}">
+            <i class="fas fa-cube"></i> DIGT SOFT
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:home' %}">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'core:about' %}">Acerca de</a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link btn btn-primary text-white px-4" href="{% url 'dashboard:index' %}">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link btn btn-primary text-white px-4" href="{% url 'usuarios:login' %}">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="about-hero">
+    <div class="container text-center">
+        <h1 class="display-3 fw-bold mb-3">Acerca de DIGT SOFT</h1>
+        <p class="lead">Sistema de Gestión Empresarial de nueva generación</p>
+    </div>
+</section>
+
+<!-- About Content -->
+<section class="about-section">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-6">
+                <h2 class="fw-bold mb-4">Nuestra Misión</h2>
+                <p class="lead">Proporcionar soluciones tecnológicas innovadoras que optimicen la gestión empresarial y mejoren la productividad de nuestros clientes.</p>
+                <p>DIGT SOFT es un sistema integral diseñado para empresas que buscan digitalizar y automatizar sus procesos de negocio, desde la gestión de clientes hasta el control de inventarios y facturación.</p>
+            </div>
+            <div class="col-lg-6">
+                <h2 class="fw-bold mb-4">Nuestra Visión</h2>
+                <p class="lead">Ser la plataforma de gestión empresarial líder en el mercado, reconocida por su innovación, confiabilidad y facilidad de uso.</p>
+                <p>Creemos en la transformación digital como motor de crecimiento, y trabajamos cada día para ofrecer herramientas que empoderen a las empresas a alcanzar su máximo potencial.</p>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-12 text-center mb-5">
+                <h2 class="fw-bold">¿Por qué elegir DIGT SOFT?</h2>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h4>Innovación</h4>
+                    <p>Tecnología de vanguardia con las últimas tendencias en desarrollo web.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h4>Soporte 24/7</h4>
+                    <p>Atención personalizada para resolver cualquier duda o problema.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h4>Seguridad</h4>
+                    <p>Máxima protección de datos con los estándares más altos.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,210 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Técnicos - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/tecnicos.css' %}">
+<link rel="stylesheet" href="{% static 'css/theme-switcher.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="tecnicos-container">
+    <!-- Encabezado -->
+    <div class="tecnicos-header">
+        <div class="header-left">
+            <h1><i class="fas fa-user-cog"></i> Gestión de Técnicos</h1>
+            <p class="text-muted">Administra los técnicos de tu empresa</p>
+        </div>
+        <div class="header-right">
+            <a href="{% url 'tecnicos:crear' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Registrar Técnico
+            </a>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_tecnicos }}</h3>
+                <p>Total Técnicos</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ tecnicos_activos }}</h3>
+                <p>Técnicos Activos</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+                <i class="fas fa-user-times"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ tecnicos_inactivos }}</h3>
+                <p>Técnicos Inactivos</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros y Búsqueda -->
+    <div class="search-filter-container">
+        <form method="get" class="search-form">
+            <div class="search-group">
+                <i class="fas fa-search"></i>
+                {{ form_busqueda.busqueda }}
+            </div>
+            <div class="filter-group">
+                <label>Estado:</label>
+                {{ form_busqueda.estado }}
+            </div>
+            <button type="submit" class="btn btn-search">
+                <i class="fas fa-filter"></i> Filtrar
+            </button>
+            <a href="{% url 'tecnicos:lista' %}" class="btn btn-clear">
+                <i class="fas fa-times"></i> Limpiar
+            </a>
+        </form>
+    </div>
+
+    <!-- Mensajes -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                <i class="fas fa-check-circle"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Tabla de Técnicos -->
+    <div class="table-container">
+        {% if tecnicos %}
+            <table class="tecnicos-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre Completo</th>
+                        <th>Documento</th>
+                        <th>Teléfono</th>
+                        <th>Correo</th>
+                        <th>Profesión</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tecnico in tecnicos %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td class="nombre-cell">
+                                <div class="nombre-avatar">
+                                    <span>{{ tecnico.nombres.0 }}{{ tecnico.apellidos.0 }}</span>
+                                </div>
+                                <strong>{{ tecnico.nombre_completo }}</strong>
+                            </td>
+                            <td>{{ tecnico.numero_documento }}</td>
+                            <td><i class="fas fa-phone"></i> {{ tecnico.telefono }}</td>
+                            <td><i class="fas fa-envelope"></i> {{ tecnico.correo }}</td>
+                            <td><span class="badge badge-profesion">{{ tecnico.profesion }}</span></td>
+                            <td>
+                                {% if tecnico.activo %}
+                                    <span class="badge badge-activo">
+                                        <i class="fas fa-check-circle"></i> Activo
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge-inactivo">
+                                        <i class="fas fa-times-circle"></i> Inactivo
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="actions-cell">
+                                <a href="{% url 'tecnicos:detalle' tecnico.pk %}"
+                                   class="btn-action btn-view"
+                                   title="Ver detalle">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'tecnicos:editar' tecnico.pk %}"
+                                   class="btn-action btn-edit"
+                                   title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'tecnicos:eliminar' tecnico.pk %}"
+                                   class="btn-action btn-delete"
+                                   title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Paginación -->
+            {% if tecnicos.has_other_pages %}
+                <div class="pagination-container">
+                    <nav>
+                        <ul class="pagination">
+                            {% if tecnicos.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if request.GET.busqueda %}&busqueda={{ request.GET.busqueda }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ tecnicos.previous_page_number }}{% if request.GET.busqueda %}&busqueda={{ request.GET.busqueda }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}">
+                                        <i class="fas fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Página {{ tecnicos.number }} de {{ tecnicos.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if tecnicos.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ tecnicos.next_page_number }}{% if request.GET.busqueda %}&busqueda={{ request.GET.busqueda }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}">
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ tecnicos.paginator.num_pages }}{% if request.GET.busqueda %}&busqueda={{ request.GET.busqueda }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-users-slash"></i>
+                <h3>No hay técnicos registrados</h3>
+                <p>Comienza registrando tu primer técnico</p>
+                <a href="{% url 'tecnicos:crear' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Registrar Técnico
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/theme-switcher.js' %}"></script>
+<script src="{% static 'js/tecnicos.js' %}"></script>
+{% endblock %}
+

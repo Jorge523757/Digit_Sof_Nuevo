@@ -1,0 +1,131 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Movimiento de Inventario - DIGT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h2 mb-2">
+                        <i class="fas fa-exchange-alt"></i> Movimiento de Inventario
+                    </h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'productos:lista' %}">Productos</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'productos:detalle' producto.pk %}">{{ producto.nombre_producto }}</a></li>
+                            <li class="breadcrumb-item active">Movimiento</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div>
+                    <a href="{% url 'productos:detalle' producto.pk %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+
+            <!-- Información del Producto -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-box"></i> Producto</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Nombre:</strong> {{ producto.nombre_producto }}</p>
+                            <p><strong>Código SKU:</strong> {{ producto.codigo_sku }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Stock Actual:</strong> <span class="badge bg-primary fs-5">{{ producto.stock_actual }}</span></p>
+                            <p><strong>Stock Mínimo:</strong> {{ producto.stock_minimo }} | <strong>Stock Máximo:</strong> {{ producto.stock_maximo }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de Movimiento -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-exchange-alt"></i> Registrar Movimiento</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Error:</strong> Por favor corrige los errores a continuación.
+                        </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Producto</label>
+                                {{ form.producto }}
+                                <input type="hidden" name="producto" value="{{ producto.id }}">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tipo de Movimiento *</label>
+                                {{ form.tipo_movimiento }}
+                                {% if form.tipo_movimiento.errors %}
+                                    <div class="text-danger small">{{ form.tipo_movimiento.errors }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    <strong>Entrada/Devolución:</strong> Aumenta stock |
+                                    <strong>Salida/Ajuste:</strong> Disminuye stock
+                                </small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Cantidad *</label>
+                                {{ form.cantidad }}
+                                {% if form.cantidad.errors %}
+                                    <div class="text-danger small">{{ form.cantidad.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Motivo *</label>
+                                {{ form.motivo }}
+                                {% if form.motivo.errors %}
+                                    <div class="text-danger small">{{ form.motivo.errors }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Ej: Compra a proveedor, Venta a cliente, Corrección de inventario, etc.
+                                </small>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Observaciones</label>
+                                {{ form.observaciones }}
+                                {% if form.observaciones.errors %}
+                                    <div class="text-danger small">{{ form.observaciones.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'productos:detalle' producto.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Registrar Movimiento
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

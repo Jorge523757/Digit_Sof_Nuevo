@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Botones - Digit Soft</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 50px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .console-output {
+            background: #2d2d2d;
+            color: #0f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            height: 400px;
+            overflow-y: auto;
+        }
+        .console-line {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="test-card">
+            <h1><i class="fas fa-bug me-2"></i>Test de Botones - E-commerce</h1>
+            <p class="text-muted">Esta página simula los botones del e-commerce para diagnosticar problemas</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="test-card">
+                    <h3><i class="fas fa-shopping-cart me-2"></i>Botón de Prueba</h3>
+                    <p>Este botón simula el comportamiento del botón "Agregar al Carrito"</p>
+
+                    <button class="btn btn-success btn-lg w-100"
+                            id="testButton"
+                            onclick="testAddToCart(1); return false;">
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        Agregar al Carrito (Test)
+                    </button>
+
+                    <hr>
+
+                    <h4 class="mt-4">Información</h4>
+                    <ul>
+                        <li><strong>URL del servidor:</strong> <span id="server-url">http://127.0.0.1:8000</span></li>
+                        <li><strong>Endpoint:</strong> /tienda/carrito/agregar/</li>
+                        <li><strong>Producto ID:</strong> 1</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="test-card">
+                    <h3><i class="fas fa-terminal me-2"></i>Consola (Output)</h3>
+                    <div class="console-output" id="console"></div>
+                    <button class="btn btn-secondary mt-2" onclick="clearConsole()">
+                        <i class="fas fa-eraser me-2"></i>Limpiar Consola
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-card">
+            <h3><i class="fas fa-check-circle me-2"></i>Checklist</h3>
+            <div id="checklist">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="check1">
+                    <label class="form-check-label" for="check1">
+                        Servidor Django corriendo en puerto 8000
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="check2">
+                    <label class="form-check-label" for="check2">
+                        CSRF Token presente
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="check3">
+                    <label class="form-check-label" for="check3">
+                        Función addToCart definida
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="check4">
+                    <label class="form-check-label" for="check4">
+                        Respuesta exitosa del servidor
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const consoleDiv = document.getElementById('console');
+
+        function log(message, type = 'info') {
+            const line = document.createElement('div');
+            line.className = 'console-line';
+
+            let color = '#0f0'; // verde
+            if (type === 'error') color = '#f00'; // rojo
+            if (type === 'warning') color = '#ff0'; // amarillo
+            if (type === 'success') color = '#0ff'; // cyan
+
+            line.style.color = color;
+            line.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleDiv.appendChild(line);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        function clearConsole() {
+            consoleDiv.innerHTML = '';
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        async function testAddToCart(productoId) {
+            log('🚀 === INICIANDO TEST ===', 'info');
+            log('📦 Producto ID: ' + productoId, 'info');
+
+            // Verificar checklist
+            const button = document.getElementById('testButton');
+            const originalText = button.innerHTML;
+
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Procesando...';
+            button.disabled = true;
+
+            // 1. Verificar CSRF Token
+            const csrfToken = getCookie('csrftoken');
+            if (csrfToken) {
+                log('✅ CSRF Token: Presente', 'success');
+                document.getElementById('check2').checked = true;
+            } else {
+                log('❌ CSRF Token: FALTA - Necesitas abrir primero http://127.0.0.1:8000/', 'error');
+                button.innerHTML = originalText;
+                button.disabled = false;
+                return;
+            }
+
+            // 2. Verificar función addToCart
+            document.getElementById('check3').checked = true;
+            log('✅ Función testAddToCart: Definida', 'success');
+
+            // 3. Hacer petición
+            const url = 'http://127.0.0.1:8000/tienda/carrito/agregar/';
+            log('📍 Enviando POST a: ' + url, 'info');
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        producto_id: productoId,
+                        cantidad: 1
+                    })
+                });
+
+                log('📥 Response status: ' + response.status, response.ok ? 'success' : 'error');
+
+                if (!response.ok) {
+                    if (response.status === 0) {
+                        log('❌ Error: Servidor no responde. ¿Está Django corriendo?', 'error');
+                        document.getElementById('check1').checked = false;
+                    } else {
+                        log('❌ Error HTTP: ' + response.status, 'error');
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                } else {
+                    document.getElementById('check1').checked = true;
+                }
+
+                const data = await response.json();
+                log('📦 Response data: ' + JSON.stringify(data), 'info');
+
+                if (data.success) {
+                    log('✅ ¡ÉXITO! Producto agregado al carrito', 'success');
+                    document.getElementById('check4').checked = true;
+
+                    button.innerHTML = '<i class="fas fa-check me-2"></i>¡Funcionó!';
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-primary');
+
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.classList.remove('btn-primary');
+                        button.classList.add('btn-success');
+                        button.disabled = false;
+                    }, 3000);
+                } else {
+                    log('❌ Error del servidor: ' + data.error, 'error');
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+            } catch (error) {
+                log('❌ Error catch: ' + error.message, 'error');
+                log('Posibles causas:', 'warning');
+                log('  • Django no está corriendo', 'warning');
+                log('  • La URL es incorrecta', 'warning');
+                log('  • Problema con CORS', 'warning');
+
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+
+            log('🏁 === TEST COMPLETADO ===', 'info');
+        }
+
+        // Inicialización
+        window.addEventListener('DOMContentLoaded', function() {
+            log('🌐 Página de test cargada', 'info');
+            log('👉 Abre primero http://127.0.0.1:8000/ para obtener el CSRF token', 'warning');
+            log('👉 Luego haz click en el botón de prueba', 'warning');
+            log('', 'info');
+        });
+    </script>
+</body>
+</html>
+
