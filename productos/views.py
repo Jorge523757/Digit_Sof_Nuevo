@@ -708,7 +708,8 @@ def ver_carrito(request):
     context = {
         'productos_carrito': productos_carrito,
         'total': total,
-        'cantidad_items': len(productos_carrito)
+        'cantidad_items': len(productos_carrito),
+        'usuario_autenticado': request.user.is_authenticated  # Para mostrar botón de login si es necesario
     }
 
     return render(request, 'ecommerce/carrito.html', context)

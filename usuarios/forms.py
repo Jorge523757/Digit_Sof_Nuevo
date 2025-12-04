@@ -153,3 +153,80 @@ class PerfilUsuarioForm(forms.ModelForm):
             'foto': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
+
+class UsuarioCrearForm(UserCreationForm):
+    """Formulario para que administradores creen nuevos usuarios"""
+
+    email = forms.EmailField(
+        required=True,
+        label="Correo Electrónico",
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'correo@ejemplo.com'
+        })
+    )
+    first_name = forms.CharField(
+        max_length=100,
+        required=True,
+        label="Nombres",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nombres del usuario'
+        })
+    )
+    last_name = forms.CharField(
+        max_length=100,
+        required=True,
+        label="Apellidos",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Apellidos del usuario'
+        })
+    )
+    is_staff = forms.BooleanField(
+        required=False,
+        label="¿Es personal autorizado (Staff)?",
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    is_active = forms.BooleanField(
+        required=False,
+        initial=True,
+        label="¿Usuario activo?",
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2', 'is_staff', 'is_active']
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre de usuario'
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password1'].widget.attrs.update({'class': 'form-control'})
+        self.fields['password2'].widget.attrs.update({'class': 'form-control'})
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError('Este correo electrónico ya está registrado.')
+        return email
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.is_staff = self.cleaned_data.get('is_staff', False)
+        user.is_active = self.cleaned_data.get('is_active', True)
+
+        if commit:
+            user.save()
+
+        return user
+
+
