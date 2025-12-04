@@ -159,7 +159,7 @@ Página principal: Funciona ✓
 cls
 color 0A
 echo ============================================================
-echo    DIGT SOFT - INICIANDO SISTEMA COMPLETO
+echo    DIGIT SOFT - INICIANDO SISTEMA COMPLETO
 echo ============================================================
 echo.
 echo Deteniendo procesos anteriores...

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}DIGT SOFT - Sistema de Gestión Empresarial{% endblock %}
+{% block title %}DIGITSOFT - Sistema de Gestión Empresarial{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -1106,7 +1106,7 @@
 <nav class="navbar navbar-expand-lg navbar-light navbar-custom fixed-top">
     <div class="container">
         <a class="navbar-brand" href="{% url 'core:home' %}">
-            <i class="fas fa-cube"></i> DIGT SOFT
+            <i class="fas fa-cube"></i> DIGITSOFT
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -1161,17 +1161,17 @@
 
         <!-- Slides del Carrusel -->
         <div class="carousel-inner">
-            <!-- Slide 1 - Fachada Digit Soft -->
+            <!-- Slide 1 - Fachada DIGITSOFT -->
             <div class="carousel-item active">
                 <div class="carousel-image-wrapper">
-                    <img src="{% static 'images/fachada-digit-soft.jpg' %}" class="d-block w-100" alt="Fachada DIGT SOFT">
+                    <img src="{% static 'images/fachada-digit-soft.jpg' %}" class="d-block w-100" alt="Fachada DIGITSOFT">
                     <div class="carousel-overlay"></div>
                 </div>
                 <div class="carousel-caption-custom">
                     <div class="container">
                         <div class="row align-items-center">
                             <div class="col-lg-8 mx-auto text-center">
-                                <h1 class="display-3 fw-bold mb-4 animate-slide-up">Bienvenido a DIGT SOFT</h1>
+                                <h1 class="display-3 fw-bold mb-4 animate-slide-up">Bienvenido a DIGITSOFT</h1>
                                 <p class="lead mb-4 animate-slide-up animation-delay-1">Tu aliado tecnológico en soluciones informáticas integrales</p>
                                 <div class="animate-slide-up animation-delay-2">
                                     {% if user.is_authenticated %}

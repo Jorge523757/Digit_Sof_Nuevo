@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if buscar %}Búsqueda: {{ buscar }}{% else %}Productos{% endif %} - Digit Soft</title>
+    <title>{% if buscar %}Búsqueda: {{ buscar }}{% else %}Productos{% endif %} - DIGITSOFT</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -153,6 +153,62 @@
         .pagination-container {
             margin-top: 2rem;
         }
+
+        /* Estilos para filtros activos */
+        .filter-chip {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .filter-chip .badge {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+            font-weight: 500;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-remove-filter {
+            background: none;
+            border: none;
+            color: white;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .btn-remove-filter:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .btn-remove-filter i {
+            font-size: 0.7rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #active-filters {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
     </style>
 </head>
 <body>
@@ -163,20 +219,26 @@
                 <div class="col-md-2">
                     <h4 class="mb-0">
                         <i class="fas fa-laptop-code me-2"></i>
-                        Digit Soft
+                        DIGITSOFT
                     </h4>
                 </div>
                 <div class="col-md-8">
                     <!-- Barra de búsqueda -->
-                    <form method="GET" class="search-bar">
+                    <form method="GET" class="search-bar" role="search" id="searchForm">
                         <div class="input-group">
-                            <input type="text" class="form-control" name="q"
+                            <input type="text"
+                                   class="form-control"
+                                   name="q"
+                                   id="searchInput"
                                    value="{{ buscar|default:'' }}"
-                                   placeholder="Buscar productos, marcas, modelos...">
+                                   placeholder="Buscar productos, marcas, modelos..."
+                                   autocomplete="off">
                             <button class="btn btn-light" type="submit">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
+                        <!-- Indicador de resultados -->
+                        <small class="text-white-50 results-count" id="resultsCount"></small>
                     </form>
                 </div>
                 <div class="col-md-2 text-end">
@@ -258,6 +320,54 @@
 
             <!-- Contenido Principal -->
             <div class="col-md-9">
+                <!-- Filtros Activos (Chips) -->
+                <div id="active-filters" class="mb-3" style="display: none;">
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                        <span class="text-muted me-2">
+                            <i class="fas fa-filter"></i> Filtros activos:
+                        </span>
+
+                        <!-- Chip de búsqueda -->
+                        <div id="filter-search-chip" class="filter-chip" style="display: none;">
+                            <span class="badge bg-primary d-inline-flex align-items-center">
+                                <i class="fas fa-search me-1"></i>
+                                <span id="filter-search-text"></span>
+                                <button class="btn-remove-filter ms-2" onclick="removeSearchFilter()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </span>
+                        </div>
+
+                        <!-- Chip de categoría -->
+                        <div id="filter-category-chip" class="filter-chip" style="display: none;">
+                            <span class="badge bg-info d-inline-flex align-items-center">
+                                <i class="fas fa-tag me-1"></i>
+                                <span id="filter-category-text"></span>
+                                <button class="btn-remove-filter ms-2" onclick="removeCategoryFilter()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </span>
+                        </div>
+
+                        <!-- Chip de ordenamiento -->
+                        <div id="filter-order-chip" class="filter-chip" style="display: none;">
+                            <span class="badge bg-success d-inline-flex align-items-center">
+                                <i class="fas fa-sort me-1"></i>
+                                <span id="filter-order-text"></span>
+                                <button class="btn-remove-filter ms-2" onclick="removeOrderFilter()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </span>
+                        </div>
+
+                        <!-- Botón limpiar todos los filtros -->
+                        <button class="btn btn-sm btn-outline-danger" onclick="clearAllFilters()">
+                            <i class="fas fa-times-circle me-1"></i>
+                            Limpiar todos los filtros
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Productos Destacados -->
                 {% if productos_destacados and not buscar %}
                 <div class="featured-products text-center">
@@ -467,13 +577,433 @@
     <script>
         console.log('🚀 Productos.html cargado');
 
+        // ========================================
+        // BÚSQUEDA DINÁMICA
+        // ========================================
+        let searchTimeout = null;
+        let currentCategory = '{{ categoria_actual|default:"" }}';
+        let currentOrden = '{{ ordenar|default:"nombre" }}';
+        let currentQuery = '{{ buscar|default:"" }}';
+
+        // Mapeo de nombres de ordenamiento
+        const ordenNombres = {
+            'nombre': 'Nombre A-Z',
+            'precio_asc': 'Precio: Menor a Mayor',
+            'precio_desc': 'Precio: Mayor a Menor',
+            'nuevo': 'Más Nuevos',
+            'stock': 'Mayor Stock'
+        };
+
+        // ========================================
+        // GESTIÓN DE FILTROS ACTIVOS
+        // ========================================
+
+        // Actualizar visualización de filtros activos
+        function updateActiveFilters() {
+            const activeFiltersContainer = document.getElementById('active-filters');
+            const searchChip = document.getElementById('filter-search-chip');
+            const categoryChip = document.getElementById('filter-category-chip');
+            const orderChip = document.getElementById('filter-order-chip');
+
+            let hasActiveFilters = false;
+
+            // Chip de búsqueda
+            if (currentQuery) {
+                document.getElementById('filter-search-text').textContent = `Búsqueda: "${currentQuery}"`;
+                searchChip.style.display = 'inline-block';
+                hasActiveFilters = true;
+            } else {
+                searchChip.style.display = 'none';
+            }
+
+            // Chip de categoría
+            if (currentCategory) {
+                const categoryLink = document.querySelector(`a[href*="categoria=${currentCategory}"]`);
+                const categoryName = categoryLink ? categoryLink.textContent.trim() : `Categoría ${currentCategory}`;
+                document.getElementById('filter-category-text').textContent = `Categoría: ${categoryName}`;
+                categoryChip.style.display = 'inline-block';
+                hasActiveFilters = true;
+            } else {
+                categoryChip.style.display = 'none';
+            }
+
+            // Chip de ordenamiento (solo si no es el default)
+            if (currentOrden && currentOrden !== 'nombre') {
+                document.getElementById('filter-order-text').textContent = ordenNombres[currentOrden] || currentOrden;
+                orderChip.style.display = 'inline-block';
+                hasActiveFilters = true;
+            } else {
+                orderChip.style.display = 'none';
+            }
+
+            // Mostrar u ocultar contenedor de filtros activos
+            activeFiltersContainer.style.display = hasActiveFilters ? 'block' : 'none';
+        }
+
+        // Eliminar filtro de búsqueda
+        function removeSearchFilter() {
+            currentQuery = '';
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = '';
+            performDynamicSearch('', currentCategory, currentOrden);
+        }
+
+        // Eliminar filtro de categoría
+        function removeCategoryFilter() {
+            currentCategory = '';
+
+            // Actualizar estado visual de las categorías
+            const categoryLinks = document.querySelectorAll('.filters-sidebar a[href*="categoria"]');
+            categoryLinks.forEach(link => {
+                link.classList.remove('fw-bold', 'text-primary');
+            });
+
+            const allCategoriesLink = document.querySelector('.filters-sidebar a[href*="ecommerce:productos"]');
+            if (allCategoriesLink) {
+                allCategoriesLink.classList.add('fw-bold');
+            }
+
+            performDynamicSearch(currentQuery, '', currentOrden);
+        }
+
+        // Eliminar filtro de ordenamiento
+        function removeOrderFilter() {
+            currentOrden = 'nombre';
+            const selectOrden = document.getElementById('ordenar');
+            if (selectOrden) selectOrden.value = 'nombre';
+            performDynamicSearch(currentQuery, currentCategory, 'nombre');
+        }
+
+        // Limpiar todos los filtros
+        function clearAllFilters() {
+            currentQuery = '';
+            currentCategory = '';
+            currentOrden = 'nombre';
+
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = '';
+
+            const selectOrden = document.getElementById('ordenar');
+            if (selectOrden) selectOrden.value = 'nombre';
+
+            // Actualizar estado visual de las categorías
+            const categoryLinks = document.querySelectorAll('.filters-sidebar a[href*="categoria"]');
+            categoryLinks.forEach(link => {
+                link.classList.remove('fw-bold', 'text-primary');
+            });
+
+            const allCategoriesLink = document.querySelector('.filters-sidebar a[href*="ecommerce:productos"]');
+            if (allCategoriesLink) {
+                allCategoriesLink.classList.add('fw-bold');
+            }
+
+            // Mostrar notificación
+            showNotification('✅ Todos los filtros han sido eliminados', 'success');
+
+            performDynamicSearch('', '', 'nombre');
+        }
+
+        // Inicializar búsqueda dinámica
+        document.addEventListener('DOMContentLoaded', function() {
+            // Actualizar filtros activos al cargar
+            updateActiveFilters();
+
+            const searchInput = document.getElementById('searchInput');
+
+            if (searchInput) {
+                // Búsqueda al escribir (con delay)
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    const query = this.value.trim();
+                    currentQuery = query;
+
+                    // Esperar 500ms después de que el usuario deje de escribir
+                    searchTimeout = setTimeout(() => {
+                        if (query.length >= 2 || query.length === 0) {
+                            performDynamicSearch(query, currentCategory, currentOrden);
+                        }
+                    }, 500);
+                });
+
+                // Búsqueda al presionar Enter
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        clearTimeout(searchTimeout);
+                        const query = this.value.trim();
+                        performDynamicSearch(query, currentCategory, currentOrden);
+                    }
+                });
+            }
+
+            // Hacer que los links de categoría usen búsqueda dinámica
+            const categoryLinks = document.querySelectorAll('.filters-sidebar a[href*="categoria"]');
+            categoryLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = new URL(this.href, window.location.origin);
+                    const categoria = url.searchParams.get('categoria') || '';
+                    currentCategory = categoria;
+
+                    // Actualizar estado visual
+                    categoryLinks.forEach(l => {
+                        l.classList.remove('fw-bold', 'text-primary');
+                    });
+                    this.classList.add('fw-bold', 'text-primary');
+
+                    const query = searchInput ? searchInput.value.trim() : '';
+                    performDynamicSearch(query, categoria, currentOrden);
+                });
+            });
+
+            // Link "Todas las categorías"
+            const allCategoriesLink = document.querySelector('.filters-sidebar a[href*="ecommerce:productos"]');
+            if (allCategoriesLink) {
+                allCategoriesLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentCategory = '';
+
+                    // Actualizar estado visual
+                    categoryLinks.forEach(l => {
+                        l.classList.remove('fw-bold', 'text-primary');
+                    });
+                    this.classList.add('fw-bold');
+
+                    const query = searchInput ? searchInput.value.trim() : '';
+                    performDynamicSearch(query, '', currentOrden);
+                });
+            }
+        });
+
+        // Realizar búsqueda dinámica
+        async function performDynamicSearch(query = '', categoria = '', orden = 'nombre') {
+            const resultsContainer = document.querySelector('.row:has(.product-card)');
+
+            if (!resultsContainer) {
+                console.error('No se encontró el contenedor de resultados');
+                return;
+            }
+
+            // Mostrar loading
+            showLoadingProducts(resultsContainer);
+
+            try {
+                // Construir URL de la API
+                let url = '/tienda/api/buscar/?';
+                if (query) url += `q=${encodeURIComponent(query)}&`;
+                if (categoria) url += `categoria=${encodeURIComponent(categoria)}&`;
+                if (orden) url += `orden=${encodeURIComponent(orden)}`;
+
+                console.log('🔍 Buscando:', url);
+
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayDynamicResults(data.productos, resultsContainer);
+                    updateResultsCount(data.total);
+                } else {
+                    showError('Error al buscar productos');
+                }
+            } catch (error) {
+                console.error('Error en búsqueda dinámica:', error);
+                // Si falla, recargar la página con los parámetros
+                let redirectUrl = '/tienda/?';
+                if (query) redirectUrl += `q=${encodeURIComponent(query)}&`;
+                if (categoria) redirectUrl += `categoria=${encodeURIComponent(categoria)}&`;
+                if (orden) redirectUrl += `orden=${encodeURIComponent(orden)}`;
+                window.location.href = redirectUrl;
+            }
+        }
+
+        // Mostrar loading
+        function showLoadingProducts(container) {
+            container.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Buscando...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Buscando productos...</p>
+                </div>
+            `;
+        }
+
+        // Mostrar resultados dinámicos
+        function displayDynamicResults(productos, container) {
+            if (productos.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-warning text-center">
+                            <i class="fas fa-search fa-3x mb-3"></i>
+                            <h4>No se encontraron productos</h4>
+                            <p>Intenta con otros términos de búsqueda</p>
+                            <button onclick="clearDynamicSearch()" class="btn btn-primary mt-2">
+                                <i class="fas fa-redo"></i> Ver todos los productos
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            productos.forEach(producto => {
+                html += generateProductCard(producto);
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Generar tarjeta de producto
+        function generateProductCard(producto) {
+            const imagen = producto.imagen || '';
+            const stockClass = producto.stock > 10 ? 'stock-high' : producto.stock > 5 ? 'stock-medium' : 'stock-low';
+            let stockIcon = 'check-circle';
+            let stockText = `En stock (${producto.stock})`;
+
+            if (producto.stock <= 0) {
+                stockIcon = 'times-circle';
+                stockText = 'Sin stock';
+            } else if (producto.stock <= 5) {
+                stockIcon = 'exclamation-circle';
+                stockText = `¡Solo quedan ${producto.stock}!`;
+            } else if (producto.stock <= 10) {
+                stockIcon = 'exclamation-triangle';
+                stockText = `Pocas unidades (${producto.stock})`;
+            }
+
+            const nombreCorto = producto.nombre.length > 50 ? producto.nombre.substring(0, 50) + '...' : producto.nombre;
+            const descripcionCorta = producto.descripcion ?
+                (producto.descripcion.length > 80 ? producto.descripcion.substring(0, 80) + '...' : producto.descripcion) : '';
+
+            const precioFormateado = new Intl.NumberFormat('es-CO', {
+                style: 'decimal',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(producto.precio);
+
+            const precioMayoristaFormateado = producto.precio_mayorista ?
+                new Intl.NumberFormat('es-CO', {
+                    style: 'decimal',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(producto.precio_mayorista) : null;
+
+            const isAuthenticated = {{ user.is_authenticated|lower }};
+
+            let botonesHTML = '';
+            if (isAuthenticated) {
+                if (producto.stock > 0) {
+                    botonesHTML = `
+                        <button class="btn btn-add-cart flex-grow-1" onclick="addToCart(${producto.id})">
+                            <i class="fas fa-cart-plus me-1"></i> Agregar
+                        </button>
+                    `;
+                } else {
+                    botonesHTML = `
+                        <button class="btn btn-secondary flex-grow-1" disabled>
+                            <i class="fas fa-ban me-1"></i> Sin Stock
+                        </button>
+                    `;
+                }
+            } else {
+                botonesHTML = `
+                    <a href="/usuarios/login/?next=/tienda/" class="btn btn-add-cart flex-grow-1">
+                        <i class="fas fa-sign-in-alt me-1"></i> Iniciar Sesión
+                    </a>
+                `;
+            }
+
+            return `
+                <div class="col-md-4 col-lg-3 mb-4">
+                    <div class="card product-card position-relative h-100">
+                        ${producto.precio_mayorista ? '<div class="discount-badge">OFERTA</div>' : ''}
+                        <div class="product-image">
+                            ${imagen ? `<img src="${imagen}" alt="${producto.nombre}">` : '<i class="fas fa-laptop-code no-image"></i>'}
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            ${producto.marca ? `<small class="text-muted">${producto.marca}</small>` : ''}
+                            <h6 class="card-title">
+                                <a href="${producto.url}" class="text-decoration-none text-dark">
+                                    ${nombreCorto}
+                                </a>
+                            </h6>
+                            ${descripcionCorta ? `<p class="card-text text-muted small mb-2">${descripcionCorta}</p>` : ''}
+                            ${producto.procesador || producto.memoria_ram ? `
+                                <div class="mb-2">
+                                    ${producto.procesador ? `<small class="badge bg-light text-dark me-1">${producto.procesador.substring(0, 15)}</small>` : ''}
+                                    ${producto.memoria_ram ? `<small class="badge bg-light text-dark">${producto.memoria_ram}</small>` : ''}
+                                </div>
+                            ` : ''}
+                            <div class="mt-auto">
+                                <div class="price-section mb-2">
+                                    ${producto.precio_mayorista ? `
+                                        <div class="price-original">$${precioFormateado}</div>
+                                        <div class="price-sale">$${precioMayoristaFormateado}</div>
+                                    ` : `
+                                        <div class="price-sale">$${precioFormateado}</div>
+                                    `}
+                                </div>
+                                <div class="stock-info mb-2">
+                                    <span class="stock-badge ${stockClass}">
+                                        <i class="fas fa-${stockIcon}"></i> ${stockText}
+                                    </span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    ${botonesHTML}
+                                    <a href="${producto.url}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Actualizar contador de resultados
+        function updateResultsCount(total) {
+            const countElement = document.getElementById('resultsCount');
+            if (countElement) {
+                countElement.textContent = `${total} producto${total !== 1 ? 's' : ''} encontrado${total !== 1 ? 's' : ''}`;
+                countElement.style.display = 'block';
+            }
+
+            // Actualizar también en estadísticas del sidebar
+            const statsElement = document.querySelector('.filters-sidebar .bg-light p:first-of-type strong');
+            if (statsElement) {
+                statsElement.textContent = total;
+            }
+        }
+
+        // Limpiar búsqueda dinámica
+        function clearDynamicSearch() {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = '';
+            currentCategory = 'todas';
+            performDynamicSearch('', 'todas');
+        }
+
+        // ========================================
+        // FUNCIONES ORIGINALES
+        // ========================================
+
         // Función para cambiar el orden
         function changeOrder() {
             const select = document.getElementById('ordenar');
-            const currentUrl = new URL(window.location);
-            currentUrl.searchParams.set('orden', select.value);
-            currentUrl.searchParams.set('page', '1');
-            window.location.href = currentUrl.toString();
+            currentOrden = select.value;
+
+            const searchInput = document.getElementById('searchInput');
+            const query = searchInput ? searchInput.value.trim() : '';
+
+            // Usar búsqueda dinámica con el nuevo orden
+            performDynamicSearch(query, currentCategory, currentOrden);
         }
 
         // Función para agregar al carrito

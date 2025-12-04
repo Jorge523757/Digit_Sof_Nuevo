@@ -1,4 +1,4 @@
-# 📋 Instrucciones de Desarrollo - DIGT SOFT
+# 📋 Instrucciones de Desarrollo - DIGIT SOFT
 
 ## ✅ Estado del Proyecto
 - ✅ Proyecto subido a GitHub: https://github.com/Jorge523757/Digit_Sof_Nuevo

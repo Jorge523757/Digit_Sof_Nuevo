@@ -27,8 +27,8 @@ urlpatterns = [
     path('capacitaciones/', include('capacitaciones.urls')),
 ]
 
-admin.site.site_header = "DIGT SOFT - Sistema de Gestión"
-admin.site.site_title = "DIGT SOFT Admin"
+admin.site.site_header = "DIGIT SOFT - Sistema de Gestión"
+admin.site.site_title = "DIGIT SOFT Admin"
 admin.site.index_title = "Panel de Administración"
 
 if settings.DEBUG:

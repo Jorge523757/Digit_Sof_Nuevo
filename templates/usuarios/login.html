@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Iniciar Sesión - DIGT SOFT{% endblock %}
+{% block title %}Iniciar Sesión - DIGITSOFT{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -377,6 +377,13 @@
                 <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
             </button>
         </form>
+
+        <!-- Enlace de recuperación de contraseña -->
+        <div class="text-center mt-3 mb-3">
+            <a href="{% url 'usuarios:recuperar_password' %}" style="color: #667eea; text-decoration: none; font-size: 0.9rem; transition: all 0.3s ease;">
+                <i class="fas fa-key"></i> ¿Olvidaste tu contraseña?
+            </a>
+        </div>
 
         <div class="register-link">
             <p>¿No tienes cuenta?</p>

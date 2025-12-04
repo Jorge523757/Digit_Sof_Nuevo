@@ -162,7 +162,7 @@ Contraseña: admin123
    - Fecha inicio: (fecha futura, ej: 7 días desde hoy)
    - Fecha fin: (fecha inicio + 2 días)
    - Duración horas: `16`
-   - Lugar: `Centro de Capacitación DIGT SOFT`
+   - Lugar: `Centro de Capacitación DIGIT SOFT`
    - Modalidad: `PRESENCIAL`
    - Estado: `PROGRAMADA`
    - Cupo máximo: `15`

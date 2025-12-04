@@ -230,3 +230,61 @@ class UsuarioCrearForm(UserCreationForm):
         return user
 
 
+class RecuperarPasswordForm(forms.Form):
+    """Formulario para solicitar recuperación de contraseña"""
+
+    email = forms.EmailField(
+        required=True,
+        label="Correo Electrónico",
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ingresa tu correo electrónico',
+            'autofocus': True
+        }),
+        help_text='Ingresa el correo con el que te registraste'
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if not User.objects.filter(email=email).exists():
+            raise forms.ValidationError('No existe ninguna cuenta con este correo electrónico.')
+        return email
+
+
+class ResetPasswordForm(forms.Form):
+    """Formulario para resetear la contraseña con token"""
+
+    new_password1 = forms.CharField(
+        required=True,
+        label="Nueva Contraseña",
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ingresa tu nueva contraseña',
+            'minlength': '8'
+        }),
+        min_length=8,
+        help_text='La contraseña debe tener al menos 8 caracteres'
+    )
+
+    new_password2 = forms.CharField(
+        required=True,
+        label="Confirmar Nueva Contraseña",
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Confirma tu nueva contraseña',
+            'minlength': '8'
+        }),
+        min_length=8
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('new_password1')
+        password2 = cleaned_data.get('new_password2')
+
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError('Las contraseñas no coinciden.')
+
+        return cleaned_data
+
+

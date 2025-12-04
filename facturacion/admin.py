@@ -1,5 +1,5 @@
 """
-DIGT SOFT - Admin del Módulo de Facturación
+DIGIT SOFT - Admin del Módulo de Facturación
 """
 
 from django.contrib import admin

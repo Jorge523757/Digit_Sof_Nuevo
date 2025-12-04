@@ -1,5 +1,5 @@
 """
-DIGT SOFT - Módulo de Clientes
+DIGIT SOFT - Módulo de Clientes
 Views - HU1: Gestión de Clientes (RF1-RF4)
 """
 

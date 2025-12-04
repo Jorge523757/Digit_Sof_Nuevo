@@ -1,5 +1,5 @@
 """
-DIGT SOFT - Módulo de Clientes
+DIGIT SOFT - Módulo de Clientes
 URLs
 """
 

@@ -11,6 +11,7 @@ urlpatterns = [
     # API pública
     path('api/publicos/', views.api_productos_publicos, name='api_publicos'),
     path('api/reaccion/', views.api_reaccion_producto, name='api_reaccion'),
+    path('api/buscar/', views.api_buscar_productos, name='api_buscar'),  # Nueva API de búsqueda
     path('detalle/<int:pk>/', views.producto_detalle_publico, name='detalle_publico'),
 
     # Lista y búsqueda

@@ -592,6 +592,50 @@ def producto_detalle_publico(request, pk):
     return render(request, 'productos/detalle_publico.html', context)
 
 
+def api_buscar_productos(request):
+    """API para búsqueda dinámica de productos"""
+    query = request.GET.get('q', '')
+    categoria = request.GET.get('categoria', '')
+
+    # Base queryset
+    productos = Producto.objects.filter(activo=True, disponible_web=True)
+
+    # Aplicar búsqueda
+    if query:
+        productos = productos.filter(
+            Q(nombre_producto__icontains=query) |
+            Q(marca__icontains=query) |
+            Q(descripcion__icontains=query) |
+            Q(codigo_sku__icontains=query)
+        )
+
+    # Aplicar filtro de categoría
+    if categoria and categoria != 'todas':
+        productos = productos.filter(categoria__nombre__icontains=categoria)
+
+    # Limitar resultados
+    productos = productos[:20]
+
+    # Serializar productos
+    productos_data = []
+    for producto in productos:
+        productos_data.append({
+            'id': producto.id,
+            'nombre': producto.nombre_producto,
+            'marca': producto.marca or '',
+            'precio': float(producto.precio_venta),
+            'stock': producto.stock_actual,
+            'imagen': producto.imagen.url if producto.imagen else None,
+            'url': f'/tienda/producto/{producto.id}/',
+        })
+
+    return JsonResponse({
+        'success': True,
+        'productos': productos_data,
+        'total': len(productos_data)
+    })
+
+
 # =======================
 # VISTAS DEL E-COMMERCE
 # =======================
@@ -602,47 +646,66 @@ def productos_ecommerce(request):
 
     # Obtener parámetros de filtrado
     categoria = request.GET.get('categoria')
-    busqueda = request.GET.get('q')
+    busqueda = request.GET.get('q', '').strip()
     orden = request.GET.get('orden', 'nombre')
 
     # Filtros
     if categoria and categoria != 'todas':
-        productos = productos.filter(categoria__nombre__icontains=categoria)
+        # Intentar filtrar por ID primero, si falla usar nombre
+        try:
+            categoria_id = int(categoria)
+            productos = productos.filter(categoria_id=categoria_id)
+        except (ValueError, TypeError):
+            productos = productos.filter(categoria__nombre__icontains=categoria)
 
     if busqueda:
         productos = productos.filter(
             Q(nombre_producto__icontains=busqueda) |
             Q(descripcion__icontains=busqueda) |
-            Q(marca__icontains=busqueda)
+            Q(marca__icontains=busqueda) |
+            Q(modelo_equipo__icontains=busqueda)
         )
 
     # Ordenamiento
-    if orden == 'precio_asc':
-        productos = productos.order_by('precio_venta')
-    elif orden == 'precio_desc':
-        productos = productos.order_by('-precio_venta')
-    elif orden == 'fecha':
-        productos = productos.order_by('-fecha_creacion')
-    elif orden == 'stock':
-        productos = productos.order_by('-stock_actual')
-    else:
-        productos = productos.order_by('nombre_producto')
+    orden_map = {
+        'nombre': 'nombre_producto',
+        'precio_asc': 'precio_venta',
+        'precio_desc': '-precio_venta',
+        'nuevo': '-fecha_creacion',
+        'stock': '-stock_actual'
+    }
+    productos = productos.order_by(orden_map.get(orden, 'nombre_producto'))
+
+    # Contar total ANTES de paginar
+    total_productos = productos.count()
 
     # Paginación
     paginator = Paginator(productos, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    # Categorías para el filtro
-    categorias = CategoriaProducto.objects.all()
+    # Categorías para el filtro (solo las que tienen productos)
+    categorias = CategoriaProducto.objects.filter(activo=True)
+
+    # Productos destacados (solo si no hay búsqueda)
+    productos_destacados = []
+    if not busqueda:
+        productos_destacados = Producto.objects.filter(
+            activo=True,
+            disponible_web=True,
+            destacado=True,
+            stock_actual__gt=0
+        )[:6]
 
     context = {
-        'productos': page_obj,
+        'productos': page_obj.object_list,
+        'page_obj': page_obj,
+        'productos_destacados': productos_destacados,
         'categorias': categorias,
         'categoria_actual': categoria,
-        'busqueda_actual': busqueda,
-        'orden_actual': orden,
-        'total_productos': productos.count(),
+        'buscar': busqueda,
+        'ordenar': orden,
+        'total_productos': total_productos,
     }
 
     return render(request, 'ecommerce/productos.html', context)
@@ -665,6 +728,69 @@ def producto_detalle_ecommerce(request, producto_id):
     }
 
     return render(request, 'ecommerce/producto_detalle.html', context)
+
+
+def buscar_productos_api(request):
+    """API para búsqueda dinámica de productos"""
+    query = request.GET.get('q', '').strip()
+    categoria_id = request.GET.get('categoria', '')
+    orden = request.GET.get('orden', 'nombre')
+
+    # Query base
+    productos = Producto.objects.filter(activo=True, disponible_web=True, stock_actual__gt=0)
+
+    # Filtrar por búsqueda
+    if query:
+        productos = productos.filter(
+            Q(nombre_producto__icontains=query) |
+            Q(descripcion__icontains=query) |
+            Q(marca__icontains=query) |
+            Q(modelo_equipo__icontains=query)
+        )
+
+    # Filtrar por categoría
+    if categoria_id and categoria_id != 'todas':
+        try:
+            productos = productos.filter(categoria_id=int(categoria_id))
+        except (ValueError, TypeError):
+            pass
+
+    # Ordenar
+    orden_map = {
+        'nombre': 'nombre_producto',
+        'precio_asc': 'precio_venta',
+        'precio_desc': '-precio_venta',
+        'nuevo': '-fecha_creacion',
+        'stock': '-stock_actual'
+    }
+    productos = productos.order_by(orden_map.get(orden, 'nombre_producto'))
+
+    # Limitar resultados
+    productos = productos[:24]
+
+    # Serializar productos
+    productos_data = []
+    for p in productos:
+        productos_data.append({
+            'id': p.id,
+            'nombre': p.nombre_producto,
+            'descripcion': p.descripcion or '',
+            'precio': float(p.precio_venta),
+            'precio_mayorista': float(p.precio_mayorista) if p.precio_mayorista else None,
+            'stock': p.stock_actual,
+            'marca': p.marca or '',
+            'modelo': p.modelo_equipo or '',
+            'imagen': p.imagen.url if p.imagen else '',
+            'url': f'/tienda/producto/{p.id}/',
+            'procesador': p.procesador or '',
+            'memoria_ram': p.memoria_ram or '',
+        })
+
+    return JsonResponse({
+        'success': True,
+        'productos': productos_data,
+        'total': len(productos_data)
+    })
 
 
 def obtener_carrito(request):

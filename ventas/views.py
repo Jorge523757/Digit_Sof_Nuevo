@@ -1,5 +1,5 @@
 """
-DIGT SOFT - Vistas del Módulo de Ventas
+DIGITSOFT - Vistas del Módulo de Ventas
 Integrado con E-commerce y Productos
 """
 

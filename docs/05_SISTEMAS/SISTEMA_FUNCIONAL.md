@@ -1,4 +1,4 @@
-# 🎉 DIGT SOFT - Sistema Completamente Funcional
+# 🎉 DIGIT SOFT - Sistema Completamente Funcional
 
 ## ✅ ESTADO DEL PROYECTO
 
@@ -297,7 +297,7 @@ Digit_Sof_Nuevo/
 - ✅ Control de inventario
 - ✅ Garantías
 
-**Desarrollado por:** DIGT SOFT Team
+**Desarrollado por:** DIGIT SOFT Team
 **Fecha:** Diciembre 2024
 **Versión:** 1.0.0
 **Framework:** Django 5.1.3 + Python 3.13

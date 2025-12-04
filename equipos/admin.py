@@ -1,5 +1,5 @@
 """
-DIGT SOFT - Admin del Módulo de Equipos
+DIGIT SOFT - Admin del Módulo de Equipos
 """
 
 from django.contrib import admin

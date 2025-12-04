@@ -1,5 +1,5 @@
 """
-DIGT SOFT - Formularios del Módulo de Ventas
+DIGITSOFT - Formularios del Módulo de Ventas
 """
 
 from django import forms

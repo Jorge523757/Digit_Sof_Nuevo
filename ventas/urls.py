@@ -1,5 +1,5 @@
 """
-DIGT SOFT - URLs del Módulo de Ventas
+DIGITSOFT - URLs del Módulo de Ventas
 """
 
 from django.urls import path

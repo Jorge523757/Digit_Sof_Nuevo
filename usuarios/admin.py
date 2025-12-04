@@ -202,3 +202,65 @@ class PerfilUsuarioAdmin(admin.ModelAdmin):
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
+
+# ==============================================
+# ADMIN DE TOKENS DE RECUPERACIÓN
+# ==============================================
+
+from .models import PasswordResetToken
+
+
+@admin.register(PasswordResetToken)
+class PasswordResetTokenAdmin(admin.ModelAdmin):
+    """Admin para tokens de recuperación de contraseña"""
+    
+    list_display = [
+        'user', 'token_corto', 'created_at', 'estado_display', 'used_at'
+    ]
+    list_filter = ['used', 'created_at']
+    search_fields = ['user__username', 'user__email', 'token']
+    readonly_fields = ['token', 'created_at', 'used_at']
+    date_hierarchy = 'created_at'
+    
+    fieldsets = (
+        ('Información del Token', {
+            'fields': ('user', 'token', 'created_at')
+        }),
+        ('Estado', {
+            'fields': ('used', 'used_at')
+        }),
+    )
+    
+    def token_corto(self, obj):
+        """Muestra una versión corta del token"""
+        token_str = str(obj.token)
+        return f"{token_str[:8]}...{token_str[-8:]}"
+    token_corto.short_description = "Token"
+    
+    def estado_display(self, obj):
+        """Muestra el estado del token con colores"""
+        if obj.used:
+            return format_html(
+                '<span style="background-color: #95a5a6; color: white; '
+                'padding: 3px 10px; border-radius: 3px; font-weight: bold;">'
+                '<i class="fas fa-check"></i> USADO</span>'
+            )
+        elif obj.is_valid():
+            return format_html(
+                '<span style="background-color: #2ecc71; color: white; '
+                'padding: 3px 10px; border-radius: 3px; font-weight: bold;">'
+                '<i class="fas fa-clock"></i> VÁLIDO</span>'
+            )
+        else:
+            return format_html(
+                '<span style="background-color: #e74c3c; color: white; '
+                'padding: 3px 10px; border-radius: 3px; font-weight: bold;">'
+                '<i class="fas fa-times"></i> EXPIRADO</span>'
+            )
+    estado_display.short_description = "Estado"
+    
+    def has_add_permission(self, request):
+        """No permitir agregar tokens manualmente"""
+        return False
+
+

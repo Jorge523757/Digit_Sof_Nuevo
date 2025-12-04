@@ -1,5 +1,5 @@
 """
-DIGT SOFT - Módulo de Facturación
+DIGIT SOFT - Módulo de Facturación
 Models - Gestión de Facturas Electrónicas
 """
 

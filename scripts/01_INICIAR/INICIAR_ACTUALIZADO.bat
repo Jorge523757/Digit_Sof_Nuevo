@@ -2,7 +2,7 @@
 cls
 color 0A
 echo ============================================================
-echo    DIGT SOFT - Sistema Actualizado y Profesional
+echo    DIGIT SOFT - Sistema Actualizado y Profesional
 echo ============================================================
 echo.
 echo [CORRECCIONES APLICADAS]

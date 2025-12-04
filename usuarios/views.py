@@ -141,6 +141,143 @@ def cambiar_contrasena(request):
     return render(request, 'usuarios/cambiar_contrasena.html', {'form': form})
 
 
+# ==================== RECUPERACIÓN DE CONTRASEÑA ====================
+
+def recuperar_password(request):
+    """Vista para solicitar recuperación de contraseña"""
+    from .forms import RecuperarPasswordForm
+    from .models import PasswordResetToken
+    from django.core.mail import send_mail
+    from django.conf import settings
+
+    if request.user.is_authenticated:
+        return redirect('dashboard:index')
+
+    if request.method == 'POST':
+        form = RecuperarPasswordForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            user = User.objects.get(email=email)
+
+            # Crear token de recuperación
+            token = PasswordResetToken.create_token(user)
+
+            # Construir URL de reset
+            reset_url = request.build_absolute_uri(
+                f'/usuarios/reset-password/{token.token}/'
+            )
+
+            # Enviar email (en desarrollo, solo mostrar mensaje)
+            try:
+                # Mensaje de email
+                subject = 'Recuperación de Contraseña - DIGITSOFT'
+                message = f"""
+Hola {user.first_name or user.username},
+
+Has solicitado recuperar tu contraseña en DIGITSOFT.
+
+Para crear una nueva contraseña, haz clic en el siguiente enlace:
+{reset_url}
+
+Este enlace es válido por 24 horas.
+
+Si no solicitaste este cambio, puedes ignorar este mensaje.
+
+Saludos,
+Equipo DIGITSOFT
+"""
+
+                # En desarrollo, solo mostrar en consola
+                print("=" * 80)
+                print("EMAIL DE RECUPERACIÓN")
+                print("=" * 80)
+                print(f"Para: {email}")
+                print(f"Asunto: {subject}")
+                print(message)
+                print("=" * 80)
+                print(f"URL de reset: {reset_url}")
+                print("=" * 80)
+
+                # Intentar enviar email (si está configurado)
+                # send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+
+                messages.success(
+                    request,
+                    f'✅ Se ha enviado un correo a {email} con las instrucciones para recuperar tu contraseña. '
+                    f'Por favor revisa tu bandeja de entrada y spam.'
+                )
+
+                # En desarrollo, también mostrar el link directamente
+                messages.info(
+                    request,
+                    f'🔗 Link de recuperación (solo en desarrollo): '
+                    f'<a href="{reset_url}" class="alert-link">Click aquí para resetear</a>'
+                )
+
+                return redirect('usuarios:login')
+
+            except Exception as e:
+                messages.error(request, f'Error al enviar el correo: {str(e)}')
+    else:
+        form = RecuperarPasswordForm()
+
+    return render(request, 'usuarios/recuperar_password.html', {'form': form})
+
+
+def reset_password(request, token):
+    """Vista para resetear la contraseña con token"""
+    from .forms import ResetPasswordForm
+    from .models import PasswordResetToken
+
+    try:
+        reset_token = PasswordResetToken.objects.get(token=token)
+
+        # Verificar si el token es válido
+        if not reset_token.is_valid():
+            messages.error(
+                request,
+                '❌ Este enlace de recuperación ha expirado o ya fue usado. '
+                'Por favor solicita uno nuevo.'
+            )
+            return redirect('usuarios:recuperar_password')
+
+        if request.method == 'POST':
+            form = ResetPasswordForm(request.POST)
+            if form.is_valid():
+                # Cambiar la contraseña
+                new_password = form.cleaned_data['new_password1']
+                user = reset_token.user
+                user.set_password(new_password)
+                user.save()
+
+                # Marcar token como usado
+                reset_token.mark_as_used()
+
+                messages.success(
+                    request,
+                    '✅ Tu contraseña ha sido cambiada exitosamente. '
+                    'Ahora puedes iniciar sesión con tu nueva contraseña.'
+                )
+                return redirect('usuarios:login')
+        else:
+            form = ResetPasswordForm()
+
+        context = {
+            'form': form,
+            'token': token,
+            'user': reset_token.user
+        }
+        return render(request, 'usuarios/reset_password.html', context)
+
+    except PasswordResetToken.DoesNotExist:
+        messages.error(
+            request,
+            '❌ El enlace de recuperación no es válido. '
+            'Por favor solicita uno nuevo.'
+        )
+        return redirect('usuarios:recuperar_password')
+
+
 # ==================== GESTIÓN DE USUARIOS (ADMIN) ====================
 
 @login_required

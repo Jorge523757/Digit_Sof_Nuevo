@@ -92,7 +92,7 @@ Admin → Capacitaciones → Agregar
 - Fecha inicio: (7 días desde hoy)
 - Fecha fin: (9 días desde hoy)
 - Duración: 16 horas
-- Lugar: Centro DIGT SOFT
+- Lugar: Centro DIGIT SOFT
 - Modalidad: PRESENCIAL
 - Estado: PROGRAMADA
 - Cupo: 15

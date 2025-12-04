@@ -1,5 +1,5 @@
 """
-DIGT SOFT - Sistema de Gestión Empresarial
+DIGIT SOFT - Sistema de Gestión Empresarial
 Configuración Principal
 """
 
