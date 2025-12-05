@@ -1,0 +1,270 @@
+/* ============================================
+   Z-INDEX FIX - DIGITSOFT
+   Corrige problemas de superposición de elementos
+   ============================================ */
+
+/* Jerarquía de z-index:
+   - Contenido principal: 1-10
+   - Header/Nav: 100-200
+   - Sidebar: 900-1000
+   - Widgets flotantes: 1030-1040
+   - Modales: 1050-1060
+   - Tooltips: 1070-1080
+*/
+
+/* ============================================
+   CONTENIDO PRINCIPAL - SIEMPRE VISIBLE
+   ============================================ */
+
+.main-wrapper,
+.main-content {
+    position: relative;
+    z-index: 1 !important;
+    background: #f8f9fa;
+}
+
+.container-fluid {
+    position: relative;
+    z-index: 2 !important;
+}
+
+/* Cards y tablas */
+.card,
+.table-responsive,
+.module-header,
+.search-box {
+    position: relative;
+    z-index: 5 !important;
+}
+
+/* ============================================
+   HEADER Y NAVEGACIÓN
+   ============================================ */
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100 !important;
+}
+
+.header-container {
+    position: relative;
+    z-index: 101 !important;
+}
+
+.navbar {
+    z-index: 100 !important;
+}
+
+.navbar-menu,
+.dropdown-menu {
+    z-index: 105 !important;
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+
+.sidebar {
+    position: fixed;
+    z-index: 900 !important;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    z-index: 899 !important;
+}
+
+/* ============================================
+   BOTONES Y WIDGETS FLOTANTES
+   ============================================ */
+
+.floating-widgets-container {
+    position: fixed;
+    z-index: 1030 !important;
+}
+
+.accessibility-widget {
+    position: relative;
+    z-index: 1035 !important;
+}
+
+.accessibility-toggle {
+    position: relative;
+    z-index: 1035 !important;
+}
+
+.accessibility-panel {
+    position: fixed;
+    z-index: 1040 !important;
+}
+
+.whatsapp-widget {
+    position: relative;
+    z-index: 1032 !important;
+}
+
+.whatsapp-float-btn {
+    position: relative;
+    z-index: 1032 !important;
+}
+
+/* ============================================
+   MODALES Y OVERLAYS
+   ============================================ */
+
+.modal {
+    z-index: 1055 !important;
+}
+
+.modal-backdrop {
+    z-index: 1050 !important;
+}
+
+/* ============================================
+   TOOLTIPS Y POPOVERS
+   ============================================ */
+
+.tooltip {
+    z-index: 1070 !important;
+}
+
+.popover {
+    z-index: 1075 !important;
+}
+
+/* ============================================
+   MENSAJES Y ALERTAS
+   ============================================ */
+
+.messages,
+.alert {
+    position: relative;
+    z-index: 10 !important;
+}
+
+.accessibility-notification {
+    position: fixed;
+    z-index: 1060 !important;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+footer {
+    position: relative;
+    z-index: 1 !important;
+}
+
+/* ============================================
+   FIX PARA TABLAS QUE NO SE VEN
+   ============================================ */
+
+table,
+table thead,
+table tbody,
+table tr,
+table td,
+table th {
+    position: relative;
+    z-index: auto !important;
+    visibility: visible !important;
+    display: table !important;
+    opacity: 1 !important;
+}
+
+table thead {
+    display: table-header-group !important;
+}
+
+table tbody {
+    display: table-row-group !important;
+}
+
+table tr {
+    display: table-row !important;
+}
+
+table td,
+table th {
+    display: table-cell !important;
+}
+
+/* ============================================
+   ASEGURAR VISIBILIDAD DE ELEMENTOS CRÍTICOS
+   ============================================ */
+
+.card-body,
+.table-responsive,
+.module-header,
+.search-box,
+.filters-section {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* ============================================
+   RESPONSIVE - NO TAPAR CONTENIDO
+   ============================================ */
+
+@media (max-width: 768px) {
+    /* Asegurar que widgets no tapen contenido en móvil */
+    body {
+        padding-bottom: 100px !important;
+    }
+
+    .main-content {
+        padding-bottom: 120px !important;
+    }
+
+    /* Widgets flotantes más pequeños en móvil */
+    .floating-widgets-container {
+        right: 15px;
+        bottom: 15px;
+        gap: 10px;
+    }
+
+    .accessibility-toggle,
+    .whatsapp-float-btn {
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 1.5rem !important;
+    }
+
+    /* Panel de accesibilidad responsive */
+    .accessibility-panel {
+        right: 10px;
+        bottom: 80px;
+        width: 280px;
+        max-width: calc(100vw - 20px);
+    }
+}
+
+@media (max-width: 576px) {
+    .accessibility-toggle,
+    .whatsapp-float-btn {
+        width: 45px !important;
+        height: 45px !important;
+        font-size: 1.3rem !important;
+    }
+}
+
+/* ============================================
+   DEBUG - REMOVER EN PRODUCCIÓN
+   ============================================ */
+
+/* Descomentar para debug visual de z-index
+.main-content {
+    outline: 2px solid green !important;
+}
+
+.card {
+    outline: 1px solid blue !important;
+}
+
+.floating-widgets-container {
+    outline: 2px solid red !important;
+}
+*/
+

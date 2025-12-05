@@ -86,18 +86,24 @@ def checkout_carrito(request):
 @login_required
 @csrf_exempt
 def procesar_compra(request):
-    """Procesar la compra y generar factura"""
+    """Procesar la compra y generar factura con registro profesional"""
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Método no permitido'})
 
     try:
         from ventas.models import Venta, DetalleVenta
+        from compras.models import Compra, DetalleCompra
+        from facturacion.models import Factura
         from clientes.models import Cliente
+        from proveedores.models import Proveedor
         from django.utils import timezone
+        from django.db import transaction
+        from datetime import timedelta
         import random
 
         data = json.loads(request.body)
         metodo_pago = data.get('metodo_pago', 'EFECTIVO')
+        requiere_factura = data.get('requiere_factura', True)  # Por defecto siempre generar factura
 
         # Obtener datos del cliente del formulario
         cliente_data = {
@@ -114,139 +120,231 @@ def procesar_compra(request):
         if not carrito:
             return JsonResponse({'success': False, 'error': 'Carrito vacío'})
 
-        # Buscar o crear cliente
-        cliente = None
-        try:
-            # Buscar por correo primero
-            cliente = Cliente.objects.filter(correo=cliente_data['correo']).first()
-
-            if cliente:
-                # Actualizar datos del cliente si cambió algo
-                cliente.nombres = cliente_data['nombres'] or cliente.nombres
-                cliente.apellidos = cliente_data['apellidos'] or cliente.apellidos
-                cliente.numero_documento = cliente_data['numero_documento'] or cliente.numero_documento
-                cliente.telefono = cliente_data['telefono'] or cliente.telefono
-                cliente.direccion = cliente_data['direccion'] or cliente.direccion
-                cliente.save()
-            else:
-                # Crear nuevo cliente
-                cliente = Cliente.objects.create(
-                    nombres=cliente_data['nombres'] or request.user.first_name or 'Cliente',
-                    apellidos=cliente_data['apellidos'] or request.user.last_name or 'Web',
-                    numero_documento=cliente_data['numero_documento'] or f'WEB-{request.user.id}',
-                    telefono=cliente_data['telefono'] or 'Sin teléfono',
-                    correo=cliente_data['correo'],
-                    direccion=cliente_data['direccion'] or 'Sin dirección',
-                    activo=True
-                )
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': f'Error al procesar datos del cliente: {str(e)}'})
-
-        # Calcular totales
-        subtotal = Decimal('0')
-        productos_venta = []
-
-        for producto_id, item in carrito.items():
+        # Usar transacción atómica para asegurar consistencia
+        with transaction.atomic():
+            # Buscar o crear cliente
+            cliente = None
             try:
-                producto = Producto.objects.get(id=producto_id, activo=True)
+                # Buscar por correo primero
+                cliente = Cliente.objects.filter(correo=cliente_data['correo']).first()
 
-                # Verificar stock
-                if item['cantidad'] > producto.stock_actual:
-                    return JsonResponse({
-                        'success': False,
-                        'error': f'Stock insuficiente para {producto.nombre_producto}'
+                if cliente:
+                    # Actualizar datos del cliente si cambió algo
+                    cliente.nombres = cliente_data['nombres'] or cliente.nombres
+                    cliente.apellidos = cliente_data['apellidos'] or cliente.apellidos
+                    cliente.numero_documento = cliente_data['numero_documento'] or cliente.numero_documento
+                    cliente.telefono = cliente_data['telefono'] or cliente.telefono
+                    cliente.direccion = cliente_data['direccion'] or cliente.direccion
+                    cliente.save()
+                else:
+                    # Crear nuevo cliente
+                    cliente = Cliente.objects.create(
+                        nombres=cliente_data['nombres'] or request.user.first_name or 'Cliente',
+                        apellidos=cliente_data['apellidos'] or request.user.last_name or 'Web',
+                        numero_documento=cliente_data['numero_documento'] or f'WEB-{request.user.id}',
+                        telefono=cliente_data['telefono'] or 'Sin teléfono',
+                        correo=cliente_data['correo'],
+                        direccion=cliente_data['direccion'] or 'Sin dirección',
+                        activo=True
+                    )
+            except Exception as e:
+                return JsonResponse({'success': False, 'error': f'Error al procesar datos del cliente: {str(e)}'})
+
+            # Calcular totales
+            subtotal = Decimal('0')
+            productos_venta = []
+
+            for producto_id, item in carrito.items():
+                try:
+                    producto = Producto.objects.get(id=producto_id, activo=True)
+
+                    # Verificar stock
+                    if item['cantidad'] > producto.stock_actual:
+                        return JsonResponse({
+                            'success': False,
+                            'error': f'Stock insuficiente para {producto.nombre_producto}'
+                        })
+
+                    precio = Decimal(str(item['precio']))
+                    cantidad = item['cantidad']
+                    subtotal_item = precio * cantidad
+                    subtotal += subtotal_item
+
+                    productos_venta.append({
+                        'producto': producto,
+                        'cantidad': cantidad,
+                        'precio': precio,
+                        'subtotal': subtotal_item
                     })
+                except Producto.DoesNotExist:
+                    continue
 
-                precio = Decimal(str(item['precio']))
-                cantidad = item['cantidad']
-                subtotal_item = precio * cantidad
-                subtotal += subtotal_item
+            if not productos_venta:
+                return JsonResponse({'success': False, 'error': 'No hay productos válidos en el carrito'})
 
-                productos_venta.append({
-                    'producto': producto,
-                    'cantidad': cantidad,
-                    'precio': precio,
-                    'subtotal': subtotal_item
-                })
-            except Producto.DoesNotExist:
-                continue
+            # Calcular impuestos y total
+            impuestos = subtotal * Decimal('0.19')
+            total = subtotal + impuestos
 
-        if not productos_venta:
-            return JsonResponse({'success': False, 'error': 'No hay productos válidos en el carrito'})
+            # Crear la venta
+            numero_venta = f"VEN-{timezone.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"
 
-        # Calcular impuestos y total
-        impuestos = subtotal * Decimal('0.19')
-        total = subtotal + impuestos
-
-        # Crear la venta
-        numero_venta = f"VEN-{timezone.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"
-
-        venta = Venta.objects.create(
-            numero_venta=numero_venta,
-            cliente=cliente,
-            estado='COMPLETADA',
-            canal_venta='WEB',
-            subtotal=subtotal,
-            descuento=Decimal('0'),
-            impuestos=impuestos,
-            total=total,
-            metodo_pago=metodo_pago,
-            observaciones='Compra desde e-commerce'
-        )
-
-        # Crear detalles de la venta y actualizar stock
-        for item in productos_venta:
-            producto = item['producto']
-
-            DetalleVenta.objects.create(
-                venta=venta,
-                producto=producto,
-                cantidad=item['cantidad'],
-                precio_unitario=item['precio'],
-                subtotal=item['subtotal']
+            venta = Venta.objects.create(
+                numero_venta=numero_venta,
+                cliente=cliente,
+                usuario=request.user if hasattr(Venta, 'usuario') else None,  # Asociar usuario si el campo existe
+                estado='COMPLETADA',
+                canal_venta='WEB',
+                subtotal=subtotal,
+                descuento=Decimal('0'),
+                impuestos=impuestos,
+                total=total,
+                metodo_pago=metodo_pago,
+                pagado=True,
+                fecha_pago=timezone.now(),
+                observaciones=f'Compra realizada por {request.user.get_full_name() or request.user.username} desde e-commerce'
             )
 
-            # Actualizar stock
-            producto.stock_actual -= item['cantidad']
-            producto.save()
+            # Crear detalles de la venta y actualizar stock
+            for item in productos_venta:
+                producto = item['producto']
 
-        # Limpiar carrito
-        request.session['carrito'] = {}
-        request.session.modified = True
+                DetalleVenta.objects.create(
+                    venta=venta,
+                    producto=producto,
+                    cantidad=item['cantidad'],
+                    precio_unitario=item['precio'],
+                    subtotal=item['subtotal']
+                )
 
-        return JsonResponse({
-            'success': True,
-            'message': '✅ Compra procesada exitosamente',
-            'venta_id': venta.id,
-            'numero_venta': venta.numero_venta,
-            'total': float(total)
-        })
+                # Actualizar stock
+                producto.stock_actual -= item['cantidad']
+                producto.save()
+
+            # CREAR FACTURA EN MÓDULO DE FACTURACIÓN
+            if requiere_factura:
+                # Calcular fecha de vencimiento (30 días)
+                fecha_vencimiento = timezone.now().date() + timedelta(days=30)
+
+                factura = Factura.objects.create(
+                    cliente=cliente,
+                    venta=venta,
+                    tipo_factura='VENTA',
+                    estado='EMITIDA' if metodo_pago != 'CREDITO' else 'BORRADOR',
+                    fecha_vencimiento=fecha_vencimiento,
+                    fecha_pago=timezone.now().date() if metodo_pago != 'CREDITO' else None,
+                    subtotal=subtotal,
+                    iva=impuestos,
+                    total=total,
+                    observaciones=f'Factura electrónica generada automáticamente - Venta: {numero_venta} - Usuario: {request.user.get_full_name() or request.user.username}'
+                )
+                factura_id = factura.id
+                numero_factura = factura.numero_factura
+            else:
+                factura_id = None
+                numero_factura = None
+
+            # REGISTRAR EN MÓDULO DE COMPRAS PROFESIONALMENTE
+            # Obtener o crear proveedor por defecto para compras web
+            proveedor, created = Proveedor.objects.get_or_create(
+                nombre_empresa='COMPRAS WEB E-COMMERCE',
+                defaults={
+                    'nit': '999999999-9',
+                    'nombre_contacto': 'Sistema Web',
+                    'telefono': '0000000000',
+                    'email': 'web@digitsoft.com',
+                    'direccion': 'Sistema de E-commerce',
+                    'activo': True
+                }
+            )
+
+            # Crear registro de compra
+            numero_compra = f"COMP-{timezone.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"
+
+            compra = Compra.objects.create(
+                numero_compra=numero_compra,
+                proveedor=proveedor,
+                usuario=request.user if hasattr(Compra, 'usuario') else None,  # Asociar usuario si el campo existe
+                estado='COMPLETADA',
+                subtotal=subtotal,
+                impuestos=impuestos,
+                descuento=Decimal('0'),
+                total=total,
+                metodo_pago=metodo_pago,
+                pagado=True,
+                fecha_pago=timezone.now(),
+                observaciones=f'Compra web - Cliente: {cliente.nombre_completo} - Venta: {numero_venta} - Factura: {numero_factura or "N/A"}',
+                responsable=request.user.get_full_name() or request.user.username
+            )
+
+            # Crear detalles de compra
+            for item in productos_venta:
+                DetalleCompra.objects.create(
+                    compra=compra,
+                    producto=item['producto'],
+                    cantidad=item['cantidad'],
+                    precio_unitario=item['precio'],
+                    subtotal=item['subtotal'],
+                    recibido=True,
+                    fecha_recepcion=timezone.now()
+                )
+
+            # Limpiar carrito
+            request.session['carrito'] = {}
+            request.session.modified = True
+
+            return JsonResponse({
+                'success': True,
+                'message': '✅ Compra procesada exitosamente',
+                'venta_id': venta.id,
+                'numero_venta': venta.numero_venta,
+                'compra_id': compra.id,
+                'numero_compra': compra.numero_compra,
+                'factura_id': factura_id,
+                'numero_factura': numero_factura,
+                'total': float(total),
+                'usuario': request.user.get_full_name() or request.user.username
+            })
 
     except Exception as e:
-        return JsonResponse({'success': False, 'error': f'Error al procesar compra: {str(e)}'})
+        import traceback
+        return JsonResponse({
+            'success': False,
+            'error': f'Error al procesar compra: {str(e)}',
+            'detail': traceback.format_exc()
+        })
 
 
 @login_required
 def ver_factura(request, venta_id):
     """Ver factura de una venta"""
-    from ventas.models import Venta, DetalleVenta
+    try:
+        from ventas.models import Venta, DetalleVenta
 
-    venta = get_object_or_404(Venta, id=venta_id)
+        venta = get_object_or_404(Venta, id=venta_id)
 
-    # Verificar que el usuario tenga permiso para ver esta factura
-    if not request.user.is_staff and venta.cliente.usuario != request.user:
-        messages.error(request, 'No tienes permiso para ver esta factura')
-        return redirect('ecommerce:productos')
+        # Verificar que el usuario tenga permiso para ver esta factura
+        # Si el usuario es staff, puede ver todas las facturas
+        # Si no es staff, solo puede ver sus propias facturas
+        if not request.user.is_staff:
+            # Verificar si el usuario realizó esta venta
+            if hasattr(venta, 'usuario') and venta.usuario and venta.usuario != request.user:
+                messages.error(request, 'No tienes permiso para ver esta factura')
+                return redirect('ecommerce:productos')
 
-    detalles = DetalleVenta.objects.filter(venta=venta).select_related('producto')
+        detalles = DetalleVenta.objects.filter(venta=venta).select_related('producto')
 
-    context = {
-        'venta': venta,
-        'detalles': detalles,
-        'fecha_actual': timezone.now()
-    }
+        context = {
+            'venta': venta,
+            'detalles': detalles,
+            'fecha_actual': timezone.now()
+        }
 
-    return render(request, 'ecommerce/factura.html', context)
+        return render(request, 'ecommerce/factura_nueva.html', context)
+
+    except Exception as e:
+        messages.error(request, f'Error al cargar la factura: {str(e)}')
+        return redirect('ventas:lista')
 
 
 # VISTAS CRUD DE PRODUCTOS

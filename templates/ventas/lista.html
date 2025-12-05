@@ -1,106 +1,297 @@
 {% extends 'base_dashboard.html' %}
 {% load static %}
 
-{% block title %}Ventas - DIGT SOFT{% endblock %}
+{% block title %}Ventas - DIGITSOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-card {
+        border-left: 4px solid #667eea;
+        transition: transform 0.2s;
+    }
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .filter-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+    }
+    .filter-card .card-header {
+        background: rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    .filter-group {
+        background: rgba(255,255,255,0.1);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    .filter-group label {
+        color: white;
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+    .filter-group input,
+    .filter-group select {
+        background: rgba(255,255,255,0.9);
+        border: none;
+    }
+    .table-ventas {
+        font-size: 0.95rem;
+    }
+    .table-ventas thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    .table-ventas tbody tr:hover {
+        background-color: #f8f9fa;
+        cursor: pointer;
+    }
+    .badge-custom {
+        padding: 6px 12px;
+        font-weight: 500;
+    }
+    .action-buttons .btn {
+        margin: 2px;
+    }
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2><i class="fas fa-shopping-cart"></i> Sistema de Ventas</h2>
-            <p class="text-muted">Gestión completa de ventas y e-commerce</p>
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2><i class="fas fa-shopping-cart"></i> Sistema de Ventas</h2>
+                <p class="mb-0">Gestión completa de ventas y e-commerce</p>
+            </div>
+            <a href="{% url 'admin:ventas_venta_add' %}" class="btn btn-light btn-lg">
+                <i class="fas fa-plus"></i> Nueva Venta
+            </a>
         </div>
-        <a href="{% url 'admin:ventas_venta_add' %}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Nueva Venta
-        </a>
     </div>
 
-    <!-- Estadísticas -->
     <div class="row mb-4">
         <div class="col-md-3">
-            <div class="card">
+            <div class="card stats-card">
                 <div class="card-body">
-                    <h6 class="text-muted">Total Ventas</h6>
-                    <h3>{{ total_ventas }}</h3>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-2">Total Ventas</h6>
+                            <h3 class="mb-0">{{ total_ventas }}</h3>
+                        </div>
+                        <div class="text-primary">
+                            <i class="fas fa-shopping-bag fa-3x opacity-50"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card">
+            <div class="card stats-card" style="border-left-color: #28a745;">
                 <div class="card-body">
-                    <h6 class="text-muted">Completadas</h6>
-                    <h3 class="text-success">{{ ventas_completadas }}</h3>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-2">Completadas</h6>
+                            <h3 class="mb-0 text-success">{{ ventas_completadas }}</h3>
+                        </div>
+                        <div class="text-success">
+                            <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card">
+            <div class="card stats-card" style="border-left-color: #ffc107;">
                 <div class="card-body">
-                    <h6 class="text-muted">Pendientes</h6>
-                    <h3 class="text-warning">{{ ventas_pendientes }}</h3>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-2">Pendientes</h6>
+                            <h3 class="mb-0 text-warning">{{ ventas_pendientes }}</h3>
+                        </div>
+                        <div class="text-warning">
+                            <i class="fas fa-clock fa-3x opacity-50"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card">
+            <div class="card stats-card" style="border-left-color: #28a745;">
                 <div class="card-body">
-                    <h6 class="text-muted">Total Ingresos</h6>
-                    <h3 class="text-success">${{ total_ingresos|floatformat:0 }}</h3>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-2">Total Ingresos</h6>
+                            <h3 class="mb-0 text-success">${{ total_ingresos|floatformat:0 }}</h3>
+                        </div>
+                        <div class="text-success">
+                            <i class="fas fa-dollar-sign fa-3x opacity-50"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Tabla -->
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <span><i class="fas fa-list"></i> Listado de Ventas</span>
+    <div class="card filter-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-filter"></i> Filtros de Búsqueda
+                <button class="btn btn-sm btn-light float-end" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosAvanzados">
+                    <i class="fas fa-chevron-down"></i> Mostrar/Ocultar
+                </button>
+            </h5>
+        </div>
+        <div class="collapse show" id="filtrosAvanzados">
+            <div class="card-body">
+                <form method="get" id="filtrosForm">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="filter-group">
+                                <label><i class="fas fa-search"></i> Búsqueda General</label>
+                                <input type="text" name="busqueda" class="form-control" placeholder="Nº Venta, Cliente, Documento..." value="{{ busqueda }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="filter-group">
+                                <label><i class="fas fa-calendar-alt"></i> Fecha Desde</label>
+                                <input type="date" name="fecha_desde" class="form-control" value="{{ fecha_desde }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="filter-group">
+                                <label><i class="fas fa-calendar-check"></i> Fecha Hasta</label>
+                                <input type="date" name="fecha_hasta" class="form-control" value="{{ fecha_hasta }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="filter-group">
+                                <label><i class="fas fa-info-circle"></i> Estado</label>
+                                <select name="estado" class="form-select">
+                                    <option value="">Todos los estados</option>
+                                    {% for value, label in estados %}
+                                    <option value="{{ value }}" {% if estado == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="filter-group">
+                                <label><i class="fas fa-store"></i> Canal de Venta</label>
+                                <select name="canal" class="form-select">
+                                    <option value="">Todos los canales</option>
+                                    {% for value, label in canales %}
+                                    <option value="{{ value }}" {% if canal == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="filter-group">
+                                <label><i class="fas fa-credit-card"></i> Método de Pago</label>
+                                <select name="metodo_pago" class="form-select">
+                                    <option value="">Todos los métodos</option>
+                                    {% for value, label in metodos_pago %}
+                                    <option value="{{ value }}" {% if metodo_pago == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="text-white">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Resultados:</strong> {{ ventas_filtradas_count }} ventas | <strong>Total:</strong> ${{ ventas_filtradas_total|floatformat:0 }}
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-light me-2"><i class="fas fa-search"></i> Buscar</button>
+                            <a href="{% url 'ventas:lista' %}" class="btn btn-outline-light"><i class="fas fa-redo"></i> Limpiar</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0">
+                <i class="fas fa-list"></i> Listado de Ventas
+                <span class="badge bg-primary ms-2">{{ page_obj.paginator.count }} registros</span>
+            </h5>
             <div class="btn-group">
-                <a href="{% url 'ventas:reporte_pdf' %}?{{ request.GET.urlencode }}"
-                   class="btn btn-sm btn-danger" title="Descargar reporte en PDF">
+                <a href="{% url 'ventas:reporte_pdf' %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-danger" title="Descargar PDF">
                     <i class="fas fa-file-pdf"></i> PDF
                 </a>
-                <a href="{% url 'ventas:reporte_excel' %}?{{ request.GET.urlencode }}"
-                   class="btn btn-sm btn-success" title="Descargar reporte en Excel">
+                <a href="{% url 'ventas:reporte_excel' %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-success" title="Descargar Excel">
                     <i class="fas fa-file-excel"></i> Excel
                 </a>
             </div>
         </div>
-        <div class="card-body">
+        <div class="card-body p-0">
             {% if page_obj.object_list %}
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-ventas table-hover mb-0">
                     <thead>
                         <tr>
-                            <th>Nº Venta</th>
+                            <th class="ps-4">Nº Venta</th>
                             <th>Cliente</th>
-                            <th>Fecha</th>
+                            <th>Fecha y Hora</th>
                             <th>Canal</th>
-                            <th>Total</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
+                            <th>Método Pago</th>
+                            <th class="text-end">Total</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for venta in page_obj %}
                         <tr>
-                            <td><strong>{{ venta.numero_venta }}</strong></td>
-                            <td>{{ venta.cliente.nombre_completo }}</td>
-                            <td>{{ venta.fecha_venta|date:"d/m/Y H:i" }}</td>
-                            <td><span class="badge bg-info">{{ venta.get_canal_venta_display }}</span></td>
-                            <td><strong>${{ venta.total|floatformat:0 }}</strong></td>
+                            <td class="ps-4"><strong class="text-primary">{{ venta.numero_venta }}</strong></td>
                             <td>
-                                {% if venta.estado == 'COMPLETADA' %}
-                                    <span class="badge bg-success">{{ venta.get_estado_display }}</span>
-                                {% elif venta.estado == 'PENDIENTE' %}
-                                    <span class="badge bg-warning">{{ venta.get_estado_display }}</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">{{ venta.get_estado_display }}</span>
-                                {% endif %}
+                                <div>
+                                    <strong>{{ venta.cliente.nombre_completo }}</strong>
+                                    {% if venta.cliente.numero_documento %}
+                                    <br><small class="text-muted">{{ venta.cliente.numero_documento }}</small>
+                                    {% endif %}
+                                </div>
                             </td>
                             <td>
-                                <a href="{% url 'ventas:detalle' venta.pk %}" class="btn btn-sm btn-info">
+                                <div>
+                                    <i class="fas fa-calendar"></i> {{ venta.fecha_venta|date:"d/m/Y" }}
+                                    <br><small class="text-muted"><i class="fas fa-clock"></i> {{ venta.fecha_venta|date:"H:i" }}</small>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-custom bg-info">{{ venta.get_canal_venta_display }}</span></td>
+                            <td><span class="badge badge-custom bg-secondary">{{ venta.get_metodo_pago_display }}</span></td>
+                            <td class="text-end"><strong class="text-success">${{ venta.total|floatformat:0 }}</strong></td>
+                            <td class="text-center">
+                                {% if venta.estado == 'COMPLETADA' %}
+                                    <span class="badge badge-custom bg-success"><i class="fas fa-check-circle"></i> {{ venta.get_estado_display }}</span>
+                                {% elif venta.estado == 'PENDIENTE' %}
+                                    <span class="badge badge-custom bg-warning"><i class="fas fa-clock"></i> {{ venta.get_estado_display }}</span>
+                                {% elif venta.estado == 'CANCELADA' %}
+                                    <span class="badge badge-custom bg-danger"><i class="fas fa-times-circle"></i> {{ venta.get_estado_display }}</span>
+                                {% else %}
+                                    <span class="badge badge-custom bg-secondary">{{ venta.get_estado_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center action-buttons">
+                                <a href="{% url 'ventas:ver_factura' venta.pk %}" class="btn btn-sm btn-info" title="Ver Factura" data-bs-toggle="tooltip">
                                     <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'ventas:detalle' venta.pk %}" class="btn btn-sm btn-primary" title="Ver Detalle" data-bs-toggle="tooltip">
+                                    <i class="fas fa-info-circle"></i>
                                 </a>
                             </td>
                         </tr>
@@ -108,20 +299,57 @@
                     </tbody>
                 </table>
             </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer bg-white">
+                <nav>
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}"><i class="fas fa-angle-double-left"></i></a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}"><i class="fas fa-angle-left"></i></a>
+                        </li>
+                        {% endif %}
+                        <li class="page-item active"><span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}"><i class="fas fa-angle-right"></i></a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}"><i class="fas fa-angle-double-right"></i></a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+
             {% else %}
-            <div class="alert alert-info text-center">
-                <i class="fas fa-info-circle fa-3x mb-3"></i>
-                <h5>No hay ventas registradas</h5>
-                <p>Para agregar ventas, primero debes tener productos registrados.</p>
-                <a href="{% url 'admin:productos_producto_add' %}" class="btn btn-primary me-2">
-                    <i class="fas fa-box"></i> Agregar Productos
-                </a>
-                <a href="{% url 'admin:ventas_venta_add' %}" class="btn btn-success">
-                    <i class="fas fa-plus"></i> Agregar Venta
-                </a>
+            <div class="alert alert-info text-center m-4">
+                <i class="fas fa-info-circle fa-3x mb-3 d-block"></i>
+                <h5>No se encontraron ventas</h5>
+                {% if busqueda or estado or canal or metodo_pago or fecha_desde or fecha_hasta %}
+                <p>No hay ventas que coincidan con los filtros aplicados.</p>
+                <a href="{% url 'ventas:lista' %}" class="btn btn-primary"><i class="fas fa-redo"></i> Limpiar Filtros</a>
+                {% else %}
+                <p>Aún no hay ventas registradas en el sistema.</p>
+                <a href="{% url 'admin:ventas_venta_add' %}" class="btn btn-success"><i class="fas fa-plus"></i> Crear Primera Venta</a>
+                {% endif %}
             </div>
             {% endif %}
         </div>
     </div>
 </div>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+</script>
+{% endblock %}
+

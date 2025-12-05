@@ -15,8 +15,8 @@ from usuarios.decorators import staff_required
 @login_required
 @staff_required
 def ventas_lista(request):
-    """Lista de ventas con búsqueda y filtros"""
-    ventas = Venta.objects.select_related('cliente').all()
+    """Lista de ventas con búsqueda y filtros avanzados"""
+    ventas = Venta.objects.select_related('cliente').all().order_by('-fecha_venta')
 
     # Búsqueda simple
     busqueda = request.GET.get('busqueda', '')
@@ -24,27 +24,87 @@ def ventas_lista(request):
         ventas = ventas.filter(
             Q(numero_venta__icontains=busqueda) |
             Q(cliente__nombres__icontains=busqueda) |
-            Q(cliente__apellidos__icontains=busqueda)
+            Q(cliente__apellidos__icontains=busqueda) |
+            Q(cliente__numero_documento__icontains=busqueda)
         )
 
+    # Filtro por estado
+    estado = request.GET.get('estado', '')
+    if estado:
+        ventas = ventas.filter(estado=estado)
+
+    # Filtro por canal
+    canal = request.GET.get('canal', '')
+    if canal:
+        ventas = ventas.filter(canal_venta=canal)
+
+    # Filtro por método de pago
+    metodo_pago = request.GET.get('metodo_pago', '')
+    if metodo_pago:
+        ventas = ventas.filter(metodo_pago=metodo_pago)
+
+    # Filtro por rango de fechas
+    fecha_desde = request.GET.get('fecha_desde', '')
+    fecha_hasta = request.GET.get('fecha_hasta', '')
+
+    if fecha_desde:
+        from datetime import datetime
+        try:
+            fecha_desde_obj = datetime.strptime(fecha_desde, '%Y-%m-%d')
+            ventas = ventas.filter(fecha_venta__date__gte=fecha_desde_obj.date())
+        except ValueError:
+            pass
+
+    if fecha_hasta:
+        from datetime import datetime
+        try:
+            fecha_hasta_obj = datetime.strptime(fecha_hasta, '%Y-%m-%d')
+            ventas = ventas.filter(fecha_venta__date__lte=fecha_hasta_obj.date())
+        except ValueError:
+            pass
+
     # Paginación
-    paginator = Paginator(ventas, 20)
+    paginator = Paginator(ventas, 15)  # 15 ventas por página
     page_obj = paginator.get_page(request.GET.get('page'))
 
-    # Estadísticas
+    # Estadísticas generales
     total_ventas = Venta.objects.count()
     ventas_completadas = Venta.objects.filter(estado='COMPLETADA').count()
     ventas_pendientes = Venta.objects.filter(estado='PENDIENTE').count()
+    ventas_canceladas = Venta.objects.filter(estado='CANCELADA').count()
     total_ingresos = Venta.objects.filter(estado='COMPLETADA').aggregate(
         total=Sum('total')
     )['total'] or 0
+
+    # Estadísticas del filtro actual
+    ventas_filtradas = ventas.aggregate(
+        total=Sum('total'),
+        count=Count('id')
+    )
+
+    # Opciones para los filtros
+    estados = Venta.ESTADO_CHOICES
+    canales = Venta.CANAL_VENTA_CHOICES
+    metodos_pago = Venta.METODO_PAGO_CHOICES
 
     context = {
         'page_obj': page_obj,
         'total_ventas': total_ventas,
         'ventas_completadas': ventas_completadas,
         'ventas_pendientes': ventas_pendientes,
+        'ventas_canceladas': ventas_canceladas,
         'total_ingresos': total_ingresos,
+        'ventas_filtradas_count': ventas_filtradas['count'] or 0,
+        'ventas_filtradas_total': ventas_filtradas['total'] or 0,
+        'busqueda': busqueda,
+        'estado': estado,
+        'canal': canal,
+        'metodo_pago': metodo_pago,
+        'fecha_desde': fecha_desde,
+        'fecha_hasta': fecha_hasta,
+        'estados': estados,
+        'canales': canales,
+        'metodos_pago': metodos_pago,
     }
 
     return render(request, 'ventas/lista.html', context)

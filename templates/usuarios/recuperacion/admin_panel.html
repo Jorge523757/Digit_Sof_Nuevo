@@ -1,0 +1,462 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Gestión de Contraseñas - DIGITSOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+    }
+    .user-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: all 0.3s;
+    }
+    .user-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+    .user-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .user-info {
+        flex: 1;
+    }
+    .user-name {
+        font-weight: 600;
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 5px;
+    }
+    .user-email {
+        color: #666;
+        font-size: 14px;
+    }
+    .user-type-badge {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+    .badge-usuario { background: #667eea; color: white; }
+    .badge-cliente { background: #28a745; color: white; }
+    .badge-tecnico { background: #ffc107; color: #333; }
+    .badge-proveedor { background: #17a2b8; color: white; }
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    .btn-change-password {
+        flex: 1;
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-change-password:hover {
+        background: #c82333;
+        transform: translateY(-1px);
+    }
+    .btn-generate-temp {
+        flex: 1;
+        background: #ffc107;
+        color: #333;
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-generate-temp:hover {
+        background: #e0a800;
+        transform: translateY(-1px);
+    }
+    .search-box {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .search-box input {
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 12px 15px;
+        width: 100%;
+        font-size: 14px;
+    }
+    .tabs-container {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .nav-tabs .nav-link {
+        border: none;
+        color: #666;
+        font-weight: 600;
+        padding: 12px 24px;
+    }
+    .nav-tabs .nav-link.active {
+        color: #dc3545;
+        border-bottom: 3px solid #dc3545;
+    }
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    .stat-card i {
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+    .stat-card h3 {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    .stat-card p {
+        color: #666;
+        font-size: 14px;
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2><i class="fas fa-user-lock"></i> Gestión de Contraseñas</h2>
+                <p class="mb-0">Administra y restablece contraseñas de usuarios del sistema</p>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="mb-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <i class="fas fa-users text-primary"></i>
+            <h3>{{ usuarios_sistema.count }}</h3>
+            <p>Usuarios</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-user-tie text-success"></i>
+            <h3>{{ clientes.count }}</h3>
+            <p>Clientes</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-tools text-warning"></i>
+            <h3>{{ tecnicos.count }}</h3>
+            <p>Técnicos</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-truck text-info"></i>
+            <h3>{{ proveedores.count }}</h3>
+            <p>Proveedores</p>
+        </div>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="🔍 Buscar por nombre, email o usuario..." onkeyup="filterUsers()">
+    </div>
+
+    <div class="tabs-container">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#usuarios">
+                    <i class="fas fa-users"></i> Usuarios del Sistema
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#clientes">
+                    <i class="fas fa-user-tie"></i> Clientes
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#tecnicos">
+                    <i class="fas fa-tools"></i> Técnicos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#proveedores">
+                    <i class="fas fa-truck"></i> Proveedores
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-4">
+            <!-- USUARIOS -->
+            <div id="usuarios" class="tab-pane fade show active">
+                {% for usuario in usuarios_sistema %}
+                <div class="user-card" data-search="{{ usuario.username|lower }} {{ usuario.get_full_name|lower }} {{ usuario.email|lower }}">
+                    <div class="user-card-header">
+                        <div class="user-info">
+                            <div class="user-name">
+                                <i class="fas fa-user text-primary"></i>
+                                {{ usuario.get_full_name|default:usuario.username }}
+                                <span class="user-type-badge badge-usuario">Usuario</span>
+                                {% if usuario.is_superuser %}
+                                <span class="badge bg-danger">Admin</span>
+                                {% endif %}
+                            </div>
+                            <div class="user-email">
+                                <i class="fas fa-envelope"></i> {{ usuario.email|default:"Sin email" }}
+                                <span class="text-muted">|</span>
+                                <i class="fas fa-at"></i> {{ usuario.username }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-change-password" onclick="openPasswordModal('usuario', {{ usuario.id }}, '{{ usuario.get_full_name|default:usuario.username }}', '{{ usuario.email }}')">
+                            <i class="fas fa-key"></i> Cambiar Contraseña
+                        </button>
+                        <button class="btn-generate-temp" onclick="generateTempPassword('usuario', {{ usuario.id }}, '{{ usuario.get_full_name|default:usuario.username }}')">
+                            <i class="fas fa-random"></i> Generar Temporal
+                        </button>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-center text-muted">No hay usuarios registrados</p>
+                {% endfor %}
+            </div>
+
+            <!-- CLIENTES -->
+            <div id="clientes" class="tab-pane fade">
+                {% for cliente in clientes %}
+                <div class="user-card" data-search="{{ cliente.nombres|lower }} {{ cliente.apellidos|lower }} {{ cliente.email|lower }}">
+                    <div class="user-card-header">
+                        <div class="user-info">
+                            <div class="user-name">
+                                <i class="fas fa-user-tie text-success"></i>
+                                {{ cliente.nombre_completo }}
+                                <span class="user-type-badge badge-cliente">Cliente</span>
+                            </div>
+                            <div class="user-email">
+                                <i class="fas fa-envelope"></i> {{ cliente.email }}
+                                <span class="text-muted">|</span>
+                                <i class="fas fa-id-card"></i> {{ cliente.numero_documento }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        {% if cliente.usuario %}
+                        <button class="btn-change-password" onclick="openPasswordModal('cliente', {{ cliente.id }}, '{{ cliente.nombre_completo }}', '{{ cliente.email }}')">
+                            <i class="fas fa-key"></i> Cambiar Contraseña
+                        </button>
+                        <button class="btn-generate-temp" onclick="generateTempPassword('cliente', {{ cliente.id }}, '{{ cliente.nombre_completo }}')">
+                            <i class="fas fa-random"></i> Generar Temporal
+                        </button>
+                        {% else %}
+                        <button class="btn btn-secondary" disabled>
+                            <i class="fas fa-exclamation-triangle"></i> Sin usuario asociado
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-center text-muted">No hay clientes registrados</p>
+                {% endfor %}
+            </div>
+
+            <!-- TÉCNICOS -->
+            <div id="tecnicos" class="tab-pane fade">
+                {% for tecnico in tecnicos %}
+                <div class="user-card" data-search="{{ tecnico.nombres|lower }} {{ tecnico.apellidos|lower }} {{ tecnico.email|lower }}">
+                    <div class="user-card-header">
+                        <div class="user-info">
+                            <div class="user-name">
+                                <i class="fas fa-tools text-warning"></i>
+                                {{ tecnico.nombre_completo }}
+                                <span class="user-type-badge badge-tecnico">Técnico</span>
+                            </div>
+                            <div class="user-email">
+                                <i class="fas fa-envelope"></i> {{ tecnico.email }}
+                                <span class="text-muted">|</span>
+                                <i class="fas fa-phone"></i> {{ tecnico.telefono }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        {% if tecnico.usuario %}
+                        <button class="btn-change-password" onclick="openPasswordModal('tecnico', {{ tecnico.id }}, '{{ tecnico.nombre_completo }}', '{{ tecnico.email }}')">
+                            <i class="fas fa-key"></i> Cambiar Contraseña
+                        </button>
+                        <button class="btn-generate-temp" onclick="generateTempPassword('tecnico', {{ tecnico.id }}, '{{ tecnico.nombre_completo }}')">
+                            <i class="fas fa-random"></i> Generar Temporal
+                        </button>
+                        {% else %}
+                        <button class="btn btn-secondary" disabled>
+                            <i class="fas fa-exclamation-triangle"></i> Sin usuario asociado
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-center text-muted">No hay técnicos registrados</p>
+                {% endfor %}
+            </div>
+
+            <!-- PROVEEDORES -->
+            <div id="proveedores" class="tab-pane fade">
+                {% for proveedor in proveedores %}
+                <div class="user-card" data-search="{{ proveedor.nombre_empresa|lower }} {{ proveedor.nombre_contacto|lower }} {{ proveedor.email|lower }}">
+                    <div class="user-card-header">
+                        <div class="user-info">
+                            <div class="user-name">
+                                <i class="fas fa-truck text-info"></i>
+                                {{ proveedor.nombre_empresa }}
+                                <span class="user-type-badge badge-proveedor">Proveedor</span>
+                            </div>
+                            <div class="user-email">
+                                <i class="fas fa-user"></i> {{ proveedor.nombre_contacto }}
+                                <span class="text-muted">|</span>
+                                <i class="fas fa-envelope"></i> {{ proveedor.email }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" disabled>
+                            <i class="fas fa-info-circle"></i> Los proveedores no tienen usuario
+                        </button>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-center text-muted">No hay proveedores registrados</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para cambiar contraseña -->
+<div class="modal fade" id="passwordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-key"></i> Cambiar Contraseña
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="passwordForm" method="post" action="">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p id="modalUserInfo" class="mb-3"></p>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nueva Contraseña</label>
+                        <input type="text" class="form-control" name="nueva_contrasena" id="nueva_contrasena" required minlength="8">
+                        <small class="text-muted">Mínimo 8 caracteres</small>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="enviar_correo" name="enviar_correo" checked>
+                        <label class="form-check-label" for="enviar_correo">
+                            Enviar nueva contraseña por correo electrónico
+                        </label>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Importante:</strong> El usuario deberá usar esta contraseña para iniciar sesión.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-save"></i> Cambiar Contraseña
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterUsers() {
+    const searchValue = document.getElementById('searchInput').value.toLowerCase();
+    const userCards = document.querySelectorAll('.user-card');
+
+    userCards.forEach(card => {
+        const searchData = card.getAttribute('data-search');
+        if (searchData.includes(searchValue)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function openPasswordModal(tipo, id, nombre, email) {
+    const modal = new bootstrap.Modal(document.getElementById('passwordModal'));
+    const form = document.getElementById('passwordForm');
+    const userInfo = document.getElementById('modalUserInfo');
+
+    form.action = `/usuarios/admin/cambiar-contrasena/${tipo}/${id}/`;
+    userInfo.innerHTML = `
+        <strong>Usuario:</strong> ${nombre}<br>
+        <strong>Email:</strong> ${email}
+    `;
+
+    // Generar contraseña aleatoria
+    document.getElementById('nueva_contrasena').value = generateRandomPassword();
+
+    modal.show();
+}
+
+function generateRandomPassword() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+}
+
+function generateTempPassword(tipo, id, nombre) {
+    if (confirm(`¿Generar y enviar contraseña temporal para ${nombre}?`)) {
+        window.location.href = `/usuarios/admin/generar-temporal/${tipo}/${id}/`;
+    }
+}
+</script>
+{% endblock %}

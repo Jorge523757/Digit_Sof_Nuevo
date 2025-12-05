@@ -5,6 +5,7 @@ Models - Gestión de Compras a Proveedores
 
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.contrib.auth.models import User
 from decimal import Decimal
 from proveedores.models import Proveedor
 from productos.models import Producto
@@ -41,6 +42,16 @@ class Compra(models.Model):
         on_delete=models.PROTECT,
         related_name='compras',
         verbose_name="Proveedor"
+    )
+
+    # Usuario que realiza la compra
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        related_name='compras_realizadas',
+        verbose_name="Usuario",
+        null=True,
+        blank=True
     )
 
     # Detalles

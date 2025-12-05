@@ -4,6 +4,7 @@ Models - Gestión de Ventas integrado con Productos (E-commerce)
 """
 
 from django.db import models
+from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from decimal import Decimal
 from clientes.models import Cliente
@@ -51,6 +52,16 @@ class Venta(models.Model):
         on_delete=models.PROTECT,
         related_name='ventas',
         verbose_name="Cliente"
+    )
+
+    # Usuario que realiza la venta
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        related_name='ventas_realizadas',
+        verbose_name="Usuario",
+        null=True,
+        blank=True
     )
 
     # Detalles de la venta

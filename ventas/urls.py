@@ -4,6 +4,7 @@ DIGITSOFT - URLs del Módulo de Ventas
 
 from django.urls import path
 from . import views
+from productos.views import ver_factura
 
 app_name = 'ventas'
 
@@ -15,6 +16,7 @@ urlpatterns = [
     # CRUD
     path('crear/', views.venta_crear, name='crear'),
     path('<int:pk>/', views.venta_detalle, name='detalle'),
+    path('<int:venta_id>/factura/', ver_factura, name='ver_factura'),
     path('<int:pk>/editar/', views.venta_editar, name='editar'),
 
     # Acciones

@@ -84,7 +84,7 @@ body.high-contrast .card {
     transition: all 0.3s ease;
     outline: none;
     position: relative;
-    z-index: 10001;
+    z-index: 1035; /* Cambiado de 10001 a 1035 */
 }
 
 .accessibility-toggle:hover {
@@ -139,7 +139,7 @@ body.high-contrast .card {
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     transform-origin: bottom right;
-    z-index: 10000;
+    z-index: 1040; /* Cambiado de 10000 a 1040 para no interferir con contenido */
 }
 
 /* Estado oculto */

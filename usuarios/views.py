@@ -286,57 +286,44 @@ def listar_usuarios(request):
     """Vista para listar todos los usuarios del sistema"""
     # Búsqueda
     query = request.GET.get('q', '')
-    tipo_filtro = request.GET.get('tipo', '')
+    rol_filtro = request.GET.get('rol', '')
     estado_filtro = request.GET.get('estado', '')
 
-    usuarios = User.objects.select_related('perfil').all()
+    usuarios = User.objects.all().order_by('-date_joined')
 
+    # Aplicar filtros
     if query:
         usuarios = usuarios.filter(
             Q(username__icontains=query) |
             Q(email__icontains=query) |
             Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(perfil__documento__icontains=query)
+            Q(last_name__icontains=query)
         )
 
-    if tipo_filtro:
-        usuarios = usuarios.filter(perfil__tipo_usuario=tipo_filtro)
+    if rol_filtro == 'superuser':
+        usuarios = usuarios.filter(is_superuser=True)
+    elif rol_filtro == 'staff':
+        usuarios = usuarios.filter(is_staff=True, is_superuser=False)
+    elif rol_filtro == 'normal':
+        usuarios = usuarios.filter(is_staff=False, is_superuser=False)
 
     if estado_filtro == 'activo':
-        usuarios = usuarios.filter(is_active=True, perfil__bloqueado=False)
-    elif estado_filtro == 'bloqueado':
-        usuarios = usuarios.filter(perfil__bloqueado=True)
+        usuarios = usuarios.filter(is_active=True)
     elif estado_filtro == 'inactivo':
         usuarios = usuarios.filter(is_active=False)
 
-    # Ordenar
-    orden = request.GET.get('orden', '-date_joined')
-    usuarios = usuarios.order_by(orden)
-
-    # Paginación
-    paginator = Paginator(usuarios, 20)
-    page = request.GET.get('page', 1)
-    usuarios_page = paginator.get_page(page)
-
     # Estadísticas
-    stats = {
-        'total': User.objects.count(),
-        'activos': User.objects.filter(is_active=True, perfil__bloqueado=False).count(),
-        'bloqueados': PerfilUsuario.objects.filter(bloqueado=True).count(),
-        'staff': User.objects.filter(is_staff=True).count(),
-        'admins': PerfilUsuario.objects.filter(tipo_usuario='ADMIN').count(),
-        'clientes': PerfilUsuario.objects.filter(tipo_usuario='CLIENTE').count(),
-        'tecnicos': PerfilUsuario.objects.filter(tipo_usuario='TECNICO').count(),
-    }
+    total_usuarios = User.objects.count()
+    usuarios_activos = User.objects.filter(is_active=True).count()
+    usuarios_inactivos = User.objects.filter(is_active=False).count()
+    usuarios_staff = User.objects.filter(is_staff=True).count()
 
     context = {
-        'usuarios': usuarios_page,
-        'stats': stats,
-        'query': query,
-        'tipo_filtro': tipo_filtro,
-        'estado_filtro': estado_filtro,
-        'orden': orden,
+        'usuarios': usuarios,
+        'total_usuarios': total_usuarios,
+        'usuarios_activos': usuarios_activos,
+        'usuarios_inactivos': usuarios_inactivos,
+        'usuarios_staff': usuarios_staff,
     }
 
     return render(request, 'usuarios/gestionar/listar.html', context)

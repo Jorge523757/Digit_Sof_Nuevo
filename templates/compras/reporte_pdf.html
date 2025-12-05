@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Compras</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        h1 { color: #f5576c; text-align: center; }
+        .header { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f5576c; }
+        .info { margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background-color: #f5576c; color: white; padding: 8px; text-align: left; }
+        td { padding: 6px; border-bottom: 1px solid #ddd; }
+        .total { font-weight: bold; background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>REPORTE DE COMPRAS</h1>
+        <div class="info">
+            <p><strong>Fecha de generación:</strong> {{ fecha|date:"d/m/Y H:i" }}</p>
+            <p><strong>Generado por:</strong> {{ usuario.get_full_name|default:usuario.username }}</p>
+            <p><strong>Total de compras:</strong> {{ total_compras }}</p>
+            <p><strong>Total gastado:</strong> ${{ total_gastado|floatformat:2 }}</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nº Compra</th>
+                <th>Proveedor</th>
+                <th>Usuario</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for compra in compras %}
+            <tr>
+                <td>{{ compra.numero_compra }}</td>
+                <td>{{ compra.proveedor.nombre_empresa }}</td>
+                <td>{{ compra.usuario.get_full_name|default:"N/A" }}</td>
+                <td>{{ compra.fecha_compra|date:"d/m/Y" }}</td>
+                <td>${{ compra.total|floatformat:2 }}</td>
+                <td>{{ compra.get_estado_display }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
+

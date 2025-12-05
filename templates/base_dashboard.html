@@ -33,6 +33,10 @@
     <link rel="stylesheet" href="{% static 'css/responsive-fixes.css' %}">
     <link rel="stylesheet" href="{% static 'css/tablas-responsive.css' %}">
     <link rel="stylesheet" href="{% static 'css/modulos-fix-responsive.css' %}">
+    <link rel="stylesheet" href="{% static 'css/z-index-fix.css' %}">
+
+    <!-- CRÍTICO: Debe cargarse último para fix de clicks -->
+    <link rel="stylesheet" href="{% static 'css/click-fix-critical.css' %}">
 
     {% block extra_css %}{% endblock %}
 </head>
@@ -124,6 +128,19 @@
                 </a>
             </li>
 
+            <!-- Administración -->
+            <div class="sidebar-category">Administración</div>
+            <li>
+                <a href="{% url 'usuarios:listar_usuarios' %}">
+                    <i class="fas fa-users"></i> Gestión de Usuarios
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'usuarios:admin_gestionar_contrasenas' %}">
+                    <i class="fas fa-user-lock"></i> Gestión de Contraseñas
+                </a>
+            </li>
+
             <!-- Otros -->
             <div class="sidebar-category">Otros</div>
             <li>
@@ -138,7 +155,7 @@
     <header>
         <div class="header-container">
             <div class="d-flex align-items-center gap-3">
-                <div class="menu-toggle" id="menuToggle" style="display: flex !important; visibility: visible !important; opacity: 1 !important; cursor: pointer; padding: 12px 15px; border-radius: 10px; background: linear-gradient(135deg, #037dc4, #0f9bec); color: white; width: 50px; height: 50px; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(3, 125, 196, 0.4); z-index: 10000;">
+                <div class="menu-toggle" id="menuToggle" style="display: flex !important; visibility: visible !important; opacity: 1 !important; cursor: pointer; padding: 12px 15px; border-radius: 10px; background: linear-gradient(135deg, #037dc4, #0f9bec); color: white; width: 50px; height: 50px; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(3, 125, 196, 0.4); z-index: 100; position: relative;">
                     <i class="fas fa-bars fa-lg" style="color: white; font-size: 1.5rem;"></i>
                 </div>
                 <div class="logo">

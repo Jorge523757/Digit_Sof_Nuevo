@@ -29,10 +29,19 @@
             });
         }
 
+        // Función para cerrar sidebar
+        function closeSidebarFunc() {
+            sidebar.classList.remove('show');
+            if (sidebarOverlay) {
+                sidebarOverlay.classList.remove('show');
+            }
+            document.body.style.overflow = '';
+        }
+
         // Cerrar sidebar
         if (closeSidebar) {
             closeSidebar.addEventListener('click', function() {
-                closeSidebar();
+                closeSidebarFunc();
             });
         }
 
@@ -43,13 +52,6 @@
             });
         }
 
-        function closeSidebarFunc() {
-            sidebar.classList.remove('show');
-            if (sidebarOverlay) {
-                sidebarOverlay.classList.remove('show');
-            }
-            document.body.style.overflow = '';
-        }
 
         // Cerrar sidebar al cambiar a desktop
         window.addEventListener('resize', function() {
