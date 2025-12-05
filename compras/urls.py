@@ -13,6 +13,10 @@ urlpatterns = [
     path('<int:pk>/', views.compra_detalle, name='detalle'),
     path('<int:pk>/editar/', views.compra_editar, name='editar'),
     path('<int:pk>/eliminar/', views.compra_eliminar, name='eliminar'),
+
+    # Reportes
+    path('reporte/pdf/', views.compra_reporte_pdf, name='reporte_pdf'),
+    path('reporte/excel/', views.compra_reporte_excel, name='reporte_excel'),
 ]
 """
 DIGT SOFT - Vistas del Módulo de Compras

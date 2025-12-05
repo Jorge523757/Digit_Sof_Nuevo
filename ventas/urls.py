@@ -19,6 +19,10 @@ urlpatterns = [
 
     # Acciones
     path('<int:pk>/cambiar-estado/', views.venta_cambiar_estado, name='cambiar_estado'),
+
+    # Reportes
+    path('reporte/pdf/', views.venta_reporte_pdf, name='reporte_pdf'),
+    path('reporte/excel/', views.venta_reporte_excel, name='reporte_excel'),
 ]
 """
 DIGT SOFT - Formularios del Módulo de Ventas

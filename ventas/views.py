@@ -128,3 +128,103 @@ def ventas_reportes(request):
     return render(request, 'ventas/reportes.html', context)
 
 
+# REPORTES PDF Y EXCEL
+# ==============================================
+
+@login_required
+@staff_required
+def venta_reporte_pdf(request):
+    """Generar reporte de ventas en PDF"""
+    from utils.reportes import generar_pdf
+    from datetime import datetime
+
+    # Obtener filtros
+    query = request.GET.get('q', '').strip()
+    estado = request.GET.get('estado', '')
+
+    # Filtrar datos
+    ventas = Venta.objects.all().select_related('cliente')
+
+    if query:
+        ventas = ventas.filter(
+            Q(numero_venta__icontains=query) |
+            Q(cliente__nombres__icontains=query) |
+            Q(cliente__apellidos__icontains=query)
+        )
+
+    if estado:
+        ventas = ventas.filter(estado=estado)
+
+    ventas = ventas.order_by('-fecha_venta')
+
+    context = {
+        'ventas': ventas,
+        'fecha': datetime.now(),
+        'usuario': request.user,
+        'total_ventas': ventas.count(),
+        'total_ingresos': ventas.aggregate(Sum('total'))['total__sum'] or 0,
+    }
+
+    filename = f'reporte_ventas_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    return generar_pdf('reportes/ventas_pdf.html', context, filename)
+
+
+@login_required
+@staff_required
+def venta_reporte_excel(request):
+    """Generar reporte de ventas en Excel"""
+    from utils.reportes import generar_excel_avanzado
+    from datetime import datetime
+
+    # Obtener filtros
+    query = request.GET.get('q', '').strip()
+    estado = request.GET.get('estado', '')
+
+    # Filtrar datos
+    ventas_query = Venta.objects.all().select_related('cliente')
+
+    if query:
+        ventas_query = ventas_query.filter(
+            Q(numero_venta__icontains=query) |
+            Q(cliente__nombres__icontains=query) |
+            Q(cliente__apellidos__icontains=query)
+        )
+
+    if estado:
+        ventas_query = ventas_query.filter(estado=estado)
+
+    ventas_query = ventas_query.order_by('-fecha_venta')
+
+    # Preparar datos para Excel
+    datos = []
+    for venta in ventas_query:
+        datos.append({
+            'numero_venta': venta.numero_venta,
+            'cliente': str(venta.cliente) if venta.cliente else 'Sin cliente',
+            'fecha_venta': venta.fecha_venta,
+            'subtotal': float(venta.subtotal),
+            'impuestos': float(venta.impuestos),
+            'total': float(venta.total),
+            'estado': venta.get_estado_display(),
+            'metodo_pago': venta.get_metodo_pago_display(),
+        })
+
+    # Definir columnas
+    columnas = [
+        ('numero_venta', 'Número Venta', 'texto'),
+        ('cliente', 'Cliente', 'texto'),
+        ('fecha_venta', 'Fecha', 'fecha'),
+        ('subtotal', 'Subtotal', 'moneda'),
+        ('impuestos', 'Impuestos', 'moneda'),
+        ('total', 'Total', 'moneda'),
+        ('estado', 'Estado', 'texto'),
+        ('metodo_pago', 'Método Pago', 'texto'),
+    ]
+
+    titulo = 'Reporte de Ventas'
+    filename = f'reporte_ventas_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+
+    # Columnas con totales
+    totales = ['subtotal', 'impuestos', 'total']
+
+    return generar_excel_avanzado(datos, columnas, titulo, filename, totales=totales)

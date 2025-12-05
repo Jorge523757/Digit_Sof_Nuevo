@@ -22,6 +22,11 @@
     <link rel="stylesheet" href="{% static 'css/accessibility.css' %}">
     <link rel="stylesheet" href="{% static 'css/floating-widgets.css' %}">
 
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" href="{% static 'css/responsive-global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/responsive-modulos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/responsive-fixes.css' %}">
+
     <style>
         * {
             margin: 0;
@@ -149,11 +154,8 @@
 
     <!-- Contenedor de Widgets Flotantes -->
     <div class="floating-widgets-container">
-        <!-- Widget de Accesibilidad -->
-        {% include 'includes/accessibility_widget.html' %}
-
-        <!-- Widget flotante de WhatsApp -->
-        {% include 'includes/whatsapp_widget.html' %}
+        <!-- Widgets Flotantes Unificados (Accesibilidad + WhatsApp) -->
+        {% include 'includes/floating_widgets_unified.html' %}
     </div>
 
     <!-- Accessibility JS -->
@@ -201,6 +203,9 @@
             observer.observe(el);
         });
     </script>
+
+    <!-- Responsive JavaScript -->
+    <script src="{% static 'js/responsive.js' %}"></script>
 
     {% block extra_js %}{% endblock %}
 </body>

@@ -14,6 +14,10 @@ urlpatterns = [
     path('editar/<int:pk>/', views.editar_cliente, name='editar'),
     path('eliminar/<int:pk>/', views.eliminar_cliente, name='eliminar'),
     path('detalle/<int:pk>/', views.detalle_cliente, name='detalle'),
+
+    # Reportes
+    path('reporte/pdf/', views.cliente_reporte_pdf, name='reporte_pdf'),
+    path('reporte/excel/', views.cliente_reporte_excel, name='reporte_excel'),
 ]
 
 

@@ -144,3 +144,106 @@ def detalle_cliente(request, pk):
 # Alias para compatibilidad
 index = lista_clientes
 
+
+# REPORTES PDF Y EXCEL
+# ==============================================
+
+@login_required
+@staff_required
+def cliente_reporte_pdf(request):
+    """Generar reporte de clientes en PDF"""
+    from utils.reportes import generar_pdf
+    from datetime import datetime
+
+    # Obtener filtros
+    query = request.GET.get('q', '').strip()
+    estado = request.GET.get('estado', '')
+
+    # Filtrar clientes
+    clientes = Cliente.objects.all()
+
+    if query:
+        clientes = clientes.filter(
+            Q(nombres__icontains=query) |
+            Q(apellidos__icontains=query) |
+            Q(numero_documento__icontains=query) |
+            Q(correo__icontains=query)
+        )
+
+    if estado == 'activo':
+        clientes = clientes.filter(activo=True)
+    elif estado == 'inactivo':
+        clientes = clientes.filter(activo=False)
+
+    clientes = clientes.order_by('apellidos', 'nombres')
+
+    context = {
+        'clientes': clientes,
+        'fecha': datetime.now(),
+        'usuario': request.user,
+        'total_clientes': clientes.count(),
+    }
+
+    filename = f'reporte_clientes_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    return generar_pdf('reportes/clientes_pdf.html', context, filename)
+
+
+@login_required
+@staff_required
+def cliente_reporte_excel(request):
+    """Generar reporte de clientes en Excel"""
+    from utils.reportes import generar_excel_avanzado
+    from datetime import datetime
+
+    # Obtener filtros
+    query = request.GET.get('q', '').strip()
+    estado = request.GET.get('estado', '')
+
+    # Filtrar clientes
+    clientes = Cliente.objects.all()
+
+    if query:
+        clientes = clientes.filter(
+            Q(nombres__icontains=query) |
+            Q(apellidos__icontains=query) |
+            Q(numero_documento__icontains=query) |
+            Q(correo__icontains=query)
+        )
+
+    if estado == 'activo':
+        clientes = clientes.filter(activo=True)
+    elif estado == 'inactivo':
+        clientes = clientes.filter(activo=False)
+
+    clientes = clientes.order_by('apellidos', 'nombres')
+
+    # Preparar datos
+    datos = []
+    for cliente in clientes:
+        datos.append({
+            'documento': cliente.numero_documento,
+            'nombres': cliente.nombres,
+            'apellidos': cliente.apellidos,
+            'telefono': cliente.telefono or '',
+            'correo': cliente.correo,
+            'direccion': cliente.direccion or '',
+            'activo': 'Sí' if cliente.activo else 'No',
+            'fecha_registro': cliente.fecha_registro,
+        })
+
+    # Definir columnas
+    columnas = [
+        ('documento', 'Documento', 'texto'),
+        ('nombres', 'Nombres', 'texto'),
+        ('apellidos', 'Apellidos', 'texto'),
+        ('telefono', 'Teléfono', 'texto'),
+        ('correo', 'Correo', 'texto'),
+        ('direccion', 'Dirección', 'texto'),
+        ('activo', 'Activo', 'texto'),
+        ('fecha_registro', 'Fecha Registro', 'fecha'),
+    ]
+
+    titulo = 'Reporte de Clientes'
+    filename = f'reporte_clientes_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+
+    return generar_excel_avanzado(datos, columnas, titulo, filename)

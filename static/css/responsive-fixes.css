@@ -1,0 +1,471 @@
+/* ============================================
+   MEJORAS RESPONSIVE PARA CONTENIDO
+   Asegura que no se tape información
+   ============================================ */
+
+/* Asegurar padding bottom para widgets flotantes */
+body {
+    padding-bottom: 20px; /* Reducido para no generar mucho espacio */
+}
+
+@media (max-width: 768px) {
+    body {
+        padding-bottom: 30px; /* Ajustado para móvil */
+    }
+}
+
+/* Main content responsive */
+.main-content {
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px;
+    padding-bottom: 100px; /* Extra padding para widgets */
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 15px;
+        padding-bottom: 140px; /* Más espacio en móvil */
+    }
+}
+
+/* Dashboard cards responsive */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 768px) {
+    .dashboard-cards {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+}
+
+/* Módulos grid responsive */
+.modules-grid,
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 992px) {
+    .modules-grid,
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .modules-grid,
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+
+/* Cards de módulos */
+.module-card,
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    min-height: 120px;
+}
+
+@media (max-width: 768px) {
+    .module-card,
+    .stat-card {
+        padding: 15px;
+        min-height: 100px;
+    }
+}
+
+.module-card:hover,
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Header de página responsive */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .page-header .btn,
+    .page-header button {
+        width: 100%;
+    }
+}
+
+/* Tablas responsive mejoradas */
+.table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 100px; /* Espacio para widgets */
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .table-container {
+        margin-bottom: 140px; /* Más espacio en móvil */
+    }
+}
+
+/* Footer responsive */
+footer {
+    padding-bottom: 100px; /* Espacio para widgets */
+}
+
+@media (max-width: 768px) {
+    footer {
+        padding-bottom: 140px; /* Más espacio en móvil */
+    }
+}
+
+/* Breadcrumbs responsive */
+.breadcrumb {
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .breadcrumb {
+        font-size: 0.85rem;
+    }
+}
+
+/* Botones de acción responsive */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons .btn {
+        width: 100%;
+    }
+}
+
+/* Filtros responsive */
+.filters-section {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .filters-section {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .filters-section .row {
+        flex-direction: column;
+    }
+
+    .filters-section .col-md-3,
+    .filters-section .col-md-4,
+    .filters-section .col-md-6 {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+/* Alertas responsive */
+.alert {
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .alert {
+        font-size: 0.9rem;
+        padding: 12px;
+    }
+}
+
+/* Modales responsive */
+.modal-dialog {
+    margin: 10px;
+}
+
+@media (max-width: 768px) {
+    .modal-dialog {
+        max-width: calc(100% - 20px);
+        margin: 10px auto;
+    }
+
+    .modal-body {
+        padding: 15px;
+    }
+
+    .modal-header,
+    .modal-footer {
+        padding: 12px 15px;
+    }
+}
+
+/* Sidebar overlay responsive */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.show {
+    display: block;
+    opacity: 1;
+}
+
+/* Navbar responsive */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    padding: 10px 20px;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 10px 15px;
+    }
+}
+
+/* Mejoras para el menú hamburger */
+.menu-toggle {
+    background: linear-gradient(135deg, #037dc4 0%, #0f9bec 100%);
+    border: none;
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.3rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(3, 125, 196, 0.3);
+    margin-right: 15px;
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        margin-right: 10px;
+    }
+}
+
+.menu-toggle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(3, 125, 196, 0.4);
+}
+
+.menu-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Cards de estadísticas */
+.stats-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .stats-card {
+        padding: 15px;
+        gap: 12px;
+    }
+}
+
+.stats-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.stats-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .stats-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+}
+
+/* Contenido principal sin overflow */
+.content-wrapper {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Asegurar que las imágenes no se desborden */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Prevenir scroll horizontal en móvil */
+html, body {
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Ajuste para que el contenido no se esconda bajo los widgets */
+.container,
+.container-fluid {
+    padding-bottom: 100px;
+}
+
+@media (max-width: 768px) {
+    .container,
+    .container-fluid {
+        padding-bottom: 140px;
+    }
+}
+
+/* Mejora para las listas */
+.list-group-item {
+    border: 1px solid rgba(0,0,0,.125);
+    padding: 12px 15px;
+}
+
+@media (max-width: 768px) {
+    .list-group-item {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Tabs responsive */
+.nav-tabs {
+    flex-wrap: wrap;
+    border-bottom: 2px solid #dee2e6;
+}
+
+@media (max-width: 768px) {
+    .nav-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-tabs .nav-link {
+        white-space: nowrap;
+        font-size: 0.9rem;
+        padding: 10px 12px;
+    }
+}
+
+/* Progress bars responsive */
+.progress {
+    height: 20px;
+    border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+    .progress {
+        height: 16px;
+    }
+}
+
+/* Badges responsive */
+.badge {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+    .badge {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+    }
+}
+
+/* Tooltips en móvil - deshabilitados */
+@media (max-width: 768px) {
+    [data-bs-toggle="tooltip"],
+    [data-tooltip] {
+        pointer-events: auto !important;
+    }
+}
+
+/* Asegurar z-index correcto */
+.navbar {
+    z-index: 1020;
+}
+
+.sidebar {
+    z-index: 1025;
+}
+
+.sidebar-overlay {
+    z-index: 1024;
+}
+
+.floating-widgets-container {
+    z-index: 1030;
+}
+
+.whatsapp-modal {
+    z-index: 1040;
+}
+
+.modal {
+    z-index: 1050;
+}
+
+.modal-backdrop {
+    z-index: 1045;
+}
+

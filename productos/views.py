@@ -316,9 +316,29 @@ def producto_crear(request):
     if request.method == 'POST':
         form = ProductoForm(request.POST, request.FILES)
         if form.is_valid():
-            producto = form.save()
-            messages.success(request, f'✅ Producto "{producto.nombre_producto}" creado exitosamente.')
-            return redirect('productos:detalle', pk=producto.pk)
+            try:
+                producto = form.save(commit=False)
+                # Asegurar que los campos requeridos tienen valores
+                if not producto.nombre_producto:
+                    messages.error(request, '❌ El nombre del producto es obligatorio.')
+                    return render(request, 'productos/form.html', {
+                        'form': form,
+                        'titulo': 'Registrar Nuevo Producto',
+                        'accion': 'Crear'
+                    })
+
+                producto.save()
+                messages.success(request, f'✅ Producto "{producto.nombre_producto}" creado exitosamente.')
+                return redirect('productos:detalle', pk=producto.pk)
+            except Exception as e:
+                messages.error(request, f'❌ Error al guardar el producto: {str(e)}')
+                print(f"Error al guardar producto: {e}")
+        else:
+            # Mostrar errores del formulario
+            messages.error(request, '❌ Por favor corrige los errores en el formulario.')
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
         form = ProductoForm()
 
@@ -339,9 +359,18 @@ def producto_editar(request, pk):
     if request.method == 'POST':
         form = ProductoForm(request.POST, request.FILES, instance=producto)
         if form.is_valid():
-            producto = form.save()
-            messages.success(request, f'✅ Producto "{producto.nombre_producto}" actualizado correctamente.')
-            return redirect('productos:detalle', pk=producto.pk)
+            try:
+                producto = form.save()
+                messages.success(request, f'✅ Producto "{producto.nombre_producto}" actualizado correctamente.')
+                return redirect('productos:detalle', pk=producto.pk)
+            except Exception as e:
+                messages.error(request, f'❌ Error al actualizar el producto: {str(e)}')
+                print(f"Error al actualizar producto: {e}")
+        else:
+            messages.error(request, '❌ Por favor corrige los errores en el formulario.')
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
         form = ProductoForm(instance=producto)
 
@@ -1041,4 +1070,111 @@ def obtener_contador_carrito(request):
         'success': True,
         'total_items': total_items
     })
+
+
+# REPORTES PDF Y EXCEL
+# ==============================================
+
+@login_required
+@staff_required
+def producto_reporte_pdf(request):
+    """Generar reporte de productos en PDF"""
+    from utils.reportes import generar_pdf
+    from datetime import datetime
+
+    # Obtener filtros
+    categoria = request.GET.get('categoria', '')
+    buscar = request.GET.get('buscar', '')
+    activo = request.GET.get('activo', '')
+
+    # Filtrar productos
+    productos = Producto.objects.all().select_related('categoria')
+
+    if categoria:
+        productos = productos.filter(categoria_id=categoria)
+    if buscar:
+        productos = productos.filter(
+            Q(nombre_producto__icontains=buscar) |
+            Q(codigo_sku__icontains=buscar) |
+            Q(marca__icontains=buscar)
+        )
+    if activo:
+        productos = productos.filter(activo=(activo == 'true'))
+
+    productos = productos.order_by('nombre_producto')
+
+    context = {
+        'productos': productos,
+        'fecha': datetime.now(),
+        'usuario': request.user,
+        'total_productos': productos.count(),
+    }
+
+    filename = f'reporte_productos_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    return generar_pdf('reportes/productos_pdf.html', context, filename)
+
+
+@login_required
+@staff_required
+def producto_reporte_excel(request):
+    """Generar reporte de productos en Excel"""
+    from utils.reportes import generar_excel_avanzado
+    from datetime import datetime
+
+    # Obtener filtros
+    categoria = request.GET.get('categoria', '')
+    buscar = request.GET.get('buscar', '')
+    activo = request.GET.get('activo', '')
+
+    # Filtrar productos
+    productos = Producto.objects.all().select_related('categoria')
+
+    if categoria:
+        productos = productos.filter(categoria_id=categoria)
+    if buscar:
+        productos = productos.filter(
+            Q(nombre_producto__icontains=buscar) |
+            Q(codigo_sku__icontains=buscar) |
+            Q(marca__icontains=buscar)
+        )
+    if activo:
+        productos = productos.filter(activo=(activo == 'true'))
+
+    productos = productos.order_by('nombre_producto')
+
+    # Preparar datos
+    datos = []
+    for producto in productos:
+        datos.append({
+            'codigo': producto.codigo_sku,
+            'nombre': producto.nombre_producto,
+            'categoria': producto.categoria.nombre if producto.categoria else '',
+            'marca': producto.marca or '',
+            'stock': producto.stock_actual,
+            'precio_compra': float(producto.precio_compra) if producto.precio_compra else 0,
+            'precio_venta': float(producto.precio_venta) if producto.precio_venta else 0,
+            'activo': 'Sí' if producto.activo else 'No',
+            'disponible_web': 'Sí' if producto.disponible_web else 'No',
+        })
+
+    # Definir columnas
+    columnas = [
+        ('codigo', 'Código SKU', 'texto'),
+        ('nombre', 'Nombre Producto', 'texto'),
+        ('categoria', 'Categoría', 'texto'),
+        ('marca', 'Marca', 'texto'),
+        ('stock', 'Stock', 'numero'),
+        ('precio_compra', 'Precio Compra', 'moneda'),
+        ('precio_venta', 'Precio Venta', 'moneda'),
+        ('activo', 'Activo', 'texto'),
+        ('disponible_web', 'Disp. Web', 'texto'),
+    ]
+
+    titulo = 'Reporte de Productos'
+    filename = f'reporte_productos_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+
+    # Columnas con totales
+    totales = ['stock', 'precio_compra', 'precio_venta']
+
+    return generar_excel_avanzado(datos, columnas, titulo, filename, totales=totales)
 

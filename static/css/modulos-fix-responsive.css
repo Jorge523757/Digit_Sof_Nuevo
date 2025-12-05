@@ -1,0 +1,524 @@
+/* ============================================
+   FIX RESPONSIVE PARA MÓDULOS - DIGITSOFT
+   Arregla la visualización de todos los módulos
+   ============================================ */
+
+/* ============================================
+   HEADER DEL MÓDULO RESPONSIVE
+   ============================================ */
+
+.module-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 30px;
+    border-radius: 12px;
+    color: white;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.module-header h2 {
+    margin: 0 0 10px 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.module-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+    .module-header {
+        padding: 20px;
+    }
+
+    .module-header .d-flex {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 15px;
+    }
+
+    .module-header h2 {
+        font-size: 1.4rem;
+    }
+
+    .module-header p {
+        font-size: 0.85rem;
+    }
+
+    .module-header .btn {
+        width: 100%;
+    }
+}
+
+/* ============================================
+   SEARCH BOX / FILTROS RESPONSIVE
+   ============================================ */
+
+.search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+}
+
+.search-box form .row {
+    margin: 0;
+}
+
+.search-box form .row > [class*="col-"] {
+    padding: 0 8px;
+    margin-bottom: 15px;
+}
+
+@media (max-width: 768px) {
+    .search-box {
+        padding: 15px;
+    }
+
+    .search-box form .row {
+        flex-direction: column;
+    }
+
+    .search-box form .row > [class*="col-"] {
+        width: 100%;
+        padding: 0;
+        margin-bottom: 15px;
+    }
+
+    /* Botones en columna en móvil */
+    .search-box .d-flex.gap-2 {
+        flex-direction: column !important;
+        width: 100%;
+    }
+
+    .search-box .btn {
+        width: 100% !important;
+        margin-bottom: 8px;
+    }
+
+    .search-box .btn.flex-fill {
+        flex: none !important;
+    }
+}
+
+/* ============================================
+   FORM CONTROLS MEJORADOS
+   ============================================ */
+
+.form-control,
+.form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 10px 15px;
+    transition: all 0.3s;
+    font-size: 0.95rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+@media (max-width: 768px) {
+    .form-control,
+    .form-select {
+        font-size: 16px; /* Evita zoom en iOS */
+        padding: 12px 15px;
+    }
+}
+
+/* Labels mejorados */
+label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    display: block;
+}
+
+label i {
+    margin-right: 5px;
+    color: #667eea;
+}
+
+/* Small text */
+small.text-muted {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+    small.text-muted {
+        font-size: 0.75rem;
+    }
+}
+
+/* ============================================
+   BOTONES MEJORADOS Y RESPONSIVE
+   ============================================ */
+
+.btn {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: none;
+}
+
+.btn i {
+    margin-right: 6px;
+}
+
+.btn-primary-enhanced,
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary-enhanced:hover,
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary-enhanced,
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-light {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.btn-light:hover {
+    background: #667eea;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .btn {
+        width: 100%;
+        padding: 12px 20px;
+        margin-bottom: 8px;
+    }
+
+    .btn i {
+        margin-right: 8px;
+    }
+}
+
+/* ============================================
+   CARDS MEJORADAS
+   ============================================ */
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 25px;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    border: none;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 150px; /* Espacio para widgets */
+    }
+
+    .card-header {
+        padding: 12px 15px;
+        font-size: 0.9rem;
+    }
+
+    .card-body {
+        padding: 15px;
+    }
+}
+
+/* Records counter */
+.records-counter {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+    .records-counter {
+        font-size: 0.75rem;
+        padding: 3px 10px;
+    }
+}
+
+/* ============================================
+   CONTAINER FLUID FIX
+   ============================================ */
+
+.container-fluid {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 120px; /* Espacio para widgets */
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-bottom: 160px; /* Más espacio para widgets en móvil */
+    }
+}
+
+/* ============================================
+   GRID SYSTEM FIX
+   ============================================ */
+
+.row {
+    margin-left: -8px;
+    margin-right: -8px;
+}
+
+.row > [class*="col-"] {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+@media (max-width: 768px) {
+    .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .row > [class*="col-"] {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+.animate-slide-in {
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Deshabilitar animaciones en móvil */
+@media (max-width: 768px) {
+    .animate-fade-in,
+    .animate-slide-in {
+        animation: none !important;
+    }
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+
+.d-flex {
+    display: flex;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.align-items-end {
+    align-items: flex-end;
+}
+
+.gap-2 {
+    gap: 8px;
+}
+
+.flex-fill {
+    flex: 1 1 auto;
+}
+
+@media (max-width: 768px) {
+    .d-flex {
+        flex-direction: column;
+    }
+
+    .justify-content-between {
+        justify-content: flex-start;
+    }
+
+    .gap-2 {
+        gap: 12px;
+    }
+}
+
+/* ============================================
+   MB (Margin Bottom) RESPONSIVE
+   ============================================ */
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .mb-4 {
+        margin-bottom: 1rem;
+    }
+}
+
+/* ============================================
+   SEARCH STATUS
+   ============================================ */
+
+#searchStatus {
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    #searchStatus {
+        font-size: 0.85rem;
+        padding: 8px;
+    }
+}
+
+/* ============================================
+   FIX PARA BOTONES DE REPORTES
+   ============================================ */
+
+.btn-group-reports {
+    display: flex;
+    gap: 8px;
+}
+
+@media (max-width: 768px) {
+    .btn-group-reports {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-group-reports .btn {
+        width: 100%;
+    }
+}
+
+/* ============================================
+   CLIENTES ESPECÍFICO
+   ============================================ */
+
+.clientes-container .module-header {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+/* ============================================
+   PRODUCTOS ESPECÍFICO
+   ============================================ */
+
+.productos-container .module-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* ============================================
+   VENTAS ESPECÍFICO
+   ============================================ */
+
+.ventas-container .module-header {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+/* ============================================
+   COMPRAS ESPECÍFICO
+   ============================================ */
+
+.compras-container .module-header {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+/* ============================================
+   PROVEEDORES ESPECÍFICO
+   ============================================ */
+
+.proveedores-container .module-header {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+/* ============================================
+   OVERFLOW FIX
+   ============================================ */
+
+html,
+body {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* ============================================
+   PRINT HIDE
+   ============================================ */
+
+@media print {
+    .search-box,
+    .btn,
+    .floating-widgets-container {
+        display: none !important;
+    }
+}
+

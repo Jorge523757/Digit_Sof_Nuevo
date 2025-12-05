@@ -113,3 +113,97 @@ def compra_eliminar(request, pk):
         return redirect('compras:lista')
 
     return render(request, 'compras/eliminar.html', {'compra': compra})
+
+
+# REPORTES PDF Y EXCEL
+# ==============================================
+
+from django.contrib.auth.decorators import login_required
+from usuarios.decorators import staff_required
+
+@login_required
+@staff_required
+def compra_reporte_pdf(request):
+    """Generar reporte de compras en PDF"""
+    from utils.reportes import generar_pdf
+    from datetime import datetime
+
+    query = request.GET.get('q', '').strip()
+    estado = request.GET.get('estado', '')
+
+    datos = Compra.objects.all().select_related('proveedor')
+
+    if query:
+        datos = datos.filter(
+            Q(numero_compra__icontains=query) |
+            Q(proveedor__nombre_empresa__icontains=query)
+        )
+
+    if estado:
+        datos = datos.filter(estado=estado)
+
+    datos = datos.order_by('-fecha_compra')
+
+    context = {
+        'datos': datos,
+        'fecha': datetime.now(),
+        'usuario': request.user,
+        'total': datos.count(),
+        'total_gastado': datos.aggregate(Sum('total'))['total__sum'] or 0,
+    }
+
+    filename = f'reporte_compras_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    return generar_pdf('reportes/compras_pdf.html', context, filename)
+
+
+@login_required
+@staff_required
+def compra_reporte_excel(request):
+    """Generar reporte de compras en Excel"""
+    from utils.reportes import generar_excel_avanzado
+    from datetime import datetime
+
+    query = request.GET.get('q', '').strip()
+    estado = request.GET.get('estado', '')
+
+    datos_query = Compra.objects.all().select_related('proveedor')
+
+    if query:
+        datos_query = datos_query.filter(
+            Q(numero_compra__icontains=query) |
+            Q(proveedor__nombre_empresa__icontains=query)
+        )
+
+    if estado:
+        datos_query = datos_query.filter(estado=estado)
+
+    datos_query = datos_query.order_by('-fecha_compra')
+
+    datos = []
+    for item in datos_query:
+        datos.append({
+            'numero_compra': item.numero_compra,
+            'proveedor': str(item.proveedor) if item.proveedor else '',
+            'fecha_compra': item.fecha_compra,
+            'subtotal': float(item.subtotal),
+            'impuestos': float(item.impuestos),
+            'total': float(item.total),
+            'estado': item.get_estado_display(),
+        })
+
+    columnas = [
+        ('numero_compra', 'Número Compra', 'texto'),
+        ('proveedor', 'Proveedor', 'texto'),
+        ('fecha_compra', 'Fecha', 'fecha'),
+        ('subtotal', 'Subtotal', 'moneda'),
+        ('impuestos', 'Impuestos', 'moneda'),
+        ('total', 'Total', 'moneda'),
+        ('estado', 'Estado', 'texto'),
+    ]
+
+    titulo = 'Reporte de Compras'
+    filename = f'reporte_compras_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+
+    totales = ['subtotal', 'impuestos', 'total']
+
+    return generar_excel_avanzado(datos, columnas, titulo, filename, totales=totales)

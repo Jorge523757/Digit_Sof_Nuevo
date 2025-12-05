@@ -29,5 +29,9 @@ urlpatterns = [
 
     # Acciones
     path('<int:pk>/toggle-estado/', views.producto_toggle_estado, name='toggle_estado'),
+
+    # Reportes
+    path('reporte/pdf/', views.producto_reporte_pdf, name='reporte_pdf'),
+    path('reporte/excel/', views.producto_reporte_excel, name='reporte_excel'),
 ]
 

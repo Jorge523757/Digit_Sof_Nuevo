@@ -156,6 +156,88 @@
 
         /* Estilos para filtros activos */
         .filter-chip {
+            animation: fadeInScale 0.3s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .filter-chip .badge {
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .filter-chip .badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-remove-filter {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 8px;
+            font-size: 1rem;
+            transition: transform 0.2s ease;
+            opacity: 0.8;
+        }
+
+        .btn-remove-filter:hover {
+            opacity: 1;
+            transform: scale(1.2) rotate(90deg);
+        }
+
+        #active-filters .card {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOutScale {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        .btn-outline-danger:hover {
+            transform: scale(1.05);
+        }
+        .filter-chip {
             animation: slideIn 0.3s ease-out;
         }
 
@@ -320,51 +402,62 @@
 
             <!-- Contenido Principal -->
             <div class="col-md-9">
-                <!-- Filtros Activos (Chips) -->
+                <!-- Filtros Activos (Chips) - MEJORADO -->
                 <div id="active-filters" class="mb-3" style="display: none;">
-                    <div class="d-flex align-items-center flex-wrap gap-2">
-                        <span class="text-muted me-2">
-                            <i class="fas fa-filter"></i> Filtros activos:
-                        </span>
+                    <div class="card bg-light border-0">
+                        <div class="card-body py-2">
+                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                <span class="text-muted me-2">
+                                    <i class="fas fa-filter"></i> <strong>Filtros activos:</strong>
+                                </span>
 
-                        <!-- Chip de búsqueda -->
-                        <div id="filter-search-chip" class="filter-chip" style="display: none;">
-                            <span class="badge bg-primary d-inline-flex align-items-center">
-                                <i class="fas fa-search me-1"></i>
-                                <span id="filter-search-text"></span>
-                                <button class="btn-remove-filter ms-2" onclick="removeSearchFilter()">
-                                    <i class="fas fa-times"></i>
+                                <!-- Chip de búsqueda -->
+                                <div id="filter-search-chip" class="filter-chip" style="display: none;">
+                                    <span class="badge bg-primary d-inline-flex align-items-center py-2 px-3">
+                                        <i class="fas fa-search me-2"></i>
+                                        <span id="filter-search-text"></span>
+                                        <button class="btn-remove-filter ms-2" onclick="removeSearchFilter()"
+                                                title="Eliminar filtro de búsqueda"
+                                                style="background: none; border: none; color: white; cursor: pointer; padding: 0; margin-left: 8px;">
+                                            <i class="fas fa-times-circle"></i>
+                                        </button>
+                                    </span>
+                                </div>
+
+                                <!-- Chip de categoría -->
+                                <div id="filter-category-chip" class="filter-chip" style="display: none;">
+                                    <span class="badge bg-info d-inline-flex align-items-center py-2 px-3">
+                                        <i class="fas fa-tag me-2"></i>
+                                        <span id="filter-category-text"></span>
+                                        <button class="btn-remove-filter ms-2" onclick="removeCategoryFilter()"
+                                                title="Eliminar filtro de categoría"
+                                                style="background: none; border: none; color: white; cursor: pointer; padding: 0; margin-left: 8px;">
+                                            <i class="fas fa-times-circle"></i>
+                                        </button>
+                                    </span>
+                                </div>
+
+                                <!-- Chip de ordenamiento -->
+                                <div id="filter-order-chip" class="filter-chip" style="display: none;">
+                                    <span class="badge bg-success d-inline-flex align-items-center py-2 px-3">
+                                        <i class="fas fa-sort me-2"></i>
+                                        <span id="filter-order-text"></span>
+                                        <button class="btn-remove-filter ms-2" onclick="removeOrderFilter()"
+                                                title="Eliminar ordenamiento"
+                                                style="background: none; border: none; color: white; cursor: pointer; padding: 0; margin-left: 8px;">
+                                            <i class="fas fa-times-circle"></i>
+                                        </button>
+                                    </span>
+                                </div>
+
+                                <!-- Botón limpiar todos los filtros -->
+                                <button class="btn btn-sm btn-outline-danger ms-2" onclick="clearAllFilters()"
+                                        title="Limpiar todos los filtros">
+                                    <i class="fas fa-broom me-1"></i>
+                                    Limpiar todo
                                 </button>
-                            </span>
+                            </div>
                         </div>
-
-                        <!-- Chip de categoría -->
-                        <div id="filter-category-chip" class="filter-chip" style="display: none;">
-                            <span class="badge bg-info d-inline-flex align-items-center">
-                                <i class="fas fa-tag me-1"></i>
-                                <span id="filter-category-text"></span>
-                                <button class="btn-remove-filter ms-2" onclick="removeCategoryFilter()">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </span>
-                        </div>
-
-                        <!-- Chip de ordenamiento -->
-                        <div id="filter-order-chip" class="filter-chip" style="display: none;">
-                            <span class="badge bg-success d-inline-flex align-items-center">
-                                <i class="fas fa-sort me-1"></i>
-                                <span id="filter-order-text"></span>
-                                <button class="btn-remove-filter ms-2" onclick="removeOrderFilter()">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </span>
-                        </div>
-
-                        <!-- Botón limpiar todos los filtros -->
-                        <button class="btn btn-sm btn-outline-danger" onclick="clearAllFilters()">
-                            <i class="fas fa-times-circle me-1"></i>
-                            Limpiar todos los filtros
-                        </button>
                     </div>
                 </div>
 
@@ -645,7 +738,15 @@
             currentQuery = '';
             const searchInput = document.getElementById('searchInput');
             if (searchInput) searchInput.value = '';
-            performDynamicSearch('', currentCategory, currentOrden);
+
+            // Animación de salida
+            const chip = document.getElementById('filter-search-chip');
+            chip.style.animation = 'fadeOutScale 0.3s ease-out';
+
+            setTimeout(() => {
+                performDynamicSearch('', currentCategory, currentOrden);
+                showNotification('🔍 Filtro de búsqueda eliminado', 'info');
+            }, 200);
         }
 
         // Eliminar filtro de categoría
@@ -663,7 +764,14 @@
                 allCategoriesLink.classList.add('fw-bold');
             }
 
-            performDynamicSearch(currentQuery, '', currentOrden);
+            // Animación de salida
+            const chip = document.getElementById('filter-category-chip');
+            chip.style.animation = 'fadeOutScale 0.3s ease-out';
+
+            setTimeout(() => {
+                performDynamicSearch(currentQuery, '', currentOrden);
+                showNotification('🏷️ Filtro de categoría eliminado', 'info');
+            }, 200);
         }
 
         // Eliminar filtro de ordenamiento
@@ -671,7 +779,15 @@
             currentOrden = 'nombre';
             const selectOrden = document.getElementById('ordenar');
             if (selectOrden) selectOrden.value = 'nombre';
-            performDynamicSearch(currentQuery, currentCategory, 'nombre');
+
+            // Animación de salida
+            const chip = document.getElementById('filter-order-chip');
+            chip.style.animation = 'fadeOutScale 0.3s ease-out';
+
+            setTimeout(() => {
+                performDynamicSearch(currentQuery, currentCategory, 'nombre');
+                showNotification('🔄 Ordenamiento restablecido', 'info');
+            }, 200);
         }
 
         // Limpiar todos los filtros
@@ -697,10 +813,14 @@
                 allCategoriesLink.classList.add('fw-bold');
             }
 
-            // Mostrar notificación
-            showNotification('✅ Todos los filtros han sido eliminados', 'success');
+            // Animación de salida del contenedor completo
+            const activeFiltersContainer = document.getElementById('active-filters');
+            activeFiltersContainer.style.animation = 'fadeOut 0.3s ease-out';
 
-            performDynamicSearch('', '', 'nombre');
+            setTimeout(() => {
+                performDynamicSearch('', '', 'nombre');
+                showNotification('🧹 Todos los filtros han sido eliminados', 'success');
+            }, 200);
         }
 
         // Inicializar búsqueda dinámica
