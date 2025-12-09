@@ -95,15 +95,87 @@ class RegistroClienteForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
+        if not email:
+            raise forms.ValidationError('El correo electrónico es obligatorio.')
         if User.objects.filter(email=email).exists():
-            raise forms.ValidationError('Este correo electrónico ya está registrado.')
-        return email
+            raise forms.ValidationError('Este correo electrónico ya está registrado. Por favor, usa otro correo o inicia sesión.')
+        # Validar formato de email
+        if '@' not in email or '.' not in email.split('@')[-1]:
+            raise forms.ValidationError('Por favor, ingresa un correo electrónico válido.')
+        return email.lower()
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if not username:
+            raise forms.ValidationError('El nombre de usuario es obligatorio.')
+        if len(username) < 4:
+            raise forms.ValidationError('El nombre de usuario debe tener al menos 4 caracteres.')
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError('Este nombre de usuario ya está en uso. Por favor, elige otro.')
+        # No permitir espacios
+        if ' ' in username:
+            raise forms.ValidationError('El nombre de usuario no puede contener espacios.')
+        return username
+
+    def clean_telefono(self):
+        telefono = self.cleaned_data.get('telefono')
+        if not telefono:
+            raise forms.ValidationError('El teléfono es obligatorio.')
+        # Eliminar caracteres no numéricos
+        telefono_limpio = ''.join(filter(str.isdigit, telefono))
+        if len(telefono_limpio) < 10:
+            raise forms.ValidationError('El teléfono debe tener al menos 10 dígitos.')
+        return telefono
+
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if not first_name:
+            raise forms.ValidationError('Los nombres son obligatorios.')
+        if len(first_name) < 2:
+            raise forms.ValidationError('Los nombres deben tener al menos 2 caracteres.')
+        return first_name.strip().title()
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        if not last_name:
+            raise forms.ValidationError('Los apellidos son obligatorios.')
+        if len(last_name) < 2:
+            raise forms.ValidationError('Los apellidos deben tener al menos 2 caracteres.')
+        return last_name.strip().title()
+
+    def clean_direccion(self):
+        direccion = self.cleaned_data.get('direccion')
+        if not direccion:
+            raise forms.ValidationError('La dirección es obligatoria.')
+        if len(direccion) < 10:
+            raise forms.ValidationError('Por favor, ingresa una dirección completa (mínimo 10 caracteres).')
+        return direccion.strip()
 
     def clean_documento(self):
         documento = self.cleaned_data.get('documento')
+        if not documento:
+            raise forms.ValidationError('El número de documento es obligatorio.')
+        if len(documento) < 5:
+            raise forms.ValidationError('El número de documento debe tener al menos 5 caracteres.')
         if Cliente.objects.filter(numero_documento=documento).exists():
-            raise forms.ValidationError('Este documento ya está registrado.')
-        return documento
+            raise forms.ValidationError('Este documento ya está registrado. Si ya tienes una cuenta, inicia sesión.')
+        return documento.strip().upper()
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+
+        if password1 and password2:
+            if password1 != password2:
+                raise forms.ValidationError('Las contraseñas no coinciden. Por favor, verifica e inténtalo de nuevo.')
+            if len(password1) < 8:
+                raise forms.ValidationError('La contraseña debe tener al menos 8 caracteres.')
+            if password1.isdigit():
+                raise forms.ValidationError('La contraseña no puede ser completamente numérica.')
+            if password1.lower() == self.cleaned_data.get('username', '').lower():
+                raise forms.ValidationError('La contraseña no puede ser igual al nombre de usuario.')
+
+        return password2
 
     def save(self, commit=True):
         user = super().save(commit=False)

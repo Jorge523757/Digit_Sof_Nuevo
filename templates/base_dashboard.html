@@ -57,7 +57,7 @@
             <div class="sidebar-category">Principal</div>
             <li>
                 <a href="{% url 'dashboard:index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">
-                    <i class="fas fa-home"></i> Dashboard
+                    <i class="fas fa-home"></i> Tablero
                 </a>
             </li>
 
@@ -168,7 +168,7 @@
             <nav class="navbar-menu">
                 <ul class="nav-list">
                     <li><a href="{% url 'core:home' %}">Inicio</a></li>
-                    <li><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+                    <li><a href="{% url 'dashboard:index' %}">Tablero</a></li>
 
                     <!-- Módulos Dropdown -->
                     <li class="dropdown">
