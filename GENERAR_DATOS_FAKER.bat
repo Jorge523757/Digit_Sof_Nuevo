@@ -1,36 +1,57 @@
 @echo off
-echo ========================================
-echo   GENERAR DATOS FALSOS - DIGITSOFT
-echo ========================================
+chcp 65001 >nul
+title DIGIT SOFT - Generador de Datos Faker
+color 0B
+
 echo.
-echo Este script generara datos de prueba para:
-echo   - Productos (80)
-echo   - Clientes (50)
-echo   - Proveedores (25)
-echo   - Tecnicos (20)
-echo   - Equipos (60)
-echo   - Garantias (35)
-echo   - Ordenes de Servicio (45)
-echo   - Ventas (60)
-echo   - Compras (40)
-echo   - Capacitaciones (25)
+echo ═══════════════════════════════════════════════════════════════════
+echo  DIGIT SOFT - GENERADOR DE DATOS DE PRUEBA
+echo ═══════════════════════════════════════════════════════════════════
 echo.
-echo ADVERTENCIA: Esto agregara muchos registros a tu base de datos
+echo Este script generará datos falsos para TODOS los módulos:
 echo.
-set /p confirmar="Deseas continuar? (S/N): "
-if /i "%confirmar%" NEQ "S" (
-    echo Operacion cancelada.
-    pause
-    exit /b
+echo   ✓ Clientes
+echo   ✓ Productos y Categorías
+echo   ✓ Proveedores
+echo   ✓ Equipos
+echo   ✓ Técnicos
+echo   ✓ Ventas
+echo   ✓ Órdenes de Servicio
+echo   ✓ Garantías
+echo   ✓ Compras
+echo   ✓ Capacitaciones
+echo.
+echo ═══════════════════════════════════════════════════════════════════
+echo.
+
+echo Verificando instalación de Faker...
+python -c "import faker" 2>nul
+if errorlevel 1 (
+    echo.
+    echo ⚠️  Faker no está instalado. Instalando...
+    echo.
+    pip install faker
+    if errorlevel 1 (
+        echo.
+        echo ❌ Error al instalar Faker
+        pause
+        exit /b 1
+    )
+    echo.
+    echo ✅ Faker instalado correctamente
 )
+
 echo.
-echo Generando datos...
+echo ═══════════════════════════════════════════════════════════════════
+echo  INICIANDO GENERACIÓN DE DATOS...
+echo ═══════════════════════════════════════════════════════════════════
 echo.
-python scripts\generar_datos_faker.py
+
+python generar_datos_faker.py
+
 echo.
-echo ========================================
-echo   PROCESO COMPLETADO
-echo ========================================
+echo ═══════════════════════════════════════════════════════════════════
 echo.
-pause
+echo Presiona cualquier tecla para cerrar...
+pause >nul
 

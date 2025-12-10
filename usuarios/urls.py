@@ -2,6 +2,7 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
 from . import views_recuperacion
+from . import views_notificaciones
 
 app_name = 'usuarios'
 
@@ -37,6 +38,16 @@ urlpatterns = [
     path('gestionar/<int:user_id>/bloquear/', views.bloquear_usuario, name='bloquear_usuario'),
     path('gestionar/<int:user_id>/desbloquear/', views.desbloquear_usuario, name='desbloquear_usuario'),
     path('gestionar/<int:user_id>/toggle-staff/', views.toggle_staff, name='toggle_staff'),
+
+    # Notificaciones
+    path('notificaciones/', views_notificaciones.listar_notificaciones, name='notificaciones'),
+    path('notificaciones/json/', views_notificaciones.notificaciones_json, name='notificaciones_json'),
+    path('notificaciones/<int:notificacion_id>/marcar-leida/', views_notificaciones.marcar_notificacion_leida, name='marcar_notificacion_leida'),
+    path('notificaciones/marcar-todas-leidas/', views_notificaciones.marcar_todas_leidas, name='marcar_todas_leidas'),
+    path('notificaciones/<int:notificacion_id>/eliminar/', views_notificaciones.eliminar_notificacion, name='eliminar_notificacion'),
+
+    # Debug
+    path('notificaciones/debug/', views_notificaciones.debug_notificaciones, name='debug_notificaciones'),
 ]
 
 

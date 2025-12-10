@@ -404,3 +404,74 @@ th button {
     z-index: 35 !important;
 }
 
+/* ============================================
+   SISTEMA DE NOTIFICACIONES - FIX CRÍTICO
+   ============================================ */
+
+/* Botón de notificaciones */
+#dropdownNotificaciones,
+.header-actions .dropdown button {
+    position: relative !important;
+    z-index: 100 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* Dropdown de notificaciones */
+.header-actions .dropdown-menu,
+#dropdownNotificaciones + .dropdown-menu {
+    position: absolute !important;
+    z-index: 1050 !important;
+    pointer-events: auto !important;
+    display: none;
+}
+
+/* Cuando el dropdown está abierto */
+.header-actions .dropdown-menu.show,
+#dropdownNotificaciones + .dropdown-menu.show {
+    display: block !important;
+    z-index: 1050 !important;
+    pointer-events: auto !important;
+}
+
+/* Items dentro del dropdown de notificaciones */
+#notificaciones-lista,
+#notificaciones-lista li,
+#notificaciones-lista a,
+.notificacion-item {
+    position: relative !important;
+    z-index: 1051 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* Badge de contador de notificaciones */
+#notif-count {
+    position: absolute !important;
+    z-index: 101 !important;
+    pointer-events: none !important;
+}
+
+/* Todos los dropdowns del header */
+.header-actions .dropdown {
+    position: relative !important;
+    z-index: 100 !important;
+}
+
+/* Asegurar que el botón de notificaciones sea visible y clicable */
+.btn-outline-primary {
+    position: relative !important;
+    z-index: 100 !important;
+    pointer-events: auto !important;
+}
+
+/* Header actions debe permitir clicks */
+.header-actions {
+    position: relative !important;
+    z-index: 99 !important;
+    pointer-events: auto !important;
+}
+
+.header-actions > * {
+    pointer-events: auto !important;
+}

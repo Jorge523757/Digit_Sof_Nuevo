@@ -1,12 +1,13 @@
 """
 DIGITSOFT - Módulo de Usuarios
-Models - Perfil de Usuario Extendido
+Models - Perfil de Usuario Extendido y Notificaciones
 """
 
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 
 class PerfilUsuario(models.Model):
@@ -101,11 +102,111 @@ def guardar_perfil_usuario(sender, instance, **kwargs):
     if hasattr(instance, 'perfil'):
         instance.perfil.save()
 
+# ==============================================
+# MODELO DE NOTIFICACIONES
+# ==============================================
+
+class Notificacion(models.Model):
+    """
+    Modelo para gestionar notificaciones del sistema
+    """
+
+    TIPO_CHOICES = [
+        ('INFO', 'Información'),
+        ('WARNING', 'Advertencia'),
+        ('SUCCESS', 'Éxito'),
+        ('ERROR', 'Error'),
+        ('VENTA', 'Venta'),
+        ('ORDEN', 'Orden de Servicio'),
+        ('COMPRA', 'Compra'),
+        ('SISTEMA', 'Sistema'),
+    ]
+
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='notificaciones',
+        verbose_name="Usuario"
+    )
+    titulo = models.CharField(max_length=200, verbose_name="Título")
+    mensaje = models.TextField(verbose_name="Mensaje")
+    tipo = models.CharField(
+        max_length=10,
+        choices=TIPO_CHOICES,
+        default='INFO',
+        verbose_name="Tipo"
+    )
+
+    # Control
+    leida = models.BooleanField(default=False, verbose_name="Leída")
+    fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Creación")
+    fecha_lectura = models.DateTimeField(null=True, blank=True, verbose_name="Fecha de Lectura")
+
+    # Enlace opcional
+    url = models.CharField(max_length=500, blank=True, verbose_name="URL de referencia")
+
+    # Información adicional
+    icono = models.CharField(max_length=50, blank=True, verbose_name="Icono Font Awesome")
+    color = models.CharField(max_length=20, blank=True, verbose_name="Color")
+
+    class Meta:
+        verbose_name = "Notificación"
+        verbose_name_plural = "Notificaciones"
+        ordering = ['-fecha_creacion']
+        indexes = [
+            models.Index(fields=['usuario', 'leida']),
+            models.Index(fields=['-fecha_creacion']),
+        ]
+
+    def __str__(self):
+        return f"{self.titulo} - {self.usuario.username}"
+
+    def marcar_como_leida(self):
+        """Marca la notificación como leída"""
+        if not self.leida:
+            self.leida = True
+            self.fecha_lectura = timezone.now()
+            self.save()
+
+    @property
+    def tiempo_transcurrido(self):
+        """Retorna el tiempo transcurrido desde la creación"""
+        from django.utils.timesince import timesince
+        return timesince(self.fecha_creacion)
+
+    def get_icono(self):
+        """Retorna el icono según el tipo"""
+        iconos = {
+            'INFO': 'fa-info-circle',
+            'WARNING': 'fa-exclamation-triangle',
+            'SUCCESS': 'fa-check-circle',
+            'ERROR': 'fa-times-circle',
+            'VENTA': 'fa-shopping-cart',
+            'ORDEN': 'fa-tools',
+            'COMPRA': 'fa-box',
+            'SISTEMA': 'fa-cog',
+        }
+        return self.icono or iconos.get(self.tipo, 'fa-bell')
+
+    def get_color(self):
+        """Retorna el color según el tipo"""
+        colores = {
+            'INFO': 'info',
+            'WARNING': 'warning',
+            'SUCCESS': 'success',
+            'ERROR': 'danger',
+            'VENTA': 'primary',
+            'ORDEN': 'secondary',
+            'COMPRA': 'dark',
+            'SISTEMA': 'info',
+        }
+        return self.color or colores.get(self.tipo, 'info')
+
+
 
 # ==============================================
 # MODELO DE RECUPERACIÓN DE CONTRASEÑA
 # ==============================================
-
 from django.utils import timezone
 import uuid
 from datetime import timedelta

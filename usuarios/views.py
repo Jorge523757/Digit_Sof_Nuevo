@@ -1,6 +1,6 @@
 """
 DIGT SOFT - Módulo de Usuarios
-Views - Vistas de Autenticación, Registro y Gestión de Usuarios
+Views - Vistas de Autenticación, Registro, Perfil y Notificaciones
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -15,7 +15,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from .forms import RegistroClienteForm, PerfilUsuarioForm
-from .models import PerfilUsuario
+from .models import PerfilUsuario, Notificacion
 from .decorators import admin_required, staff_required
 
 
