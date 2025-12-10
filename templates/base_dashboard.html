@@ -205,9 +205,18 @@
                     </a>
 
                     <!-- Botón ver tienda -->
-                    <a href="{% url 'ecommerce:productos' %}" class="btn btn-info btn-sm me-2">
+                    <a href="{% url 'ecommerce:productos' %}" class="btn btn-info btn-sm me-3">
                         <i class="fas fa-store"></i> Tienda
                     </a>
+
+                    <!-- Botón Tema Oscuro/Claro -->
+                    <button class="btn btn-outline-secondary btn-sm me-3"
+                            id="themeToggleHeader"
+                            type="button"
+                            title="Cambiar tema"
+                            style="min-width: 45px; height: 38px; display: inline-flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-moon" id="themeIconHeader" style="font-size: 1.1rem;"></i>
+                    </button>
 
                     <!-- Notificaciones Dropdown -->
                     <div class="dropdown me-2">
@@ -469,6 +478,63 @@
                 }
             });
         });
+
+        // =======================================
+        // BOTÓN DE TEMA OSCURO/CLARO EN HEADER
+        // =======================================
+        const themeToggleBtn = document.getElementById('themeToggleHeader');
+        const themeIcon = document.getElementById('themeIconHeader');
+
+        // Cargar tema guardado
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                updateThemeIcon(true);
+            } else {
+                document.body.classList.remove('dark-mode');
+                updateThemeIcon(false);
+            }
+        }
+
+        // Actualizar icono del botón
+        function updateThemeIcon(isDark) {
+            if (themeIcon) {
+                if (isDark) {
+                    themeIcon.className = 'fas fa-sun';
+                    if (themeToggleBtn) {
+                        themeToggleBtn.title = 'Cambiar a modo claro';
+                        themeToggleBtn.classList.remove('btn-outline-secondary');
+                        themeToggleBtn.classList.add('btn-warning');
+                    }
+                } else {
+                    themeIcon.className = 'fas fa-moon';
+                    if (themeToggleBtn) {
+                        themeToggleBtn.title = 'Cambiar a modo oscuro';
+                        themeToggleBtn.classList.remove('btn-warning');
+                        themeToggleBtn.classList.add('btn-outline-secondary');
+                    }
+                }
+            }
+        }
+
+        // Toggle tema
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', function() {
+                const isDark = document.body.classList.toggle('dark-mode');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                updateThemeIcon(isDark);
+
+                // Añadir animación de transición
+                document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+                setTimeout(() => {
+                    document.body.style.transition = '';
+                }, 300);
+            });
+        }
+
+        // Cargar tema al inicio
+        loadTheme();
     </script>
 
     <!-- Theme Switcher JS -->

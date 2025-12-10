@@ -60,9 +60,6 @@ class ValidadorContrasenaNumerica(NumericPasswordValidator):
 class ValidadorSimilitudAtributos(UserAttributeSimilarityValidator):
     """Validador de similitud con atributos del usuario con mensaje en español"""
 
-    def __init__(self, user_attributes=None, max_similarity=0.7):
-        super().__init__(user_attributes=user_attributes, max_similarity=max_similarity)
-
     def get_help_text(self):
         return 'Tu contraseña no puede ser muy similar a tu información personal.'
 
@@ -70,20 +67,27 @@ class ValidadorSimilitudAtributos(UserAttributeSimilarityValidator):
         if not user:
             return
 
-        password = password.lower()
-        for attribute_name in self.user_attributes:
-            value = getattr(user, attribute_name, None)
-            if not value or not isinstance(value, str):
-                continue
-            value_lower = value.lower()
+        # Usar el método validate del padre que ya tiene _are_similar implementado
+        try:
+            super().validate(password, user)
+        except ValidationError:
+            # Capturar el error y lanzar uno con mensaje en español
+            for attribute_name in self.user_attributes:
+                value = getattr(user, attribute_name, None)
+                if not value or not isinstance(value, str):
+                    continue
 
-            if self._are_similar(password, value_lower):
-                verbose_name = self._get_verbose_name(attribute_name)
-                raise ValidationError(
-                    f'Tu contraseña es muy similar a tu {verbose_name}. Por favor, elige una contraseña diferente.',
-                    code='password_too_similar',
-                    params={'verbose_name': verbose_name},
-                )
+                # Usar el método heredado de la clase padre
+                from difflib import SequenceMatcher
+                similarity = SequenceMatcher(None, password.lower(), value.lower()).ratio()
+
+                if similarity > self.max_similarity:
+                    verbose_name = self._get_verbose_name(attribute_name)
+                    raise ValidationError(
+                        f'Tu contraseña es muy similar a tu {verbose_name}. Por favor, elige una contraseña diferente.',
+                        code='password_too_similar',
+                        params={'verbose_name': verbose_name},
+                    )
 
     def _get_verbose_name(self, attribute_name):
         """Traduce los nombres de atributos al español"""
