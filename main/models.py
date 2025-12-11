@@ -61,18 +61,19 @@ class UserProfile(models.Model):
         return self.role == 'tecnico'
 
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    """Crear perfil automáticamente cuando se crea un usuario"""
-    if created:
-        UserProfile.objects.create(user=instance)
+# SIGNALS DESHABILITADOS - Se usa el signal de usuarios/models.py (PerfilUsuario)
+# @receiver(post_save, sender=User)
+# def create_user_profile(sender, instance, created, **kwargs):
+#     """Crear perfil automáticamente cuando se crea un usuario"""
+#     if created:
+#         UserProfile.objects.create(user=instance)
 
 
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    """Guardar el perfil cuando se guarda el usuario"""
-    if hasattr(instance, 'profile'):
-        instance.profile.save()
+# @receiver(post_save, sender=User)
+# def save_user_profile(sender, instance, **kwargs):
+#     """Guardar el perfil cuando se guarda el usuario"""
+#     if hasattr(instance, 'profile'):
+#         instance.profile.save()
 
 
 class Cliente(models.Model):
@@ -146,7 +147,7 @@ class Administrador(models.Model):
 class Marca(models.Model):
     """Modelo para marcas de productos"""
     id = models.AutoField(primary_key=True)
-    color = models.CharField(max_length=25)
+    color = models.CharField(max_length=25, blank=True, default='')
     marca = models.CharField(max_length=40)
     descripcion = models.CharField(max_length=80)
 
@@ -181,7 +182,7 @@ class Equipo(models.Model):
     id_equipo = models.AutoField(primary_key=True)
     modelo = models.CharField(max_length=35)
     clave = models.CharField(max_length=35)
-    cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE)
+    cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE, null=True, blank=True)
     marca = models.ForeignKey('Marca', on_delete=models.CASCADE)
 
     def __str__(self):

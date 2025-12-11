@@ -2,7 +2,7 @@
 cls
 color 0A
 echo ============================================================
-echo    DIGT SOFT - Sistema de Gestion Empresarial
+echo    DIGIT SOFT - Sistema de Gestion Empresarial
 echo    TODOS LOS MODULOS COMPLETADOS Y FUNCIONALES
 echo ============================================================
 echo.

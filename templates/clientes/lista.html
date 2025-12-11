@@ -72,6 +72,16 @@
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
+                    <div class="col-md-2 d-flex align-items-end gap-2">
+                        <a href="{% url 'clientes:reporte_pdf' %}?{{ request.GET.urlencode }}"
+                           class="btn btn-danger btn-enhanced flex-fill" title="Descargar PDF">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </a>
+                        <a href="{% url 'clientes:reporte_excel' %}?{{ request.GET.urlencode }}"
+                           class="btn btn-success btn-enhanced flex-fill" title="Descargar Excel">
+                            <i class="fas fa-file-excel"></i> Excel
+                        </a>
+                    </div>
                 </form>
                 <div id="searchStatus" class="mt-3"></div>
             </div>

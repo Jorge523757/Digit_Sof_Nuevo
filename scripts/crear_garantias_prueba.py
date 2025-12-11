@@ -46,7 +46,7 @@ def crear_garantias():
         {'nombre': 'Patricia Silva', 'cedula': '1111111111', 'telefono': '3201111111', 'email': 'patricia.s@email.com'},
     ]
 
-    lugares_compra = ['DIGT SOFT Sede Principal', 'Tienda Online', 'Distribuidor Autorizado', 'Amazon', 'Mercado Libre']
+    lugares_compra = ['DIGIT SOFT Sede Principal', 'Tienda Online', 'Distribuidor Autorizado', 'Amazon', 'Mercado Libre']
 
     estados = ['ACTIVA', 'ACTIVA', 'ACTIVA', 'ACTIVA', 'EN_REVISION', 'APROBADA', 'FINALIZADA']
 

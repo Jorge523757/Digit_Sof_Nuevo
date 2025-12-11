@@ -235,7 +235,7 @@
                             <a href="{% url 'productos:lista' %}" class="btn btn-secondary">
                                 <i class="fas fa-times"></i> Cancelar
                             </a>
-                            <button type="submit" class="btn btn-primary btn-lg">
+                            <button type="submit" class="btn btn-primary btn-lg" id="btn-guardar">
                                 <i class="fas fa-save"></i> {{ accion }} Producto
                             </button>
                         </div>
@@ -245,5 +245,137 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('form-producto');
+    const btnGuardar = document.getElementById('btn-guardar');
+
+    // Validación del formulario antes de enviar
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        let errorMessages = [];
+
+        // Validar nombre del producto
+        const nombreProducto = form.querySelector('[name="nombre_producto"]');
+        if (!nombreProducto.value.trim()) {
+            isValid = false;
+            errorMessages.push('El nombre del producto es obligatorio');
+            nombreProducto.classList.add('is-invalid');
+        } else {
+            nombreProducto.classList.remove('is-invalid');
+        }
+
+        // Validar código SKU
+        const codigoSku = form.querySelector('[name="codigo_sku"]');
+        if (!codigoSku.value.trim()) {
+            isValid = false;
+            errorMessages.push('El código SKU es obligatorio');
+            codigoSku.classList.add('is-invalid');
+        } else {
+            codigoSku.classList.remove('is-invalid');
+        }
+
+        // Validar descripción
+        const descripcion = form.querySelector('[name="descripcion"]');
+        if (!descripcion.value.trim()) {
+            isValid = false;
+            errorMessages.push('La descripción es obligatoria');
+            descripcion.classList.add('is-invalid');
+        } else {
+            descripcion.classList.remove('is-invalid');
+        }
+
+        // Validar precios
+        const precioCompra = form.querySelector('[name="precio_compra"]');
+        const precioVenta = form.querySelector('[name="precio_venta"]');
+
+        if (!precioCompra.value || parseFloat(precioCompra.value) <= 0) {
+            isValid = false;
+            errorMessages.push('El precio de compra debe ser mayor a 0');
+            precioCompra.classList.add('is-invalid');
+        } else {
+            precioCompra.classList.remove('is-invalid');
+        }
+
+        if (!precioVenta.value || parseFloat(precioVenta.value) <= 0) {
+            isValid = false;
+            errorMessages.push('El precio de venta debe ser mayor a 0');
+            precioVenta.classList.add('is-invalid');
+        } else {
+            precioVenta.classList.remove('is-invalid');
+        }
+
+        // Validar stocks
+        const stockActual = form.querySelector('[name="stock_actual"]');
+        const stockMinimo = form.querySelector('[name="stock_minimo"]');
+        const stockMaximo = form.querySelector('[name="stock_maximo"]');
+
+        if (!stockActual.value || parseInt(stockActual.value) < 0) {
+            isValid = false;
+            errorMessages.push('El stock actual debe ser mayor o igual a 0');
+            stockActual.classList.add('is-invalid');
+        } else {
+            stockActual.classList.remove('is-invalid');
+        }
+
+        if (!stockMinimo.value || parseInt(stockMinimo.value) < 0) {
+            isValid = false;
+            errorMessages.push('El stock mínimo debe ser mayor o igual a 0');
+            stockMinimo.classList.add('is-invalid');
+        } else {
+            stockMinimo.classList.remove('is-invalid');
+        }
+
+        if (!stockMaximo.value || parseInt(stockMaximo.value) < 0) {
+            isValid = false;
+            errorMessages.push('El stock máximo debe ser mayor o igual a 0');
+            stockMaximo.classList.add('is-invalid');
+        } else {
+            stockMaximo.classList.remove('is-invalid');
+        }
+
+        // Si hay errores, prevenrir el envío y mostrar mensajes
+        if (!isValid) {
+            e.preventDefault();
+
+            // Crear alerta con todos los errores
+            let alertHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+            alertHtml += '<h5><i class="fas fa-exclamation-triangle"></i> Errores de validación:</h5>';
+            alertHtml += '<ul>';
+            errorMessages.forEach(msg => {
+                alertHtml += '<li>' + msg + '</li>';
+            });
+            alertHtml += '</ul>';
+            alertHtml += '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+            alertHtml += '</div>';
+
+            // Insertar alerta al principio del formulario
+            const existingAlert = form.querySelector('.alert-danger');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+            form.insertAdjacentHTML('afterbegin', alertHtml);
+
+            // Scroll al inicio del formulario
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            return false;
+        }
+
+        // Deshabilitar botón para evitar doble envío
+        btnGuardar.disabled = true;
+        btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+    });
+
+    // Limpiar errores al escribir
+    const inputs = form.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+        });
+    });
+});
+</script>
 {% endblock %}
 

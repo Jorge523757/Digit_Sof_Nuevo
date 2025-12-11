@@ -48,7 +48,7 @@ Todas las plantillas deben seguir esta estructura:
 {% extends 'base_dashboard.html' %}
 {% load static %}
 
-{% block title %}Título - DIGT SOFT{% endblock %}
+{% block title %}Título - DIGIT SOFT{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/clientes-enhanced.css' %}">
@@ -93,7 +93,7 @@ Todas las plantillas deben seguir esta estructura:
 {% load static %}
 {% load widget_tweaks %}
 
-{% block title %}{{ titulo }} - DIGT SOFT{% endblock %}
+{% block title %}{{ titulo }} - DIGIT SOFT{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/clientes-enhanced.css' %}">
@@ -162,7 +162,7 @@ Todas las plantillas deben seguir esta estructura:
 {% extends 'base_dashboard.html' %}
 {% load static %}
 
-{% block title %}Detalle Proveedor - DIGT SOFT{% endblock %}
+{% block title %}Detalle Proveedor - DIGIT SOFT{% endblock %}
 
 {% block content %}
 <div class="container-fluid clientes-container animate-fade-in">

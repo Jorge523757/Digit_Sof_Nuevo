@@ -1,0 +1,477 @@
+/* ============================================
+   FIX CRÍTICO PARA TABLAS Y CLICKS - DIGITSOFT
+   Asegura que las tablas sean visibles y clicables
+   ============================================ */
+
+/* IMPORTANTE: Este archivo debe cargarse ÚLTIMO */
+
+/* ============================================
+   FORZAR VISIBILIDAD DE CONTENIDO PRINCIPAL
+   ============================================ */
+
+/* Contenido principal siempre al frente cuando sea necesario */
+.main-content,
+.main-wrapper {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Container de los módulos */
+.container-fluid {
+    position: relative !important;
+    z-index: 2 !important;
+    pointer-events: auto !important;
+}
+
+/* ============================================
+   TABLAS - SIEMPRE VISIBLES Y CLICABLES
+   ============================================ */
+
+/* Todos los elementos de tabla deben ser clicables */
+table,
+.table,
+.table-responsive,
+.card,
+.card-body,
+.module-header,
+.search-box,
+.filters-section {
+    position: relative !important;
+    z-index: 10 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Asegurar que los botones de acción funcionen */
+table td .btn,
+table td a,
+table td button,
+.btn-group-enhanced,
+.action-buttons {
+    position: relative !important;
+    z-index: 15 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* Botones de ver, editar, eliminar */
+.btn-info-enhanced,
+.btn-warning-enhanced,
+.btn-danger-enhanced,
+.btn-sm-enhanced {
+    position: relative !important;
+    z-index: 20 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* ============================================
+   HEADER - NO DEBE TAPAR CONTENIDO
+   ============================================ */
+
+header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 90 !important;
+    pointer-events: auto !important;
+}
+
+.header-container {
+    position: relative !important;
+    z-index: 95 !important;
+}
+
+/* Botón de menú hamburguesa */
+.menu-toggle,
+#menuToggle {
+    position: relative !important;
+    z-index: 100 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* Navegación */
+.navbar-menu,
+.nav-list {
+    position: relative !important;
+    z-index: 98 !important;
+}
+
+/* ============================================
+   SIDEBAR - OVERLAY CUANDO ESTÁ ABIERTO
+   ============================================ */
+
+.sidebar {
+    position: fixed !important;
+    z-index: 950 !important;
+}
+
+.sidebar-overlay {
+    position: fixed !important;
+    z-index: 940 !important;
+}
+
+/* Cuando el sidebar está abierto */
+.sidebar.open {
+    z-index: 950 !important;
+}
+
+.sidebar-overlay.open {
+    z-index: 940 !important;
+}
+
+/* ============================================
+   WIDGETS FLOTANTES - NO DEBEN TAPAR
+   ============================================ */
+
+.floating-widgets-container {
+    position: fixed !important;
+    z-index: 1030 !important;
+    pointer-events: none !important; /* Solo los botones reciben clicks */
+}
+
+.floating-widgets-container > * {
+    pointer-events: auto !important;
+}
+
+.accessibility-widget,
+.whatsapp-widget {
+    position: relative !important;
+    z-index: 1032 !important;
+}
+
+.accessibility-toggle,
+.whatsapp-float-btn {
+    position: relative !important;
+    z-index: 1035 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* Panel de accesibilidad */
+.accessibility-panel {
+    position: fixed !important;
+    z-index: 1040 !important;
+    pointer-events: auto !important;
+}
+
+/* ============================================
+   FORMULARIOS Y CAMPOS DE ENTRADA
+   ============================================ */
+
+input,
+select,
+textarea,
+button,
+.form-control,
+.form-select,
+.btn {
+    position: relative !important;
+    z-index: 12 !important;
+    pointer-events: auto !important;
+}
+
+/* ============================================
+   MODALES - SIEMPRE AL FRENTE
+   ============================================ */
+
+.modal {
+    z-index: 1055 !important;
+}
+
+.modal-backdrop {
+    z-index: 1050 !important;
+}
+
+/* ============================================
+   DROPDOWNS Y MENUS
+   ============================================ */
+
+.dropdown-menu {
+    z-index: 1000 !important;
+    pointer-events: auto !important;
+}
+
+/* ============================================
+   ASEGURAR QUE NADA TAPE LAS TABLAS
+   ============================================ */
+
+/* Remover cualquier overlay invisible que pueda estar tapando */
+body::before,
+body::after,
+.main-wrapper::before,
+.main-wrapper::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* Asegurar que no haya elementos con z-index muy alto tapando */
+* {
+    max-height: none !important;
+}
+
+/* ============================================
+   FIX PARA ELEMENTOS ESPECÍFICOS
+   ============================================ */
+
+/* Encabezado de módulo */
+.module-header {
+    z-index: 10 !important;
+    pointer-events: auto !important;
+}
+
+/* Caja de búsqueda */
+.search-box form,
+.search-box input,
+.search-box button {
+    z-index: 12 !important;
+    pointer-events: auto !important;
+}
+
+/* Card de tabla */
+.card.card-enhanced {
+    z-index: 10 !important;
+}
+
+.card-body {
+    z-index: 11 !important;
+    pointer-events: auto !important;
+}
+
+/* Tabla dentro del card */
+.card-body .table-responsive {
+    z-index: 12 !important;
+    pointer-events: auto !important;
+}
+
+/* ============================================
+   HOVER Y FOCUS - ASEGURAR INTERACTIVIDAD
+   ============================================ */
+
+a:hover,
+button:hover,
+.btn:hover,
+tr:hover {
+    z-index: 25 !important;
+    pointer-events: auto !important;
+}
+
+/* ============================================
+   MENSAJES Y ALERTAS
+   ============================================ */
+
+.messages,
+.alert {
+    position: relative !important;
+    z-index: 1045 !important;
+    pointer-events: auto !important;
+}
+
+/* ============================================
+   FOOTER - SIEMPRE AL FONDO
+   ============================================ */
+
+footer {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* ============================================
+   DEBUG - VERIFICACIÓN VISUAL
+   ============================================ */
+
+/* Descomentar para ver contornos de elementos */
+/*
+.main-content {
+    outline: 3px solid green !important;
+}
+
+.table-responsive {
+    outline: 2px solid blue !important;
+}
+
+.card {
+    outline: 2px solid orange !important;
+}
+
+table {
+    outline: 2px solid red !important;
+}
+
+.floating-widgets-container {
+    outline: 3px solid purple !important;
+}
+*/
+
+/* ============================================
+   RESPONSIVE - AJUSTES MÓVIL
+   ============================================ */
+
+@media (max-width: 768px) {
+    /* En móvil, asegurar que el contenido tenga espacio */
+    body {
+        padding-bottom: 100px !important;
+    }
+
+    .main-content {
+        padding-bottom: 120px !important;
+    }
+
+    /* Widgets más pequeños */
+    .floating-widgets-container {
+        bottom: 15px !important;
+        right: 15px !important;
+    }
+
+    /* Tablas con scroll pero siempre clicables */
+    .table-responsive {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        z-index: 10 !important;
+        pointer-events: auto !important;
+    }
+}
+
+/* ============================================
+   FIX ESPECÍFICO PARA DIGITSOFT
+   ============================================ */
+
+/* Asegurar que el menú toggle no tape nada */
+#menuToggle {
+    z-index: 100 !important;
+    max-width: 50px !important;
+    max-height: 50px !important;
+}
+
+/* Panel de accesibilidad no debe tapar contenido */
+.accessibility-panel {
+    right: 30px !important;
+    bottom: 110px !important;
+}
+
+/* WhatsApp no debe tapar */
+.whatsapp-widget {
+    z-index: 1032 !important;
+}
+
+/* ============================================
+   ASEGURAR CLICKS EN TODA LA TABLA
+   ============================================ */
+
+tbody tr {
+    cursor: default !important;
+    pointer-events: auto !important;
+}
+
+tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+td, th {
+    pointer-events: auto !important;
+}
+
+/* Links y botones en celdas */
+td a,
+td button,
+th a,
+th button {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    position: relative !important;
+    z-index: 20 !important;
+}
+
+/* ============================================
+   FINAL - OVERRIDE CUALQUIER CONFLICTO
+   ============================================ */
+
+/* Prioridad máxima para interactividad de tabla */
+.table-enhanced tbody tr td a,
+.table-enhanced tbody tr td button,
+.table-enhanced tbody tr td .btn {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    z-index: 30 !important;
+}
+
+/* Grupo de botones de acción */
+.btn-group-enhanced a,
+.btn-group-enhanced button {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    z-index: 35 !important;
+}
+
+/* ============================================
+   SISTEMA DE NOTIFICACIONES - FIX CRÍTICO
+   ============================================ */
+
+/* Botón de notificaciones */
+#dropdownNotificaciones,
+.header-actions .dropdown button {
+    position: relative !important;
+    z-index: 100 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* Dropdown de notificaciones */
+.header-actions .dropdown-menu,
+#dropdownNotificaciones + .dropdown-menu {
+    position: absolute !important;
+    z-index: 1050 !important;
+    pointer-events: auto !important;
+    display: none;
+}
+
+/* Cuando el dropdown está abierto */
+.header-actions .dropdown-menu.show,
+#dropdownNotificaciones + .dropdown-menu.show {
+    display: block !important;
+    z-index: 1050 !important;
+    pointer-events: auto !important;
+}
+
+/* Items dentro del dropdown de notificaciones */
+#notificaciones-lista,
+#notificaciones-lista li,
+#notificaciones-lista a,
+.notificacion-item {
+    position: relative !important;
+    z-index: 1051 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* Badge de contador de notificaciones */
+#notif-count {
+    position: absolute !important;
+    z-index: 101 !important;
+    pointer-events: none !important;
+}
+
+/* Todos los dropdowns del header */
+.header-actions .dropdown {
+    position: relative !important;
+    z-index: 100 !important;
+}
+
+/* Asegurar que el botón de notificaciones sea visible y clicable */
+.btn-outline-primary {
+    position: relative !important;
+    z-index: 100 !important;
+    pointer-events: auto !important;
+}
+
+/* Header actions debe permitir clicks */
+.header-actions {
+    position: relative !important;
+    z-index: 99 !important;
+    pointer-events: auto !important;
+}
+
+.header-actions > * {
+    pointer-events: auto !important;
+}

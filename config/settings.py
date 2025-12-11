@@ -1,5 +1,5 @@
 """
-DIGT SOFT - Sistema de Gestión Empresarial
+DIGIT SOFT - Sistema de Gestión Empresarial
 Configuración Principal
 """
 
@@ -86,16 +86,23 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'usuarios.validators.ValidadorSimilitudAtributos',
+        'OPTIONS': {
+            'user_attributes': ('username', 'email', 'first_name', 'last_name'),
+            'max_similarity': 0.7,
+        }
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'usuarios.validators.ValidadorLongitudMinima',
+        'OPTIONS': {
+            'min_length': 8,
+        }
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'usuarios.validators.ValidadorContrasenaComun',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'usuarios.validators.ValidadorContrasenaNumerica',
     },
 ]
 

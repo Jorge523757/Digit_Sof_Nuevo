@@ -3,7 +3,7 @@
 ## ✅ ESTADO: COMPLETADO 100%
 
 **Fecha:** 7 de Noviembre, 2025  
-**Desarrollador:** Sistema DIGT SOFT  
+**Desarrollador:** Sistema DIGIT SOFT  
 **Módulos Implementados:** Productos (E-commerce + Inventario) y Garantías
 
 ---
@@ -23,7 +23,7 @@
 
 ## 🎯 RESUMEN EJECUTIVO
 
-Se han implementado **DOS MÓDULOS COMPLETOS** del sistema DIGT SOFT siguiendo los requisitos funcionales especificados en la imagen proporcionada:
+Se han implementado **DOS MÓDULOS COMPLETOS** del sistema DIGIT SOFT siguiendo los requisitos funcionales especificados en la imagen proporcionada:
 
 ### ✅ Productos (E-commerce + Inventario)
 - **RF1:** Registrar Producto ✅
@@ -682,7 +682,7 @@ Los módulos fueron diseñados para el rol de REPRESENTANTE DE VENTAS/ACTA como 
 
 ## 🎉 CONCLUSIÓN
 
-Se han implementado **exitosamente** los módulos de **Productos (E-commerce + Inventario)** y **Garantías** para el sistema DIGT SOFT, cumpliendo al 100% con los requisitos funcionales especificados en la imagen proporcionada.
+Se han implementado **exitosamente** los módulos de **Productos (E-commerce + Inventario)** y **Garantías** para el sistema DIGIT SOFT, cumpliendo al 100% con los requisitos funcionales especificados en la imagen proporcionada.
 
 ### **Logros Destacados:**
 
@@ -716,9 +716,9 @@ Se han implementado **exitosamente** los módulos de **Productos (E-commerce + I
 
 ---
 
-**Desarrollado por:** Sistema DIGT SOFT  
+**Desarrollado por:** Sistema DIGIT SOFT  
 **Fecha:** 7 de Noviembre, 2025  
 **Versión:** 2.0.0
 
-🚀 **¡El sistema DIGT SOFT continúa creciendo!**
+🚀 **¡El sistema DIGIT SOFT continúa creciendo!**
 

@@ -1,0 +1,339 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Detalle Usuario - DIGITSOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+    }
+    .info-card {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    .info-card h5 {
+        color: #667eea;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    .info-row {
+        display: flex;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    .info-label {
+        font-weight: 600;
+        color: #666;
+        min-width: 180px;
+    }
+    .info-value {
+        color: #333;
+    }
+    .status-badge {
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    .badge-active {
+        background: #d4edda;
+        color: #155724;
+    }
+    .badge-inactive {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .btn-action {
+        flex: 1;
+        min-width: 150px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2><i class="fas fa-user"></i> Detalle del Usuario</h2>
+                <p class="mb-0">Información completa del usuario {{ usuario.get_full_name|default:usuario.username }}</p>
+            </div>
+            <a href="{% url 'usuarios:listar_usuarios' %}" class="btn btn-light">
+                <i class="fas fa-arrow-left"></i> Volver a la Lista
+            </a>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="mb-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Información Personal -->
+            <div class="info-card">
+                <h5><i class="fas fa-id-card"></i> Información Personal</h5>
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-user"></i> Nombre Completo:</span>
+                    <span class="info-value">{{ usuario.get_full_name|default:"No especificado" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-at"></i> Username:</span>
+                    <span class="info-value">{{ usuario.username }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-envelope"></i> Email:</span>
+                    <span class="info-value">{{ usuario.email|default:"No especificado" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-calendar"></i> Fecha de Registro:</span>
+                    <span class="info-value">{{ usuario.date_joined|date:"d/m/Y H:i" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-clock"></i> Último Acceso:</span>
+                    <span class="info-value">
+                        {% if usuario.last_login %}
+                            {{ usuario.last_login|date:"d/m/Y H:i" }}
+                        {% else %}
+                            Nunca
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Permisos y Roles -->
+            <div class="info-card">
+                <h5><i class="fas fa-shield-alt"></i> Permisos y Roles</h5>
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-crown"></i> Superusuario:</span>
+                    <span class="info-value">
+                        {% if usuario.is_superuser %}
+                            <span class="badge bg-danger">Sí</span>
+                        {% else %}
+                            <span class="badge bg-secondary">No</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-user-tie"></i> Personal (Staff):</span>
+                    <span class="info-value">
+                        {% if usuario.is_staff %}
+                            <span class="badge bg-primary">Sí</span>
+                        {% else %}
+                            <span class="badge bg-secondary">No</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-users"></i> Grupos:</span>
+                    <span class="info-value">
+                        {% if usuario.groups.all %}
+                            {% for grupo in usuario.groups.all %}
+                                <span class="badge bg-info me-1">{{ grupo.name }}</span>
+                            {% endfor %}
+                        {% else %}
+                            Ninguno
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="info-card">
+                <h5><i class="fas fa-chart-bar"></i> Estadísticas</h5>
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <i class="fas fa-shopping-cart fa-2x text-primary mb-2"></i>
+                            <h4>{{ usuario.ventas_realizadas.count|default:0 }}</h4>
+                            <small class="text-muted">Ventas Realizadas</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <i class="fas fa-shopping-basket fa-2x text-success mb-2"></i>
+                            <h4>{{ usuario.compras_realizadas.count|default:0 }}</h4>
+                            <small class="text-muted">Compras Realizadas</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <i class="fas fa-calendar-check fa-2x text-warning mb-2"></i>
+                            <h4>{{ usuario.date_joined|timesince }}</h4>
+                            <small class="text-muted">Tiempo en el Sistema</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Estado -->
+            <div class="info-card">
+                <h5><i class="fas fa-info-circle"></i> Estado del Usuario</h5>
+                <div class="text-center p-3">
+                    {% if usuario.is_active %}
+                        <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                        <h4 class="status-badge badge-active d-inline-block">ACTIVO</h4>
+                    {% else %}
+                        <i class="fas fa-times-circle fa-4x text-danger mb-3"></i>
+                        <h4 class="status-badge badge-inactive d-inline-block">INACTIVO</h4>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div class="info-card">
+                <h5><i class="fas fa-tools"></i> Acciones</h5>
+                <div class="action-buttons">
+                    <a href="{% url 'usuarios:editar_usuario' usuario.id %}" class="btn btn-warning btn-action">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+
+                    {% if usuario.is_active %}
+                    <button class="btn btn-danger btn-action" data-bs-toggle="modal" data-bs-target="#modalBloquear">
+                        <i class="fas fa-ban"></i> Bloquear
+                    </button>
+                    {% else %}
+                    <form method="post" action="{% url 'usuarios:desbloquear_usuario' usuario.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-action">
+                            <i class="fas fa-check"></i> Desbloquear
+                        </button>
+                    </form>
+                    {% endif %}
+
+                    <button class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#modalCambiarPassword">
+                        <i class="fas fa-key"></i> Cambiar Contraseña
+                    </button>
+
+                    <form method="post" action="{% url 'usuarios:toggle_staff' usuario.id %}" class="d-inline">
+                        {% csrf_token %}
+                        {% if usuario.is_staff %}
+                        <button type="submit" class="btn btn-secondary btn-action">
+                            <i class="fas fa-user-minus"></i> Quitar Staff
+                        </button>
+                        {% else %}
+                        <button type="submit" class="btn btn-primary btn-action">
+                            <i class="fas fa-user-plus"></i> Hacer Staff
+                        </button>
+                        {% endif %}
+                    </form>
+
+                    {% if not usuario.is_superuser %}
+                    <button class="btn btn-danger btn-action" data-bs-toggle="modal" data-bs-target="#modalEliminar">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Información del Sistema -->
+            <div class="info-card">
+                <h5><i class="fas fa-cog"></i> Información del Sistema</h5>
+                <div class="info-row">
+                    <span class="info-label">ID:</span>
+                    <span class="info-value">{{ usuario.id }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">UUID:</span>
+                    <span class="info-value"><small>{{ usuario.username }}</small></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Bloquear -->
+<div class="modal fade" id="modalBloquear" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-ban"></i> Bloquear Usuario</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas bloquear al usuario <strong>{{ usuario.get_full_name|default:usuario.username }}</strong>?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> El usuario no podrá iniciar sesión hasta que sea desbloqueado.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'usuarios:bloquear_usuario' usuario.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Sí, Bloquear</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Eliminar -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-trash"></i> Eliminar Usuario</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar al usuario <strong>{{ usuario.get_full_name|default:usuario.username }}</strong>?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> <strong>Esta acción no se puede deshacer.</strong></p>
+                <p>Se eliminarán todos los datos asociados a este usuario.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'usuarios:eliminar_usuario' usuario.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Sí, Eliminar Permanentemente</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cambiar Contraseña -->
+<div class="modal fade" id="modalCambiarPassword" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="fas fa-key"></i> Cambiar Contraseña</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Para cambiar la contraseña de <strong>{{ usuario.get_full_name|default:usuario.username }}</strong>, ve al panel de gestión de contraseñas.</p>
+                <a href="{% url 'usuarios:admin_gestionar_contrasenas' %}" class="btn btn-info">
+                    <i class="fas fa-user-lock"></i> Ir a Gestión de Contraseñas
+                </a>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

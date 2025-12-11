@@ -9,9 +9,9 @@
 
 Se ha reemplazado la sección hero estática con un **carrusel dinámico y profesional** que incluye las siguientes diapositivas:
 
-#### 📸 Slide 1 - Fachada DIGT SOFT
+#### 📸 Slide 1 - Fachada DIGIT SOFT
 - **Imagen:** `fachada-digit-soft.jpg`
-- **Título:** "Bienvenido a DIGT SOFT"
+- **Título:** "Bienvenido a DIGIT SOFT"
 - **Descripción:** Tu aliado tecnológico en soluciones informáticas integrales
 - **Botones:**
   - Ir al Dashboard (si está autenticado)

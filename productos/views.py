@@ -86,18 +86,24 @@ def checkout_carrito(request):
 @login_required
 @csrf_exempt
 def procesar_compra(request):
-    """Procesar la compra y generar factura"""
+    """Procesar la compra y generar factura con registro profesional"""
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Método no permitido'})
 
     try:
         from ventas.models import Venta, DetalleVenta
+        from compras.models import Compra, DetalleCompra
+        from facturacion.models import Factura
         from clientes.models import Cliente
+        from proveedores.models import Proveedor
         from django.utils import timezone
+        from django.db import transaction
+        from datetime import timedelta
         import random
 
         data = json.loads(request.body)
         metodo_pago = data.get('metodo_pago', 'EFECTIVO')
+        requiere_factura = data.get('requiere_factura', True)  # Por defecto siempre generar factura
 
         # Obtener datos del cliente del formulario
         cliente_data = {
@@ -114,139 +120,231 @@ def procesar_compra(request):
         if not carrito:
             return JsonResponse({'success': False, 'error': 'Carrito vacío'})
 
-        # Buscar o crear cliente
-        cliente = None
-        try:
-            # Buscar por correo primero
-            cliente = Cliente.objects.filter(correo=cliente_data['correo']).first()
-
-            if cliente:
-                # Actualizar datos del cliente si cambió algo
-                cliente.nombres = cliente_data['nombres'] or cliente.nombres
-                cliente.apellidos = cliente_data['apellidos'] or cliente.apellidos
-                cliente.numero_documento = cliente_data['numero_documento'] or cliente.numero_documento
-                cliente.telefono = cliente_data['telefono'] or cliente.telefono
-                cliente.direccion = cliente_data['direccion'] or cliente.direccion
-                cliente.save()
-            else:
-                # Crear nuevo cliente
-                cliente = Cliente.objects.create(
-                    nombres=cliente_data['nombres'] or request.user.first_name or 'Cliente',
-                    apellidos=cliente_data['apellidos'] or request.user.last_name or 'Web',
-                    numero_documento=cliente_data['numero_documento'] or f'WEB-{request.user.id}',
-                    telefono=cliente_data['telefono'] or 'Sin teléfono',
-                    correo=cliente_data['correo'],
-                    direccion=cliente_data['direccion'] or 'Sin dirección',
-                    activo=True
-                )
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': f'Error al procesar datos del cliente: {str(e)}'})
-
-        # Calcular totales
-        subtotal = Decimal('0')
-        productos_venta = []
-
-        for producto_id, item in carrito.items():
+        # Usar transacción atómica para asegurar consistencia
+        with transaction.atomic():
+            # Buscar o crear cliente
+            cliente = None
             try:
-                producto = Producto.objects.get(id=producto_id, activo=True)
+                # Buscar por correo primero
+                cliente = Cliente.objects.filter(correo=cliente_data['correo']).first()
 
-                # Verificar stock
-                if item['cantidad'] > producto.stock_actual:
-                    return JsonResponse({
-                        'success': False,
-                        'error': f'Stock insuficiente para {producto.nombre_producto}'
+                if cliente:
+                    # Actualizar datos del cliente si cambió algo
+                    cliente.nombres = cliente_data['nombres'] or cliente.nombres
+                    cliente.apellidos = cliente_data['apellidos'] or cliente.apellidos
+                    cliente.numero_documento = cliente_data['numero_documento'] or cliente.numero_documento
+                    cliente.telefono = cliente_data['telefono'] or cliente.telefono
+                    cliente.direccion = cliente_data['direccion'] or cliente.direccion
+                    cliente.save()
+                else:
+                    # Crear nuevo cliente
+                    cliente = Cliente.objects.create(
+                        nombres=cliente_data['nombres'] or request.user.first_name or 'Cliente',
+                        apellidos=cliente_data['apellidos'] or request.user.last_name or 'Web',
+                        numero_documento=cliente_data['numero_documento'] or f'WEB-{request.user.id}',
+                        telefono=cliente_data['telefono'] or 'Sin teléfono',
+                        correo=cliente_data['correo'],
+                        direccion=cliente_data['direccion'] or 'Sin dirección',
+                        activo=True
+                    )
+            except Exception as e:
+                return JsonResponse({'success': False, 'error': f'Error al procesar datos del cliente: {str(e)}'})
+
+            # Calcular totales
+            subtotal = Decimal('0')
+            productos_venta = []
+
+            for producto_id, item in carrito.items():
+                try:
+                    producto = Producto.objects.get(id=producto_id, activo=True)
+
+                    # Verificar stock
+                    if item['cantidad'] > producto.stock_actual:
+                        return JsonResponse({
+                            'success': False,
+                            'error': f'Stock insuficiente para {producto.nombre_producto}'
+                        })
+
+                    precio = Decimal(str(item['precio']))
+                    cantidad = item['cantidad']
+                    subtotal_item = precio * cantidad
+                    subtotal += subtotal_item
+
+                    productos_venta.append({
+                        'producto': producto,
+                        'cantidad': cantidad,
+                        'precio': precio,
+                        'subtotal': subtotal_item
                     })
+                except Producto.DoesNotExist:
+                    continue
 
-                precio = Decimal(str(item['precio']))
-                cantidad = item['cantidad']
-                subtotal_item = precio * cantidad
-                subtotal += subtotal_item
+            if not productos_venta:
+                return JsonResponse({'success': False, 'error': 'No hay productos válidos en el carrito'})
 
-                productos_venta.append({
-                    'producto': producto,
-                    'cantidad': cantidad,
-                    'precio': precio,
-                    'subtotal': subtotal_item
-                })
-            except Producto.DoesNotExist:
-                continue
+            # Calcular impuestos y total
+            impuestos = subtotal * Decimal('0.19')
+            total = subtotal + impuestos
 
-        if not productos_venta:
-            return JsonResponse({'success': False, 'error': 'No hay productos válidos en el carrito'})
+            # Crear la venta
+            numero_venta = f"VEN-{timezone.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"
 
-        # Calcular impuestos y total
-        impuestos = subtotal * Decimal('0.19')
-        total = subtotal + impuestos
-
-        # Crear la venta
-        numero_venta = f"VEN-{timezone.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"
-
-        venta = Venta.objects.create(
-            numero_venta=numero_venta,
-            cliente=cliente,
-            estado='COMPLETADA',
-            canal_venta='WEB',
-            subtotal=subtotal,
-            descuento=Decimal('0'),
-            impuestos=impuestos,
-            total=total,
-            metodo_pago=metodo_pago,
-            observaciones='Compra desde e-commerce'
-        )
-
-        # Crear detalles de la venta y actualizar stock
-        for item in productos_venta:
-            producto = item['producto']
-
-            DetalleVenta.objects.create(
-                venta=venta,
-                producto=producto,
-                cantidad=item['cantidad'],
-                precio_unitario=item['precio'],
-                subtotal=item['subtotal']
+            venta = Venta.objects.create(
+                numero_venta=numero_venta,
+                cliente=cliente,
+                usuario=request.user if hasattr(Venta, 'usuario') else None,  # Asociar usuario si el campo existe
+                estado='COMPLETADA',
+                canal_venta='WEB',
+                subtotal=subtotal,
+                descuento=Decimal('0'),
+                impuestos=impuestos,
+                total=total,
+                metodo_pago=metodo_pago,
+                pagado=True,
+                fecha_pago=timezone.now(),
+                observaciones=f'Compra realizada por {request.user.get_full_name() or request.user.username} desde e-commerce'
             )
 
-            # Actualizar stock
-            producto.stock_actual -= item['cantidad']
-            producto.save()
+            # Crear detalles de la venta y actualizar stock
+            for item in productos_venta:
+                producto = item['producto']
 
-        # Limpiar carrito
-        request.session['carrito'] = {}
-        request.session.modified = True
+                DetalleVenta.objects.create(
+                    venta=venta,
+                    producto=producto,
+                    cantidad=item['cantidad'],
+                    precio_unitario=item['precio'],
+                    subtotal=item['subtotal']
+                )
 
-        return JsonResponse({
-            'success': True,
-            'message': '✅ Compra procesada exitosamente',
-            'venta_id': venta.id,
-            'numero_venta': venta.numero_venta,
-            'total': float(total)
-        })
+                # Actualizar stock
+                producto.stock_actual -= item['cantidad']
+                producto.save()
+
+            # CREAR FACTURA EN MÓDULO DE FACTURACIÓN
+            if requiere_factura:
+                # Calcular fecha de vencimiento (30 días)
+                fecha_vencimiento = timezone.now().date() + timedelta(days=30)
+
+                factura = Factura.objects.create(
+                    cliente=cliente,
+                    venta=venta,
+                    tipo_factura='VENTA',
+                    estado='EMITIDA' if metodo_pago != 'CREDITO' else 'BORRADOR',
+                    fecha_vencimiento=fecha_vencimiento,
+                    fecha_pago=timezone.now().date() if metodo_pago != 'CREDITO' else None,
+                    subtotal=subtotal,
+                    iva=impuestos,
+                    total=total,
+                    observaciones=f'Factura electrónica generada automáticamente - Venta: {numero_venta} - Usuario: {request.user.get_full_name() or request.user.username}'
+                )
+                factura_id = factura.id
+                numero_factura = factura.numero_factura
+            else:
+                factura_id = None
+                numero_factura = None
+
+            # REGISTRAR EN MÓDULO DE COMPRAS PROFESIONALMENTE
+            # Obtener o crear proveedor por defecto para compras web
+            proveedor, created = Proveedor.objects.get_or_create(
+                nombre_empresa='COMPRAS WEB E-COMMERCE',
+                defaults={
+                    'nit': '999999999-9',
+                    'nombre_contacto': 'Sistema Web',
+                    'telefono': '0000000000',
+                    'email': 'web@digitsoft.com',
+                    'direccion': 'Sistema de E-commerce',
+                    'activo': True
+                }
+            )
+
+            # Crear registro de compra
+            numero_compra = f"COMP-{timezone.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"
+
+            compra = Compra.objects.create(
+                numero_compra=numero_compra,
+                proveedor=proveedor,
+                usuario=request.user if hasattr(Compra, 'usuario') else None,  # Asociar usuario si el campo existe
+                estado='COMPLETADA',
+                subtotal=subtotal,
+                impuestos=impuestos,
+                descuento=Decimal('0'),
+                total=total,
+                metodo_pago=metodo_pago,
+                pagado=True,
+                fecha_pago=timezone.now(),
+                observaciones=f'Compra web - Cliente: {cliente.nombre_completo} - Venta: {numero_venta} - Factura: {numero_factura or "N/A"}',
+                responsable=request.user.get_full_name() or request.user.username
+            )
+
+            # Crear detalles de compra
+            for item in productos_venta:
+                DetalleCompra.objects.create(
+                    compra=compra,
+                    producto=item['producto'],
+                    cantidad=item['cantidad'],
+                    precio_unitario=item['precio'],
+                    subtotal=item['subtotal'],
+                    recibido=True,
+                    fecha_recepcion=timezone.now()
+                )
+
+            # Limpiar carrito
+            request.session['carrito'] = {}
+            request.session.modified = True
+
+            return JsonResponse({
+                'success': True,
+                'message': '✅ Compra procesada exitosamente',
+                'venta_id': venta.id,
+                'numero_venta': venta.numero_venta,
+                'compra_id': compra.id,
+                'numero_compra': compra.numero_compra,
+                'factura_id': factura_id,
+                'numero_factura': numero_factura,
+                'total': float(total),
+                'usuario': request.user.get_full_name() or request.user.username
+            })
 
     except Exception as e:
-        return JsonResponse({'success': False, 'error': f'Error al procesar compra: {str(e)}'})
+        import traceback
+        return JsonResponse({
+            'success': False,
+            'error': f'Error al procesar compra: {str(e)}',
+            'detail': traceback.format_exc()
+        })
 
 
 @login_required
 def ver_factura(request, venta_id):
     """Ver factura de una venta"""
-    from ventas.models import Venta, DetalleVenta
+    try:
+        from ventas.models import Venta, DetalleVenta
 
-    venta = get_object_or_404(Venta, id=venta_id)
+        venta = get_object_or_404(Venta, id=venta_id)
 
-    # Verificar que el usuario tenga permiso para ver esta factura
-    if not request.user.is_staff and venta.cliente.usuario != request.user:
-        messages.error(request, 'No tienes permiso para ver esta factura')
-        return redirect('ecommerce:productos')
+        # Verificar que el usuario tenga permiso para ver esta factura
+        # Si el usuario es staff, puede ver todas las facturas
+        # Si no es staff, solo puede ver sus propias facturas
+        if not request.user.is_staff:
+            # Verificar si el usuario realizó esta venta
+            if hasattr(venta, 'usuario') and venta.usuario and venta.usuario != request.user:
+                messages.error(request, 'No tienes permiso para ver esta factura')
+                return redirect('ecommerce:productos')
 
-    detalles = DetalleVenta.objects.filter(venta=venta).select_related('producto')
+        detalles = DetalleVenta.objects.filter(venta=venta).select_related('producto')
 
-    context = {
-        'venta': venta,
-        'detalles': detalles,
-        'fecha_actual': timezone.now()
-    }
+        context = {
+            'venta': venta,
+            'detalles': detalles,
+            'fecha_actual': timezone.now()
+        }
 
-    return render(request, 'ecommerce/factura.html', context)
+        return render(request, 'ecommerce/factura_nueva.html', context)
+
+    except Exception as e:
+        messages.error(request, f'Error al cargar la factura: {str(e)}')
+        return redirect('ventas:lista')
 
 
 # VISTAS CRUD DE PRODUCTOS
@@ -316,9 +414,29 @@ def producto_crear(request):
     if request.method == 'POST':
         form = ProductoForm(request.POST, request.FILES)
         if form.is_valid():
-            producto = form.save()
-            messages.success(request, f'✅ Producto "{producto.nombre_producto}" creado exitosamente.')
-            return redirect('productos:detalle', pk=producto.pk)
+            try:
+                producto = form.save(commit=False)
+                # Asegurar que los campos requeridos tienen valores
+                if not producto.nombre_producto:
+                    messages.error(request, '❌ El nombre del producto es obligatorio.')
+                    return render(request, 'productos/form.html', {
+                        'form': form,
+                        'titulo': 'Registrar Nuevo Producto',
+                        'accion': 'Crear'
+                    })
+
+                producto.save()
+                messages.success(request, f'✅ Producto "{producto.nombre_producto}" creado exitosamente.')
+                return redirect('productos:detalle', pk=producto.pk)
+            except Exception as e:
+                messages.error(request, f'❌ Error al guardar el producto: {str(e)}')
+                print(f"Error al guardar producto: {e}")
+        else:
+            # Mostrar errores del formulario
+            messages.error(request, '❌ Por favor corrige los errores en el formulario.')
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
         form = ProductoForm()
 
@@ -339,9 +457,18 @@ def producto_editar(request, pk):
     if request.method == 'POST':
         form = ProductoForm(request.POST, request.FILES, instance=producto)
         if form.is_valid():
-            producto = form.save()
-            messages.success(request, f'✅ Producto "{producto.nombre_producto}" actualizado correctamente.')
-            return redirect('productos:detalle', pk=producto.pk)
+            try:
+                producto = form.save()
+                messages.success(request, f'✅ Producto "{producto.nombre_producto}" actualizado correctamente.')
+                return redirect('productos:detalle', pk=producto.pk)
+            except Exception as e:
+                messages.error(request, f'❌ Error al actualizar el producto: {str(e)}')
+                print(f"Error al actualizar producto: {e}")
+        else:
+            messages.error(request, '❌ Por favor corrige los errores en el formulario.')
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
         form = ProductoForm(instance=producto)
 
@@ -592,6 +719,50 @@ def producto_detalle_publico(request, pk):
     return render(request, 'productos/detalle_publico.html', context)
 
 
+def api_buscar_productos(request):
+    """API para búsqueda dinámica de productos"""
+    query = request.GET.get('q', '')
+    categoria = request.GET.get('categoria', '')
+
+    # Base queryset
+    productos = Producto.objects.filter(activo=True, disponible_web=True)
+
+    # Aplicar búsqueda
+    if query:
+        productos = productos.filter(
+            Q(nombre_producto__icontains=query) |
+            Q(marca__icontains=query) |
+            Q(descripcion__icontains=query) |
+            Q(codigo_sku__icontains=query)
+        )
+
+    # Aplicar filtro de categoría
+    if categoria and categoria != 'todas':
+        productos = productos.filter(categoria__nombre__icontains=categoria)
+
+    # Limitar resultados
+    productos = productos[:20]
+
+    # Serializar productos
+    productos_data = []
+    for producto in productos:
+        productos_data.append({
+            'id': producto.id,
+            'nombre': producto.nombre_producto,
+            'marca': producto.marca or '',
+            'precio': float(producto.precio_venta),
+            'stock': producto.stock_actual,
+            'imagen': producto.imagen.url if producto.imagen else None,
+            'url': f'/tienda/producto/{producto.id}/',
+        })
+
+    return JsonResponse({
+        'success': True,
+        'productos': productos_data,
+        'total': len(productos_data)
+    })
+
+
 # =======================
 # VISTAS DEL E-COMMERCE
 # =======================
@@ -602,47 +773,66 @@ def productos_ecommerce(request):
 
     # Obtener parámetros de filtrado
     categoria = request.GET.get('categoria')
-    busqueda = request.GET.get('q')
+    busqueda = request.GET.get('q', '').strip()
     orden = request.GET.get('orden', 'nombre')
 
     # Filtros
     if categoria and categoria != 'todas':
-        productos = productos.filter(categoria__nombre__icontains=categoria)
+        # Intentar filtrar por ID primero, si falla usar nombre
+        try:
+            categoria_id = int(categoria)
+            productos = productos.filter(categoria_id=categoria_id)
+        except (ValueError, TypeError):
+            productos = productos.filter(categoria__nombre__icontains=categoria)
 
     if busqueda:
         productos = productos.filter(
             Q(nombre_producto__icontains=busqueda) |
             Q(descripcion__icontains=busqueda) |
-            Q(marca__icontains=busqueda)
+            Q(marca__icontains=busqueda) |
+            Q(modelo_equipo__icontains=busqueda)
         )
 
     # Ordenamiento
-    if orden == 'precio_asc':
-        productos = productos.order_by('precio_venta')
-    elif orden == 'precio_desc':
-        productos = productos.order_by('-precio_venta')
-    elif orden == 'fecha':
-        productos = productos.order_by('-fecha_creacion')
-    elif orden == 'stock':
-        productos = productos.order_by('-stock_actual')
-    else:
-        productos = productos.order_by('nombre_producto')
+    orden_map = {
+        'nombre': 'nombre_producto',
+        'precio_asc': 'precio_venta',
+        'precio_desc': '-precio_venta',
+        'nuevo': '-fecha_creacion',
+        'stock': '-stock_actual'
+    }
+    productos = productos.order_by(orden_map.get(orden, 'nombre_producto'))
+
+    # Contar total ANTES de paginar
+    total_productos = productos.count()
 
     # Paginación
     paginator = Paginator(productos, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    # Categorías para el filtro
-    categorias = CategoriaProducto.objects.all()
+    # Categorías para el filtro (solo las que tienen productos)
+    categorias = CategoriaProducto.objects.filter(activo=True)
+
+    # Productos destacados (solo si no hay búsqueda)
+    productos_destacados = []
+    if not busqueda:
+        productos_destacados = Producto.objects.filter(
+            activo=True,
+            disponible_web=True,
+            destacado=True,
+            stock_actual__gt=0
+        )[:6]
 
     context = {
-        'productos': page_obj,
+        'productos': page_obj.object_list,
+        'page_obj': page_obj,
+        'productos_destacados': productos_destacados,
         'categorias': categorias,
         'categoria_actual': categoria,
-        'busqueda_actual': busqueda,
-        'orden_actual': orden,
-        'total_productos': productos.count(),
+        'buscar': busqueda,
+        'ordenar': orden,
+        'total_productos': total_productos,
     }
 
     return render(request, 'ecommerce/productos.html', context)
@@ -665,6 +855,69 @@ def producto_detalle_ecommerce(request, producto_id):
     }
 
     return render(request, 'ecommerce/producto_detalle.html', context)
+
+
+def buscar_productos_api(request):
+    """API para búsqueda dinámica de productos"""
+    query = request.GET.get('q', '').strip()
+    categoria_id = request.GET.get('categoria', '')
+    orden = request.GET.get('orden', 'nombre')
+
+    # Query base
+    productos = Producto.objects.filter(activo=True, disponible_web=True, stock_actual__gt=0)
+
+    # Filtrar por búsqueda
+    if query:
+        productos = productos.filter(
+            Q(nombre_producto__icontains=query) |
+            Q(descripcion__icontains=query) |
+            Q(marca__icontains=query) |
+            Q(modelo_equipo__icontains=query)
+        )
+
+    # Filtrar por categoría
+    if categoria_id and categoria_id != 'todas':
+        try:
+            productos = productos.filter(categoria_id=int(categoria_id))
+        except (ValueError, TypeError):
+            pass
+
+    # Ordenar
+    orden_map = {
+        'nombre': 'nombre_producto',
+        'precio_asc': 'precio_venta',
+        'precio_desc': '-precio_venta',
+        'nuevo': '-fecha_creacion',
+        'stock': '-stock_actual'
+    }
+    productos = productos.order_by(orden_map.get(orden, 'nombre_producto'))
+
+    # Limitar resultados
+    productos = productos[:24]
+
+    # Serializar productos
+    productos_data = []
+    for p in productos:
+        productos_data.append({
+            'id': p.id,
+            'nombre': p.nombre_producto,
+            'descripcion': p.descripcion or '',
+            'precio': float(p.precio_venta),
+            'precio_mayorista': float(p.precio_mayorista) if p.precio_mayorista else None,
+            'stock': p.stock_actual,
+            'marca': p.marca or '',
+            'modelo': p.modelo_equipo or '',
+            'imagen': p.imagen.url if p.imagen else '',
+            'url': f'/tienda/producto/{p.id}/',
+            'procesador': p.procesador or '',
+            'memoria_ram': p.memoria_ram or '',
+        })
+
+    return JsonResponse({
+        'success': True,
+        'productos': productos_data,
+        'total': len(productos_data)
+    })
 
 
 def obtener_carrito(request):
@@ -708,7 +961,8 @@ def ver_carrito(request):
     context = {
         'productos_carrito': productos_carrito,
         'total': total,
-        'cantidad_items': len(productos_carrito)
+        'cantidad_items': len(productos_carrito),
+        'usuario_autenticado': request.user.is_authenticated  # Para mostrar botón de login si es necesario
     }
 
     return render(request, 'ecommerce/carrito.html', context)
@@ -914,4 +1168,111 @@ def obtener_contador_carrito(request):
         'success': True,
         'total_items': total_items
     })
+
+
+# REPORTES PDF Y EXCEL
+# ==============================================
+
+@login_required
+@staff_required
+def producto_reporte_pdf(request):
+    """Generar reporte de productos en PDF"""
+    from utils.reportes import generar_pdf
+    from datetime import datetime
+
+    # Obtener filtros
+    categoria = request.GET.get('categoria', '')
+    buscar = request.GET.get('buscar', '')
+    activo = request.GET.get('activo', '')
+
+    # Filtrar productos
+    productos = Producto.objects.all().select_related('categoria')
+
+    if categoria:
+        productos = productos.filter(categoria_id=categoria)
+    if buscar:
+        productos = productos.filter(
+            Q(nombre_producto__icontains=buscar) |
+            Q(codigo_sku__icontains=buscar) |
+            Q(marca__icontains=buscar)
+        )
+    if activo:
+        productos = productos.filter(activo=(activo == 'true'))
+
+    productos = productos.order_by('nombre_producto')
+
+    context = {
+        'productos': productos,
+        'fecha': datetime.now(),
+        'usuario': request.user,
+        'total_productos': productos.count(),
+    }
+
+    filename = f'reporte_productos_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    return generar_pdf('reportes/productos_pdf.html', context, filename)
+
+
+@login_required
+@staff_required
+def producto_reporte_excel(request):
+    """Generar reporte de productos en Excel"""
+    from utils.reportes import generar_excel_avanzado
+    from datetime import datetime
+
+    # Obtener filtros
+    categoria = request.GET.get('categoria', '')
+    buscar = request.GET.get('buscar', '')
+    activo = request.GET.get('activo', '')
+
+    # Filtrar productos
+    productos = Producto.objects.all().select_related('categoria')
+
+    if categoria:
+        productos = productos.filter(categoria_id=categoria)
+    if buscar:
+        productos = productos.filter(
+            Q(nombre_producto__icontains=buscar) |
+            Q(codigo_sku__icontains=buscar) |
+            Q(marca__icontains=buscar)
+        )
+    if activo:
+        productos = productos.filter(activo=(activo == 'true'))
+
+    productos = productos.order_by('nombre_producto')
+
+    # Preparar datos
+    datos = []
+    for producto in productos:
+        datos.append({
+            'codigo': producto.codigo_sku,
+            'nombre': producto.nombre_producto,
+            'categoria': producto.categoria.nombre if producto.categoria else '',
+            'marca': producto.marca or '',
+            'stock': producto.stock_actual,
+            'precio_compra': float(producto.precio_compra) if producto.precio_compra else 0,
+            'precio_venta': float(producto.precio_venta) if producto.precio_venta else 0,
+            'activo': 'Sí' if producto.activo else 'No',
+            'disponible_web': 'Sí' if producto.disponible_web else 'No',
+        })
+
+    # Definir columnas
+    columnas = [
+        ('codigo', 'Código SKU', 'texto'),
+        ('nombre', 'Nombre Producto', 'texto'),
+        ('categoria', 'Categoría', 'texto'),
+        ('marca', 'Marca', 'texto'),
+        ('stock', 'Stock', 'numero'),
+        ('precio_compra', 'Precio Compra', 'moneda'),
+        ('precio_venta', 'Precio Venta', 'moneda'),
+        ('activo', 'Activo', 'texto'),
+        ('disponible_web', 'Disp. Web', 'texto'),
+    ]
+
+    titulo = 'Reporte de Productos'
+    filename = f'reporte_productos_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+
+    # Columnas con totales
+    totales = ['stock', 'precio_compra', 'precio_venta']
+
+    return generar_excel_avanzado(datos, columnas, titulo, filename, totales=totales)
 

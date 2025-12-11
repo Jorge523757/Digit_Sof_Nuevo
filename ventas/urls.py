@@ -1,9 +1,10 @@
 """
-DIGT SOFT - URLs del Módulo de Ventas
+DIGITSOFT - URLs del Módulo de Ventas
 """
 
 from django.urls import path
 from . import views
+from productos.views import ver_factura
 
 app_name = 'ventas'
 
@@ -15,10 +16,15 @@ urlpatterns = [
     # CRUD
     path('crear/', views.venta_crear, name='crear'),
     path('<int:pk>/', views.venta_detalle, name='detalle'),
+    path('<int:venta_id>/factura/', ver_factura, name='ver_factura'),
     path('<int:pk>/editar/', views.venta_editar, name='editar'),
 
     # Acciones
     path('<int:pk>/cambiar-estado/', views.venta_cambiar_estado, name='cambiar_estado'),
+
+    # Reportes
+    path('reporte/pdf/', views.venta_reporte_pdf, name='reporte_pdf'),
+    path('reporte/excel/', views.venta_reporte_excel, name='reporte_excel'),
 ]
 """
 DIGT SOFT - Formularios del Módulo de Ventas

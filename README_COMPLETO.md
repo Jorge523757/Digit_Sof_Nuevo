@@ -1,4 +1,4 @@
-# 🖥️ DIGT SOFT - Sistema de Gestión Empresarial
+# 🖥️ DIGITSOFT - Sistema de Gestión Empresarial
 
 ![Django](https://img.shields.io/badge/Django-5.2.8-green.svg)
 ![Python](https://img.shields.io/badge/Python-3.x-blue.svg)

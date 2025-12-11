@@ -31,6 +31,39 @@ def superuser_required(view_func):
     return wrapper
 
 
+def admin_required(view_func):
+    """
+    Decorador que requiere que el usuario sea admin/superusuario
+    Alias de superuser_required para compatibilidad
+    """
+    return superuser_required(view_func)
+
+
+def tipo_usuario_required(*tipos_permitidos):
+    """
+    Decorador que verifica si el usuario tiene uno de los tipos especificados
+    Uso: @tipo_usuario_required('ADMIN', 'TECNICO')
+    """
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            if not request.user.is_authenticated:
+                messages.error(request, 'Debes iniciar sesión para acceder a esta página.')
+                return redirect('usuarios:login')
+
+            if not hasattr(request.user, 'perfil'):
+                messages.error(request, 'Tu usuario no tiene perfil asignado.')
+                return redirect('dashboard:index')
+
+            if request.user.perfil.tipo_usuario not in tipos_permitidos:
+                messages.error(request, 'No tienes permisos para acceder a esta página.')
+                return redirect('dashboard:index')
+
+            return view_func(request, *args, **kwargs)
+        return wrapper
+    return decorator
+
+
 def staff_required(view_func):
     """
     Decorador que requiere que el usuario sea staff (personal autorizado)

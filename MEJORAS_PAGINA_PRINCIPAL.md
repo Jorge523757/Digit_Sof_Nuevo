@@ -233,5 +233,5 @@ La página principal ahora tiene:
 
 **Fecha de actualización**: 2 de diciembre, 2025
 **Versión**: 2.0 - Diseño Moderno y Dinámico
-**Desarrollado por**: DIGT SOFT
+**Desarrollado por**: DIGIT SOFT
 

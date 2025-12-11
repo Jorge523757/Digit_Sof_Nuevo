@@ -13,6 +13,9 @@ urlpatterns = [
     path('tienda/', ecommerce_views.productos_estilo_exito, name='productos_tienda'),  # Nueva vista estilo e-commerce
     path('producto/<int:producto_id>/', productos_views.producto_detalle_ecommerce, name='producto_detalle'),
 
+    # API de búsqueda
+    path('api/buscar/', productos_views.buscar_productos_api, name='buscar_productos_api'),
+
     # Carrito de compras
     path('carrito/', productos_views.ver_carrito, name='ver_carrito'),
     path('carrito/agregar/', productos_views.agregar_al_carrito, name='agregar_carrito'),

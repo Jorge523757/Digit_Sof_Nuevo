@@ -1,6 +1,6 @@
 @echo off
 echo ============================================================
-echo    DIGT SOFT - Sistema de Gestion Empresarial
+echo    DIGIT SOFT - Sistema de Gestion Empresarial
 echo    Verificacion y Ejecucion del Sistema
 echo ============================================================
 echo.
