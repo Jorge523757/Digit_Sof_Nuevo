@@ -11,6 +11,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('registro/', views.registro_cliente, name='registro'),
+    path('registro/tecnico/', views.registro_tecnico, name='registro_tecnico'),
 
     # Recuperación de contraseña (NUEVO)
     path('solicitar-recuperacion/', views_recuperacion.solicitar_recuperacion, name='solicitar_recuperacion'),

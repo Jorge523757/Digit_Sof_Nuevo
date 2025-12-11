@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.http import JsonResponse
-from .forms import RegistroClienteForm, PerfilUsuarioForm
+from .forms import RegistroClienteForm, RegistroTecnicoForm, PerfilUsuarioForm
 from .models import PerfilUsuario, Notificacion
 from .decorators import admin_required, staff_required
 
@@ -45,6 +45,31 @@ def registro_cliente(request):
         form = RegistroClienteForm()
 
     return render(request, 'usuarios/registro.html', {'form': form})
+
+
+def registro_tecnico(request):
+    """Vista para registro de nuevos técnicos"""
+    if request.user.is_authenticated:
+        return redirect('dashboard:index')
+
+    if request.method == 'POST':
+        form = RegistroTecnicoForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(
+                request,
+                '¡Registro exitoso! Tu cuenta de técnico ha sido creada. Ahora puedes iniciar sesión.'
+            )
+            return redirect('usuarios:login')
+        else:
+            messages.error(
+                request,
+                'Por favor, corrige los errores en el formulario.'
+            )
+    else:
+        form = RegistroTecnicoForm()
+
+    return render(request, 'usuarios/registro_tecnico.html', {'form': form})
 
 
 def login_view(request):

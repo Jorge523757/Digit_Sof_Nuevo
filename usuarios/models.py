@@ -51,6 +51,13 @@ class PerfilUsuario(models.Model):
         blank=True,
         related_name='usuario_perfil'
     )
+    tecnico = models.ForeignKey(
+        'tecnicos.Tecnico',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='usuario_perfil'
+    )
 
     # Metadatos
     fecha_registro = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Registro")
