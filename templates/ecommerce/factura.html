@@ -11,104 +11,129 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background: #f5f5f5;
+            background: #f5f5f5 !important;
+            font-family: Arial, sans-serif !important;
+            padding: 20px !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         .factura-container {
-            max-width: 900px;
-            margin: 2rem auto;
-            background: white;
-            padding: 3rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            max-width: 900px !important;
+            margin: 2rem auto !important;
+            background: white !important;
+            padding: 3rem !important;
+            border-radius: 12px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         .header-factura {
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 1.5rem;
-            margin-bottom: 2rem;
+            border-bottom: 3px solid #667eea !important;
+            padding-bottom: 1.5rem !important;
+            margin-bottom: 2rem !important;
+            display: block !important;
         }
 
         .logo-empresa {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #667eea;
+            font-size: 2rem !important;
+            font-weight: bold !important;
+            color: #667eea !important;
+            margin-bottom: 1rem !important;
         }
 
         .info-factura {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
+            background: #f8f9fa !important;
+            padding: 1rem !important;
+            border-radius: 8px !important;
+            margin-bottom: 2rem !important;
+            display: block !important;
         }
 
         .tabla-productos {
-            margin: 2rem 0;
+            margin: 2rem 0 !important;
+            width: 100% !important;
         }
 
         .tabla-productos th {
-            background: #667eea;
-            color: white;
-            padding: 12px;
+            background: #667eea !important;
+            color: white !important;
+            padding: 12px !important;
         }
 
         .tabla-productos td {
-            padding: 12px;
-            border-bottom: 1px solid #e9ecef;
+            padding: 12px !important;
+            border-bottom: 1px solid #e9ecef !important;
         }
 
         .totales {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background: #f8f9fa;
-            border-radius: 8px;
+            margin-top: 2rem !important;
+            padding: 1.5rem !important;
+            background: #f8f9fa !important;
+            border-radius: 8px !important;
         }
 
         .totales .row {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.5rem !important;
         }
 
         .total-final {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #28a745;
-            padding-top: 1rem;
-            border-top: 2px solid #dee2e6;
+            font-size: 1.5rem !important;
+            font-weight: bold !important;
+            color: #28a745 !important;
+            padding-top: 1rem !important;
+            border-top: 2px solid #dee2e6 !important;
         }
 
         .success-icon {
-            text-align: center;
-            margin-bottom: 2rem;
+            text-align: center !important;
+            margin-bottom: 2rem !important;
         }
 
         .success-icon i {
-            font-size: 4rem;
-            color: #28a745;
+            font-size: 4rem !important;
+            color: #28a745 !important;
         }
 
         .acciones-factura {
-            margin-top: 2rem;
-            text-align: center;
+            margin-top: 2rem !important;
+            text-align: center !important;
         }
 
         .btn-print {
-            background: #667eea;
-            color: white;
-            padding: 12px 32px;
-            border: none;
-            border-radius: 8px;
-            margin: 0 0.5rem;
+            background: #667eea !important;
+            color: white !important;
+            padding: 12px 32px !important;
+            border: none !important;
+            border-radius: 8px !important;
+            margin: 0 0.5rem !important;
+            cursor: pointer !important;
         }
 
         .btn-print:hover {
-            background: #5568d3;
-            color: white;
+            background: #5568d3 !important;
+            color: white !important;
+        }
+
+        h1, h2, h3, h4, h5, h6, p, div, table {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         @media print {
             body {
-                background: white;
+                background: white !important;
             }
 
             .acciones-factura,
@@ -117,8 +142,8 @@
             }
 
             .factura-container {
-                box-shadow: none;
-                margin: 0;
+                box-shadow: none !important;
+                margin: 0 !important;
             }
         }
     </style>
@@ -162,14 +187,14 @@
             <h5 class="mb-3"><i class="fas fa-user me-2"></i>Información del Cliente</h5>
             <div class="row">
                 <div class="col-md-6">
-                    <p class="mb-1"><strong>Cliente:</strong> {{ venta.cliente.nombres }} {{ venta.cliente.apellidos }}</p>
-                    {% if venta.cliente.documento %}
-                    <p class="mb-1"><strong>Documento:</strong> {{ venta.cliente.documento }}</p>
+                    <p class="mb-1"><strong>Cliente:</strong> {{ venta.cliente.nombre_completo }}</p>
+                    {% if venta.cliente.numero_documento %}
+                    <p class="mb-1"><strong>Documento:</strong> {{ venta.cliente.numero_documento }}</p>
                     {% endif %}
                 </div>
                 <div class="col-md-6">
-                    {% if venta.cliente.email %}
-                    <p class="mb-1"><strong>Email:</strong> {{ venta.cliente.email }}</p>
+                    {% if venta.cliente.correo %}
+                    <p class="mb-1"><strong>Email:</strong> {{ venta.cliente.correo }}</p>
                     {% endif %}
                     {% if venta.cliente.telefono %}
                     <p class="mb-1"><strong>Teléfono:</strong> {{ venta.cliente.telefono }}</p>

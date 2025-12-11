@@ -129,16 +129,59 @@ class ProductoForm(forms.ModelForm):
     def clean_codigo_sku(self):
         """Valida que el código SKU sea único"""
         codigo = self.cleaned_data.get('codigo_sku')
-        if codigo:
-            codigo = codigo.upper().strip()
-            # Si es edición, excluir el producto actual
-            if self.instance and self.instance.pk:
-                if Producto.objects.filter(codigo_sku=codigo).exclude(pk=self.instance.pk).exists():
-                    raise forms.ValidationError('Ya existe un producto con este código SKU.')
-            else:
-                if Producto.objects.filter(codigo_sku=codigo).exists():
-                    raise forms.ValidationError('Ya existe un producto con este código SKU.')
+        if not codigo:
+            raise forms.ValidationError('El código SKU es obligatorio.')
+
+        codigo = codigo.upper().strip()
+
+        # Validar formato
+        if len(codigo) < 3:
+            raise forms.ValidationError('El código SKU debe tener al menos 3 caracteres.')
+
+        # Si es edición, excluir el producto actual
+        if self.instance and self.instance.pk:
+            if Producto.objects.filter(codigo_sku=codigo).exclude(pk=self.instance.pk).exists():
+                raise forms.ValidationError('Ya existe un producto con este código SKU. Por favor, usa un código diferente.')
+        else:
+            if Producto.objects.filter(codigo_sku=codigo).exists():
+                raise forms.ValidationError('Ya existe un producto con este código SKU. Por favor, usa un código diferente.')
         return codigo
+
+    def clean_nombre_producto(self):
+        """Valida el nombre del producto"""
+        nombre = self.cleaned_data.get('nombre_producto')
+        if not nombre:
+            raise forms.ValidationError('El nombre del producto es obligatorio.')
+        if len(nombre) < 3:
+            raise forms.ValidationError('El nombre del producto debe tener al menos 3 caracteres.')
+        return nombre.strip()
+
+    def clean_precio_compra(self):
+        """Valida el precio de compra"""
+        precio = self.cleaned_data.get('precio_compra')
+        if precio is None:
+            raise forms.ValidationError('El precio de compra es obligatorio.')
+        if precio <= 0:
+            raise forms.ValidationError('El precio de compra debe ser mayor a cero.')
+        return precio
+
+    def clean_precio_venta(self):
+        """Valida el precio de venta"""
+        precio = self.cleaned_data.get('precio_venta')
+        if precio is None:
+            raise forms.ValidationError('El precio de venta es obligatorio.')
+        if precio <= 0:
+            raise forms.ValidationError('El precio de venta debe ser mayor a cero.')
+        return precio
+
+    def clean_stock_actual(self):
+        """Valida el stock actual"""
+        stock = self.cleaned_data.get('stock_actual')
+        if stock is None:
+            raise forms.ValidationError('El stock actual es obligatorio.')
+        if stock < 0:
+            raise forms.ValidationError('El stock actual no puede ser negativo.')
+        return stock
 
     def clean(self):
         """Validaciones adicionales"""
@@ -148,21 +191,34 @@ class ProductoForm(forms.ModelForm):
         precio_mayorista = cleaned_data.get('precio_mayorista')
         stock_minimo = cleaned_data.get('stock_minimo')
         stock_maximo = cleaned_data.get('stock_maximo')
+        stock_actual = cleaned_data.get('stock_actual')
 
         # Validar que el precio de venta sea mayor al de compra
         if precio_compra and precio_venta:
             if precio_venta <= precio_compra:
-                raise forms.ValidationError('El precio de venta debe ser mayor al precio de compra.')
+                self.add_error('precio_venta', 'El precio de venta debe ser mayor al precio de compra para tener ganancia.')
 
         # Validar precio mayorista
         if precio_mayorista and precio_compra:
             if precio_mayorista < precio_compra:
-                raise forms.ValidationError('El precio mayorista no puede ser menor al precio de compra.')
+                self.add_error('precio_mayorista', 'El precio mayorista no puede ser menor al precio de compra.')
+            if precio_mayorista and precio_venta and precio_mayorista >= precio_venta:
+                self.add_error('precio_mayorista', 'El precio mayorista debe ser menor al precio de venta.')
 
         # Validar stock
-        if stock_minimo and stock_maximo:
+        if stock_minimo is not None and stock_maximo is not None:
             if stock_minimo > stock_maximo:
-                raise forms.ValidationError('El stock mínimo no puede ser mayor al stock máximo.')
+                self.add_error('stock_minimo', 'El stock mínimo no puede ser mayor al stock máximo.')
+
+        if stock_minimo is not None and stock_actual is not None:
+            if stock_actual < stock_minimo:
+                self.add_error('stock_actual', f'Advertencia: El stock actual ({stock_actual}) está por debajo del mínimo ({stock_minimo}).')
+
+        # Validar garantía
+        tiene_garantia = cleaned_data.get('tiene_garantia')
+        meses_garantia = cleaned_data.get('meses_garantia')
+        if tiene_garantia and (not meses_garantia or meses_garantia <= 0):
+            self.add_error('meses_garantia', 'Si el producto tiene garantía, debes especificar los meses de garantía.')
 
         return cleaned_data
 

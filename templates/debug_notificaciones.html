@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Notificaciones - DIGITSOFT</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            padding: 40px;
+            background: #1a1a2e;
+            color: #eee;
+            font-family: 'Courier New', monospace;
+        }
+        .console {
+            background: #0f0f23;
+            border: 2px solid #00ff41;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .log-line {
+            padding: 5px;
+            border-left: 3px solid transparent;
+            margin: 2px 0;
+        }
+        .log-success { border-color: #00ff41; color: #00ff41; }
+        .log-error { border-color: #ff4444; color: #ff4444; }
+        .log-warning { border-color: #ffaa00; color: #ffaa00; }
+        .log-info { border-color: #00aaff; color: #00aaff; }
+        .btn-test {
+            background: #00ff41;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        .btn-test:hover {
+            background: #00cc33;
+        }
+        .test-section {
+            background: #16213e;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #00ff41;
+        }
+        h2 { color: #00ff41; }
+        h3 { color: #00aaff; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <h1>🔧 DEBUG - Sistema de Notificaciones</h1>
+        <p>Esta página te ayudará a identificar exactamente qué está fallando</p>
+
+        <div class="test-section">
+            <h2>1. CONTROLES</h2>
+            <button class="btn-test" onclick="testAPI()">📡 Probar API</button>
+            <button class="btn-test" onclick="testDOM()">🔍 Verificar DOM</button>
+            <button class="btn-test" onclick="testJavaScript()">⚙️ Test JavaScript</button>
+            <button class="btn-test" onclick="limpiarLog()">🗑️ Limpiar Log</button>
+        </div>
+
+        <div class="test-section">
+            <h2>2. SIMULACIÓN DE BOTÓN</h2>
+            <p>Este es un botón idéntico al del dashboard:</p>
+            <div class="dropdown d-inline-block">
+                <button class="btn btn-outline-primary position-relative"
+                        type="button"
+                        id="dropdownNotificaciones"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        onclick="log('🖱️ CLICK en botón detectado', 'info')">
+                    <i class="fas fa-bell"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                          id="notif-count">
+                        17
+                    </span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end"
+                    aria-labelledby="dropdownNotificaciones"
+                    style="width: 350px; max-height: 400px; overflow-y: auto;">
+                    <li><h6 class="dropdown-header"><i class="fas fa-bell"></i> Notificaciones</h6></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li id="notificaciones-lista-container">
+                        <ul id="notificaciones-lista" class="list-unstyled mb-0">
+                            <li><span class="dropdown-item-text text-muted text-center">Presiona "Probar API" primero</span></li>
+                        </ul>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-center text-primary" href="/usuarios/notificaciones/">
+                        <i class="fas fa-list"></i> Ver todas
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. LOG DE EVENTOS</h2>
+            <div class="console" id="console"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sistema de logging
+        function log(mensaje, tipo = 'info') {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const line = document.createElement('div');
+            line.className = `log-line log-${tipo}`;
+            line.textContent = `[${timestamp}] ${mensaje}`;
+            console.appendChild(line);
+            console.scrollTop = console.scrollHeight;
+
+            // También log en consola real
+            window.console.log(mensaje);
+        }
+
+        function limpiarLog() {
+            document.getElementById('console').innerHTML = '';
+            log('Log limpiado', 'info');
+        }
+
+        // Test API
+        function testAPI() {
+            log('🚀 Iniciando test de API...', 'info');
+            log('📡 Consultando: /usuarios/notificaciones/json/', 'info');
+
+            fetch('/usuarios/notificaciones/json/')
+                .then(response => {
+                    log(`📥 Respuesta recibida: HTTP ${response.status}`, response.ok ? 'success' : 'error');
+
+                    if (!response.ok) {
+                        if (response.status === 401 || response.status === 403) {
+                            throw new Error('NO ESTÁS AUTENTICADO - Inicia sesión primero');
+                        }
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+
+                    return response.json();
+                })
+                .then(data => {
+                    log(`✅ API FUNCIONA CORRECTAMENTE`, 'success');
+                    log(`📊 Datos recibidos:`, 'info');
+                    log(`   - Notificaciones no leídas: ${data.count}`, 'info');
+                    log(`   - Total recibidas: ${data.notificaciones ? data.notificaciones.length : 0}`, 'info');
+
+                    if (data.notificaciones && data.notificaciones.length > 0) {
+                        log('📝 Notificaciones:', 'info');
+                        data.notificaciones.forEach((n, i) => {
+                            log(`   ${i+1}. ${n.titulo}`, 'info');
+                        });
+
+                        // Mostrar en el dropdown
+                        actualizarDropdown(data);
+                    } else {
+                        log('⚠️ No hay notificaciones no leídas', 'warning');
+                    }
+                })
+                .catch(error => {
+                    log(`❌ ERROR: ${error.message}`, 'error');
+                    if (error.message.includes('AUTENTICADO')) {
+                        log('💡 SOLUCIÓN: Abre http://127.0.0.1:8000/usuarios/login/ y vuelve aquí', 'warning');
+                    }
+                });
+        }
+
+        // Actualizar dropdown con datos reales
+        function actualizarDropdown(data) {
+            const lista = document.getElementById('notificaciones-lista');
+            const badge = document.getElementById('notif-count');
+
+            if (!lista || !badge) {
+                log('❌ Elementos DOM no encontrados', 'error');
+                return;
+            }
+
+            // Actualizar badge
+            badge.textContent = data.count;
+            badge.style.display = data.count > 0 ? 'inline' : 'none';
+
+            // Limpiar lista
+            lista.innerHTML = '';
+
+            if (data.notificaciones && data.notificaciones.length > 0) {
+                data.notificaciones.forEach(notif => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <a class="dropdown-item" href="${notif.url || '#'}" style="white-space: normal; padding: 12px 15px;">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="fas ${notif.icono} text-${notif.color}" style="margin-top: 3px; font-size: 18px;"></i>
+                                <div style="flex: 1;">
+                                    <strong style="font-size: 14px;">${notif.titulo}</strong><br>
+                                    <small class="text-muted" style="font-size: 12px;">${notif.mensaje}</small><br>
+                                    <small class="text-muted" style="font-size: 11px;">
+                                        <i class="fas fa-clock"></i> Hace ${notif.tiempo}
+                                    </small>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                    lista.appendChild(li);
+                });
+                log('✅ Dropdown actualizado con notificaciones', 'success');
+            } else {
+                lista.innerHTML = '<li><span class="dropdown-item-text text-muted text-center">Sin notificaciones</span></li>';
+            }
+        }
+
+        // Test DOM
+        function testDOM() {
+            log('🔍 Verificando elementos DOM...', 'info');
+
+            const elementos = [
+                { id: 'dropdownNotificaciones', nombre: 'Botón de notificaciones' },
+                { id: 'notif-count', nombre: 'Badge contador' },
+                { id: 'notificaciones-lista', nombre: 'Lista de notificaciones' },
+            ];
+
+            let todosOK = true;
+            elementos.forEach(elem => {
+                const existe = document.getElementById(elem.id) !== null;
+                if (existe) {
+                    log(`✅ ${elem.nombre}: ENCONTRADO`, 'success');
+                } else {
+                    log(`❌ ${elem.nombre}: NO ENCONTRADO`, 'error');
+                    todosOK = false;
+                }
+            });
+
+            if (todosOK) {
+                log('✅ Todos los elementos DOM están presentes', 'success');
+            } else {
+                log('❌ Faltan elementos DOM - revisa el HTML', 'error');
+            }
+        }
+
+        // Test JavaScript
+        function testJavaScript() {
+            log('⚙️ Verificando JavaScript...', 'info');
+
+            // Verificar fetch
+            if (typeof fetch === 'function') {
+                log('✅ fetch API disponible', 'success');
+            } else {
+                log('❌ fetch API NO disponible', 'error');
+            }
+
+            // Verificar Bootstrap
+            if (typeof bootstrap !== 'undefined') {
+                log('✅ Bootstrap JavaScript cargado', 'success');
+            } else {
+                log('⚠️ Bootstrap JavaScript NO detectado', 'warning');
+            }
+
+            // Verificar cookie CSRF
+            const cookies = document.cookie;
+            if (cookies.includes('csrftoken')) {
+                log('✅ CSRF token encontrado en cookies', 'success');
+            } else {
+                log('⚠️ CSRF token NO encontrado - puede causar problemas con POST', 'warning');
+            }
+
+            log('✅ Tests de JavaScript completados', 'success');
+        }
+
+        // Inicializar
+        window.addEventListener('DOMContentLoaded', function() {
+            log('🎬 Sistema de debug iniciado', 'success');
+            log('📋 Instrucciones:', 'info');
+            log('   1. Presiona "Probar API" para verificar conexión', 'info');
+            log('   2. Si funciona, las notificaciones aparecerán en el dropdown', 'info');
+            log('   3. Si da error 401/403, debes iniciar sesión primero', 'info');
+            log('', 'info');
+            log('💡 TIP: Abre la consola del navegador (F12) para más detalles', 'info');
+        });
+    </script>
+</body>
+</html>
+

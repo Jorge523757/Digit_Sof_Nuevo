@@ -39,6 +39,55 @@ class CompraForm(forms.ModelForm):
             'responsable': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
+    def clean_proveedor(self):
+        """Valida que se seleccione un proveedor"""
+        proveedor = self.cleaned_data.get('proveedor')
+        if not proveedor:
+            raise forms.ValidationError('Debes seleccionar un proveedor para la compra.')
+        if not proveedor.activo:
+            raise forms.ValidationError('El proveedor seleccionado está inactivo. Por favor, selecciona otro.')
+        return proveedor
+
+    def clean_fecha_entrega_esperada(self):
+        """Valida la fecha de entrega"""
+        from datetime import date
+        fecha = self.cleaned_data.get('fecha_entrega_esperada')
+        if fecha:
+            if fecha < date.today():
+                raise forms.ValidationError('La fecha de entrega no puede ser anterior a hoy.')
+        return fecha
+
+    def clean_impuestos(self):
+        """Valida los impuestos"""
+        impuestos = self.cleaned_data.get('impuestos')
+        if impuestos is None:
+            return 0
+        if impuestos < 0:
+            raise forms.ValidationError('Los impuestos no pueden ser negativos.')
+        if impuestos > 100:
+            raise forms.ValidationError('Los impuestos no pueden ser mayores al 100%.')
+        return impuestos
+
+    def clean_descuento(self):
+        """Valida el descuento"""
+        descuento = self.cleaned_data.get('descuento')
+        if descuento is None:
+            return 0
+        if descuento < 0:
+            raise forms.ValidationError('El descuento no puede ser negativo.')
+        if descuento > 100:
+            raise forms.ValidationError('El descuento no puede ser mayor al 100%.')
+        return descuento
+
+    def clean_responsable(self):
+        """Valida el responsable"""
+        responsable = self.cleaned_data.get('responsable')
+        if responsable:
+            responsable = responsable.strip()
+            if len(responsable) < 3:
+                raise forms.ValidationError('El nombre del responsable debe tener al menos 3 caracteres.')
+        return responsable
+
 
 class BuscarCompraForm(forms.Form):
     busqueda = forms.CharField(

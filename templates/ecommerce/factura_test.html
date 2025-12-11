@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Factura</title>
+</head>
+<body>
+    <h1>TEST - SI VES ESTO, LA VISTA FUNCIONA</h1>
+    <p>Venta ID: {{ venta.id }}</p>
+    <p>Número: {{ venta.numero_venta }}</p>
+    <p>Cliente: {{ venta.cliente.nombre_completo }}</p>
+    <p>Total: ${{ venta.total }}</p>
+
+    <h2>Detalles:</h2>
+    <ul>
+    {% for detalle in detalles %}
+        <li>{{ detalle.producto.nombre_producto }} - ${{ detalle.subtotal }}</li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
+

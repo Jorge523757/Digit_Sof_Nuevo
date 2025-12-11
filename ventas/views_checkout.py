@@ -183,7 +183,7 @@ def descargar_factura_pdf(request, orden_id):
 
     # Información de la empresa
     empresa_info = Paragraph("""
-        <b>DigitSoft - Soluciones Informáticas</b><br/>
+        <b>DIGITSOFT - Soluciones Informáticas</b><br/>
         RUC: XXXXXXXXXXX<br/>
         Dirección: Tu Dirección<br/>
         Teléfono: Tu Teléfono<br/>
@@ -243,7 +243,7 @@ def descargar_factura_pdf(request, orden_id):
     elements.append(Spacer(1, 0.5*inch))
 
     # Pie de página
-    footer = Paragraph("<i>Gracias por su compra. DigitSoft - Soluciones Informáticas</i>", styles['Normal'])
+    footer = Paragraph("<i>Gracias por su compra. DIGITSOFT - Soluciones Informáticas</i>", styles['Normal'])
     elements.append(footer)
 
     doc.build(elements)

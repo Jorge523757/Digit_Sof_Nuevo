@@ -1,13 +1,11 @@
 <!-- Widget Flotante de WhatsApp -->
 <style>
-.whatsapp-float-btn{position:fixed;bottom:25px;right:25px;background:#25D366;color:white;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 4px 12px rgba(37,211,102,0.4);cursor:pointer;z-index:9999;transition:all 0.3s ease;border:none}
-.whatsapp-float-btn:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(37,211,102,0.6)}
-.whatsapp-modal{display:none;position:fixed;bottom:100px;right:25px;width:320px;background:white;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.2);z-index:9998;overflow:hidden;animation:slideUp 0.3s ease}
+.whatsapp-modal{display:none;position:fixed;bottom:110px;right:30px;width:320px;background:white;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.2);z-index:9997;overflow:hidden;animation:slideUpModal 0.3s ease}
 .whatsapp-modal.active{display:block}
-@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUpModal{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .whatsapp-header{background:linear-gradient(135deg,#25D366 0%,#128C7E 100%);color:white;padding:20px;position:relative}
 .whatsapp-close-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.2);border:none;color:white;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s}
-.whatsapp-close-btn:hover{background:rgba(255,255,255,0.3)}
+.whatsapp-close-btn:hover{background:rgba(255,255,255,0.3);transform:rotate(90deg)}
 .whatsapp-header-content{display:flex;align-items:center;gap:12px}
 .whatsapp-header-icon{font-size:32px}
 .whatsapp-header-text h4{margin:0;font-size:16px;font-weight:600}
@@ -22,10 +20,17 @@
 .whatsapp-option-title{font-weight:600;font-size:14px;color:#333;margin:0}
 .whatsapp-option-subtitle{font-size:12px;color:#999;margin:2px 0 0 0}
 .whatsapp-option-arrow{color:#25D366;font-size:18px}
-@media (max-width:480px){.whatsapp-modal{width:calc(100% - 20px);right:10px;bottom:90px}.whatsapp-float-btn{bottom:20px;right:20px;width:55px;height:55px;font-size:26px}}
+@media (max-width:768px){.whatsapp-modal{width:calc(100% - 40px);right:20px;bottom:95px}}
+@media (max-width:480px){.whatsapp-modal{width:calc(100% - 30px);right:15px;bottom:85px}}
 </style>
 
-<button class="whatsapp-float-btn" id="whatsappFloatBtn" onclick="toggleWhatsAppModal()"><i class="fab fa-whatsapp"></i></button>
+<button class="whatsapp-float-btn"
+        id="whatsappFloatBtn"
+        onclick="toggleWhatsAppModal()"
+        data-tooltip="¿Necesitas ayuda?"
+        aria-label="Abrir chat de WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+</button>
 
 <div class="whatsapp-modal" id="whatsappModal">
 <div class="whatsapp-header">

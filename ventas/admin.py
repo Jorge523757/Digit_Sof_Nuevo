@@ -1,5 +1,5 @@
 """
-DIGT SOFT - Admin del Módulo de Ventas
+DIGITSOFT - Admin del Módulo de Ventas
 """
 
 from django.contrib import admin

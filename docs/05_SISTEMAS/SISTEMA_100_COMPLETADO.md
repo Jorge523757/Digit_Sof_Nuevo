@@ -317,7 +317,7 @@ Las vistas están funcionalmente completas. Para mejorar la UI, puedes crear pla
 
 ---
 
-**Desarrollado por:** DIGT SOFT Team  
+**Desarrollado por:** DIGIT SOFT Team  
 **Fecha:** Noviembre 2025  
 **Versión:** 2.0.0  
 **Framework:** Django 5.1.3 + Python 3.13 + Bootstrap 5

@@ -146,3 +146,110 @@ def proveedor_toggle_estado(request, pk):
 
     return JsonResponse({'success': False}, status=400)
 
+
+# REPORTES PDF Y EXCEL
+# ==============================================
+
+from django.contrib.auth.decorators import login_required
+from usuarios.decorators import staff_required
+from django.db.models import Sum
+
+@login_required
+@staff_required
+def proveedor_reporte_pdf(request):
+    """Generar reporte de proveedores en PDF"""
+    from utils.reportes import generar_pdf
+    from datetime import datetime
+
+    query = request.GET.get('q', '').strip()
+    estado = request.GET.get('estado', '')
+    calificacion = request.GET.get('calificacion', '')
+
+    datos = Proveedor.objects.all()
+
+    if query:
+        datos = datos.filter(
+            Q(nombre_empresa__icontains=query) |
+            Q(nit__icontains=query) |
+            Q(nombre_contacto__icontains=query)
+        )
+
+    if estado == 'activo':
+        datos = datos.filter(activo=True)
+    elif estado == 'inactivo':
+        datos = datos.filter(activo=False)
+
+    if calificacion:
+        datos = datos.filter(calificacion=calificacion)
+
+    datos = datos.order_by('nombre_empresa')
+
+    context = {
+        'datos': datos,
+        'fecha': datetime.now(),
+        'usuario': request.user,
+        'total': datos.count(),
+    }
+
+    filename = f'reporte_proveedores_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    return generar_pdf('reportes/proveedores_pdf.html', context, filename)
+
+
+@login_required
+@staff_required
+def proveedor_reporte_excel(request):
+    """Generar reporte de proveedores en Excel"""
+    from utils.reportes import generar_excel_avanzado
+    from datetime import datetime
+
+    query = request.GET.get('q', '').strip()
+    estado = request.GET.get('estado', '')
+    calificacion = request.GET.get('calificacion', '')
+
+    datos_query = Proveedor.objects.all()
+
+    if query:
+        datos_query = datos_query.filter(
+            Q(nombre_empresa__icontains=query) |
+            Q(nit__icontains=query) |
+            Q(nombre_contacto__icontains=query)
+        )
+
+    if estado == 'activo':
+        datos_query = datos_query.filter(activo=True)
+    elif estado == 'inactivo':
+        datos_query = datos_query.filter(activo=False)
+
+    if calificacion:
+        datos_query = datos_query.filter(calificacion=calificacion)
+
+    datos_query = datos_query.order_by('nombre_empresa')
+
+    datos = []
+    for item in datos_query:
+        datos.append({
+            'nombre_empresa': item.nombre_empresa,
+            'nit': item.nit,
+            'nombre_contacto': item.nombre_contacto,
+            'telefono': item.telefono,
+            'email': item.email,
+            'ciudad': item.ciudad or '',
+            'calificacion': item.calificacion if hasattr(item, 'calificacion') else 0,
+            'activo': 'Sí' if item.activo else 'No',
+        })
+
+    columnas = [
+        ('nombre_empresa', 'Empresa', 'texto'),
+        ('nit', 'NIT', 'texto'),
+        ('nombre_contacto', 'Contacto', 'texto'),
+        ('telefono', 'Teléfono', 'texto'),
+        ('email', 'Email', 'texto'),
+        ('ciudad', 'Ciudad', 'texto'),
+        ('calificacion', 'Calificación', 'numero'),
+        ('activo', 'Activo', 'texto'),
+    ]
+
+    titulo = 'Reporte de Proveedores'
+    filename = f'reporte_proveedores_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+
+    return generar_excel_avanzado(datos, columnas, titulo, filename)

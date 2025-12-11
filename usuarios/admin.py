@@ -1,6 +1,6 @@
 """
 DIGT SOFT - Módulo de Usuarios
-Admin - Administración de Usuarios y Perfiles
+Admin - Administración de Usuarios, Perfiles y Notificaciones
 """
 
 from django.contrib import admin
@@ -9,7 +9,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils import timezone
-from .models import PerfilUsuario
+from .models import PerfilUsuario, Notificacion
 
 
 class PerfilUsuarioInline(admin.StackedInline):
@@ -201,4 +201,163 @@ class PerfilUsuarioAdmin(admin.ModelAdmin):
 # Desregistrar el admin por defecto de User y registrar el personalizado
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+
+
+# ==============================================
+# ADMIN DE NOTIFICACIONES
+# ==============================================
+
+@admin.register(Notificacion)
+class NotificacionAdmin(admin.ModelAdmin):
+    """Admin para gestionar notificaciones"""
+    list_display = [
+        'titulo', 'usuario', 'tipo', 'estado_lectura',
+        'fecha_creacion_display', 'acciones_notificacion'
+    ]
+    list_filter = ['tipo', 'leida', 'fecha_creacion']
+    search_fields = ['titulo', 'mensaje', 'usuario__username', 'usuario__email']
+    readonly_fields = ['fecha_creacion', 'fecha_lectura']
+    date_hierarchy = 'fecha_creacion'
+
+    fieldsets = (
+        ('Información Principal', {
+            'fields': ('usuario', 'titulo', 'mensaje', 'tipo')
+        }),
+        ('Estado', {
+            'fields': ('leida', 'fecha_creacion', 'fecha_lectura')
+        }),
+        ('Opciones Adicionales', {
+            'fields': ('url', 'icono', 'color'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    actions = ['marcar_como_leidas', 'marcar_como_no_leidas', 'eliminar_leidas']
+
+    def estado_lectura(self, obj):
+        """Muestra el estado de lectura con colores"""
+        if obj.leida:
+            return format_html(
+                '<span style="background-color: #27ae60; color: white; '
+                'padding: 3px 8px; border-radius: 3px;">✓ LEÍDA</span>'
+            )
+        return format_html(
+            '<span style="background-color: #3498db; color: white; '
+            'padding: 3px 8px; border-radius: 3px;">● NO LEÍDA</span>'
+        )
+    estado_lectura.short_description = "Estado"
+
+    def fecha_creacion_display(self, obj):
+        """Muestra la fecha con tiempo transcurrido"""
+        return format_html(
+            '<div title="{}">{}</div>',
+            obj.fecha_creacion.strftime('%Y-%m-%d %H:%M:%S'),
+            obj.tiempo_transcurrido
+        )
+    fecha_creacion_display.short_description = "Creada hace"
+
+    def acciones_notificacion(self, obj):
+        """Muestra botones de acciones rápidas"""
+        if obj.url:
+            return format_html(
+                '<a href="{}" class="button" target="_blank">Ver enlace</a>',
+                obj.url
+            )
+        return "-"
+    acciones_notificacion.short_description = "Acciones"
+
+    def marcar_como_leidas(self, request, queryset):
+        """Marca las notificaciones seleccionadas como leídas"""
+        count = 0
+        for notificacion in queryset:
+            if not notificacion.leida:
+                notificacion.marcar_como_leida()
+                count += 1
+        self.message_user(
+            request,
+            f'{count} notificación(es) marcada(s) como leída(s).'
+        )
+    marcar_como_leidas.short_description = "Marcar como leídas"
+
+    def marcar_como_no_leidas(self, request, queryset):
+        """Marca las notificaciones seleccionadas como no leídas"""
+        queryset.update(leida=False, fecha_lectura=None)
+        self.message_user(
+            request,
+            f'{queryset.count()} notificación(es) marcada(s) como no leída(s).'
+        )
+    marcar_como_no_leidas.short_description = "Marcar como no leídas"
+
+    def eliminar_leidas(self, request, queryset):
+        """Elimina las notificaciones leídas seleccionadas"""
+        leidas = queryset.filter(leida=True)
+        count = leidas.count()
+        leidas.delete()
+        self.message_user(
+            request,
+            f'{count} notificación(es) leída(s) eliminada(s).'
+        )
+    eliminar_leidas.short_description = "Eliminar notificaciones leídas"
+
+
+# ==============================================
+# ADMIN DE TOKENS DE RECUPERACIÓN
+# ==============================================
+
+from .models import PasswordResetToken
+
+
+@admin.register(PasswordResetToken)
+class PasswordResetTokenAdmin(admin.ModelAdmin):
+    """Admin para tokens de recuperación de contraseña"""
+    
+    list_display = [
+        'user', 'token_corto', 'created_at', 'estado_display', 'used_at'
+    ]
+    list_filter = ['used', 'created_at']
+    search_fields = ['user__username', 'user__email', 'token']
+    readonly_fields = ['token', 'created_at', 'used_at']
+    date_hierarchy = 'created_at'
+    
+    fieldsets = (
+        ('Información del Token', {
+            'fields': ('user', 'token', 'created_at')
+        }),
+        ('Estado', {
+            'fields': ('used', 'used_at')
+        }),
+    )
+    
+    def token_corto(self, obj):
+        """Muestra una versión corta del token"""
+        token_str = str(obj.token)
+        return f"{token_str[:8]}...{token_str[-8:]}"
+    token_corto.short_description = "Token"
+    
+    def estado_display(self, obj):
+        """Muestra el estado del token con colores"""
+        if obj.used:
+            return format_html(
+                '<span style="background-color: #95a5a6; color: white; '
+                'padding: 3px 10px; border-radius: 3px; font-weight: bold;">'
+                '<i class="fas fa-check"></i> USADO</span>'
+            )
+        elif obj.is_valid():
+            return format_html(
+                '<span style="background-color: #2ecc71; color: white; '
+                'padding: 3px 10px; border-radius: 3px; font-weight: bold;">'
+                '<i class="fas fa-clock"></i> VÁLIDO</span>'
+            )
+        else:
+            return format_html(
+                '<span style="background-color: #e74c3c; color: white; '
+                'padding: 3px 10px; border-radius: 3px; font-weight: bold;">'
+                '<i class="fas fa-times"></i> EXPIRADO</span>'
+            )
+    estado_display.short_description = "Estado"
+    
+    def has_add_permission(self, request):
+        """No permitir agregar tokens manualmente"""
+        return False
+
 

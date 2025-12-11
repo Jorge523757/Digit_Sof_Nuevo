@@ -1,4 +1,4 @@
-"""DIGT SOFT - URLs Facturación"""
+"""DIGIT SOFT - URLs Facturación"""
 from django.urls import path
 from . import views
 

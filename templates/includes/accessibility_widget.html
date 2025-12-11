@@ -1,0 +1,149 @@
+<!-- ========== WIDGET DE ACCESIBILIDAD ========== -->
+<aside class="accessibility-widget" aria-label="Panel de Accesibilidad">
+    <!-- Botón flotante para abrir/cerrar -->
+    <button class="accessibility-toggle"
+            id="accessibilityToggle"
+            aria-label="Abrir panel de accesibilidad"
+            aria-expanded="false"
+            data-tooltip="Accesibilidad"
+            type="button">
+        <i class="fas fa-universal-access" aria-hidden="true"></i>
+    </button>
+
+    <!-- Panel de opciones (inicialmente oculto) -->
+    <div class="accessibility-panel hidden" id="accessibilityPanel" role="toolbar" aria-label="Herramientas de Accesibilidad">
+        <div class="accessibility-header">
+            <h3>Accesibilidad</h3>
+            <button class="accessibility-close"
+                    id="accessibilityClose"
+                    aria-label="Cerrar panel"
+                    type="button">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="accessibility-content">
+            <!-- Aumentar Letra -->
+            <button class="accessibility-btn"
+                    id="fontLarge"
+                    title="Aumentar Tamaño de Letra (Ctrl + Alt + +)"
+                    aria-label="Aumentar tamaño de texto"
+                    aria-pressed="false"
+                    type="button">
+                <i class="fas fa-search-plus" aria-hidden="true"></i>
+                <span>Aumentar Texto</span>
+            </button>
+
+            <!-- Disminuir Letra -->
+            <button class="accessibility-btn"
+                    id="fontSmall"
+                    title="Disminuir Tamaño de Letra (Ctrl + Alt + -)"
+                    aria-label="Disminuir tamaño de texto"
+                    aria-pressed="false"
+                    type="button">
+                <i class="fas fa-search-minus" aria-hidden="true"></i>
+                <span>Reducir Texto</span>
+            </button>
+
+            <div class="accessibility-separator" role="separator"></div>
+
+            <!-- Alto Contraste -->
+            <button class="accessibility-btn"
+                    id="highContrast"
+                    title="Activar Alto Contraste"
+                    aria-label="Activar modo de alto contraste"
+                    aria-pressed="false"
+                    type="button">
+                <i class="fas fa-adjust" aria-hidden="true"></i>
+                <span>Alto Contraste</span>
+            </button>
+
+            <!-- Modo Oscuro -->
+            <button class="accessibility-btn"
+                    id="darkMode"
+                    title="Activar Modo Oscuro (Ctrl + Alt + D)"
+                    aria-label="Activar modo oscuro"
+                    aria-pressed="false"
+                    type="button">
+                <i class="fas fa-moon" aria-hidden="true"></i>
+                <span>Modo Oscuro</span>
+            </button>
+
+            <!-- Escala de Grises -->
+            <button class="accessibility-btn"
+                    id="grayscale"
+                    title="Activar Escala de Grises"
+                    aria-label="Activar escala de grises"
+                    aria-pressed="false"
+                    type="button">
+                <i class="fas fa-palette" aria-hidden="true"></i>
+                <span>Escala de Grises</span>
+            </button>
+
+            <div class="accessibility-separator" role="separator"></div>
+
+            <!-- Resaltar Enlaces -->
+            <button class="accessibility-btn"
+                    id="highlightLinks"
+                    title="Resaltar Todos los Enlaces"
+                    aria-label="Resaltar todos los enlaces en la página"
+                    aria-pressed="false"
+                    type="button">
+                <i class="fas fa-link" aria-hidden="true"></i>
+                <span>Resaltar Enlaces</span>
+            </button>
+
+            <!-- Espaciado Aumentado -->
+            <button class="accessibility-btn"
+                    id="increasedSpacing"
+                    title="Aumentar Espaciado"
+                    aria-label="Aumentar espaciado entre líneas y elementos"
+                    aria-pressed="false"
+                    type="button">
+                <i class="fas fa-text-height" aria-hidden="true"></i>
+                <span>Más Espaciado</span>
+            </button>
+
+            <!-- Lector de Pantalla -->
+            <button class="accessibility-btn"
+                    id="screenReader"
+                    title="Optimizar para Lector de Pantalla"
+                    aria-label="Activar optimización para lectores de pantalla"
+                    aria-pressed="false"
+                    type="button">
+                <i class="fas fa-volume-up" aria-hidden="true"></i>
+                <span>Lector de Pantalla</span>
+            </button>
+
+            <div class="accessibility-separator" role="separator"></div>
+
+            <!-- Restablecer -->
+            <button class="reset-btn"
+                    id="resetAccessibility"
+                    title="Restablecer Todas las Configuraciones (Ctrl + Alt + R)"
+                    aria-label="Restablecer todas las configuraciones de accesibilidad"
+                    type="button">
+                <i class="fas fa-undo" aria-hidden="true"></i>
+                <span>Restablecer Todo</span>
+            </button>
+        </div>
+    </div>
+</aside>
+
+<!-- Región ARIA Live para anuncios -->
+<div id="aria-live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+<!-- Estilos para screen-reader only -->
+<style>
+    .sr-only {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+    }
+</style>
+

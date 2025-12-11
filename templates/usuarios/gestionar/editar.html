@@ -1,0 +1,256 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Editar Usuario - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .user-preview {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .user-avatar-preview {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="mb-4">
+        <a href="{% url 'usuarios:detalle_usuario' usuario.id %}" class="btn btn-outline-secondary mb-3">
+            <i class="fas fa-arrow-left"></i> Volver al Detalle
+        </a>
+        <h1 class="h3 mb-1">✏️ Editar Usuario</h1>
+        <p class="text-muted mb-0">Modifica la información del usuario</p>
+    </div>
+
+    <!-- Formulario -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="form-card">
+                <!-- Vista Previa del Usuario -->
+                <div class="user-preview">
+                    {% if usuario.perfil.foto %}
+                    <img src="{{ usuario.perfil.foto.url }}" class="user-avatar-preview" alt="{{ usuario.username }}">
+                    {% else %}
+                    <div class="user-avatar-preview">
+                        {{ usuario.username.0|upper }}
+                    </div>
+                    {% endif %}
+                    <div>
+                        <h5 class="mb-0">{{ usuario.username }}</h5>
+                        <small class="text-muted">ID: {{ usuario.id }} | Registrado: {{ usuario.date_joined|date:"d/m/Y" }}</small>
+                    </div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <!-- Información de Cuenta -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <div class="section-icon">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            Información de Cuenta
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nombre de Usuario <span class="text-danger">*</span></label>
+                                <input type="text" name="username" class="form-control" value="{{ usuario.username }}" required>
+                                <small class="text-muted">El nombre de usuario no puede repetirse</small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Correo Electrónico <span class="text-danger">*</span></label>
+                                <input type="email" name="email" class="form-control" value="{{ usuario.email }}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información Personal -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <div class="section-icon">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            Información Personal
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nombres <span class="text-danger">*</span></label>
+                                <input type="text" name="first_name" class="form-control" value="{{ usuario.first_name }}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Apellidos <span class="text-danger">*</span></label>
+                                <input type="text" name="last_name" class="form-control" value="{{ usuario.last_name }}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Documento de Identidad</label>
+                                <input type="text" name="documento" class="form-control" value="{{ perfil.documento }}" placeholder="Ej: 12345678">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Teléfono</label>
+                                <input type="text" name="telefono" class="form-control" value="{{ perfil.telefono }}" placeholder="+52 123 456 7890">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Dirección</label>
+                                <textarea name="direccion" class="form-control" rows="2" placeholder="Dirección completa">{{ perfil.direccion }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Permisos y Tipo -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <div class="section-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            Permisos y Tipo de Usuario
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Tipo de Usuario <span class="text-danger">*</span></label>
+                                <select name="tipo_usuario" class="form-select" required>
+                                    {% for codigo, nombre in tipos_usuario %}
+                                    <option value="{{ codigo }}" {% if perfil.tipo_usuario == codigo %}selected{% endif %}>
+                                        {{ nombre }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Estado del Usuario</label>
+                                <div class="mt-2">
+                                    <div class="form-check form-switch mb-2">
+                                        <input type="checkbox" name="is_active" class="form-check-input" id="is_active" {% if usuario.is_active %}checked{% endif %}>
+                                        <label class="form-check-label" for="is_active">
+                                            <i class="fas fa-check-circle text-success"></i> Usuario Activo
+                                        </label>
+                                    </div>
+                                    {% if request.user.is_superuser %}
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" name="is_staff" class="form-check-input" id="is_staff" {% if usuario.is_staff %}checked{% endif %}>
+                                        <label class="form-check-label" for="is_staff">
+                                            <i class="fas fa-user-shield text-primary"></i> Personal Autorizado (Staff)
+                                        </label>
+                                        <small class="d-block text-muted">Puede acceder al panel de administración</small>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="{% url 'usuarios:detalle_usuario' usuario.id %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Información Adicional -->
+        <div class="col-lg-4">
+            <div class="form-card mb-3">
+                <h5 class="mb-3"><i class="fas fa-key text-warning"></i> Cambiar Contraseña</h5>
+                <p class="small text-muted">Para cambiar la contraseña del usuario, utiliza el panel de administración de Django o solicita al usuario que la cambie desde su perfil.</p>
+                <a href="/admin/auth/user/{{ usuario.id }}/password/" class="btn btn-warning btn-sm w-100" target="_blank">
+                    <i class="fas fa-key"></i> Cambiar Contraseña en Admin
+                </a>
+            </div>
+
+            <div class="form-card">
+                <h5 class="mb-3"><i class="fas fa-info-circle text-info"></i> Información</h5>
+
+                <div class="mb-3">
+                    <h6 class="text-primary">Datos del Sistema:</h6>
+                    <ul class="small mb-0">
+                        <li><strong>ID:</strong> {{ usuario.id }}</li>
+                        <li><strong>Fecha de Registro:</strong> {{ usuario.date_joined|date:"d/m/Y H:i" }}</li>
+                        <li><strong>Último Login:</strong> {{ usuario.last_login|date:"d/m/Y H:i"|default:"Nunca" }}</li>
+                        <li><strong>Última Actualización:</strong> {{ perfil.fecha_actualizacion|date:"d/m/Y H:i" }}</li>
+                    </ul>
+                </div>
+
+                <div class="alert alert-info mb-0 small">
+                    <i class="fas fa-lightbulb"></i>
+                    <strong>Nota:</strong> Los cambios en el tipo de usuario afectarán los permisos y accesos del usuario en el sistema.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

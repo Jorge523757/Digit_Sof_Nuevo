@@ -1,4 +1,4 @@
-"""DIGT SOFT - Vistas Facturación"""
+"""DIGIT SOFT - Vistas Facturación"""
 from django.shortcuts import render, get_object_or_404
 from .models import Factura
 

@@ -1,5 +1,5 @@
 """
-DIGT SOFT - Módulo de Equipos
+DIGIT SOFT - Módulo de Equipos
 Models - Inventario de Equipos de la Empresa
 """
 

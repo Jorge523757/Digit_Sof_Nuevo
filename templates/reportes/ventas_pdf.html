@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Ventas</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #2C3E50;
+            padding-bottom: 10px;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #2C3E50;
+            font-size: 24px;
+        }
+
+        .header p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .info {
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .info p {
+            margin: 5px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th {
+            background-color: #2C3E50;
+            color: white;
+            padding: 8px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 9px;
+        }
+
+        td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #ddd;
+            font-size: 9px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .badge {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 8px;
+            font-weight: bold;
+        }
+
+        .badge-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge-warning {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .badge-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .totales {
+            margin-top: 15px;
+            background-color: #e8f8f5;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 8px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💰 REPORTE DE VENTAS</h1>
+        <p><strong>DIGITSOFT - Sistema de Gestión Empresarial</strong></p>
+    </div>
+
+    <div class="info">
+        <p><strong>Fecha de Generación:</strong> {{ fecha|date:"d/m/Y H:i:s" }}</p>
+        <p><strong>Generado por:</strong> {{ usuario.get_full_name|default:usuario.username }}</p>
+        <p><strong>Total de Ventas:</strong> {{ total_ventas }}</p>
+        <p><strong>Ingresos Totales:</strong> ${{ total_ingresos|floatformat:2 }}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>N° Venta</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th class="text-right">Subtotal</th>
+                <th class="text-right">Impuestos</th>
+                <th class="text-right">Total</th>
+                <th class="text-center">Estado</th>
+                <th>Método Pago</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+            <tr>
+                <td>{{ venta.numero_venta }}</td>
+                <td>{{ venta.cliente.nombre_completo|default:"Sin cliente" }}</td>
+                <td>{{ venta.fecha_venta|date:"d/m/Y H:i" }}</td>
+                <td class="text-right">${{ venta.subtotal|floatformat:2 }}</td>
+                <td class="text-right">${{ venta.impuestos|floatformat:2 }}</td>
+                <td class="text-right">${{ venta.total|floatformat:2 }}</td>
+                <td class="text-center">
+                    {% if venta.estado == 'COMPLETADA' %}
+                    <span class="badge badge-success">{{ venta.get_estado_display }}</span>
+                    {% elif venta.estado == 'PENDIENTE' %}
+                    <span class="badge badge-warning">{{ venta.get_estado_display }}</span>
+                    {% else %}
+                    <span class="badge badge-danger">{{ venta.get_estado_display }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ venta.get_metodo_pago_display }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center">No hay ventas registradas</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if ventas %}
+    <div class="totales">
+        <p>TOTAL GENERAL: ${{ total_ingresos|floatformat:2 }}</p>
+    </div>
+    {% endif %}
+
+    <div class="footer">
+        <p>Este reporte fue generado automáticamente por DIGITSOFT</p>
+        <p>© 2024 DIGITSOFT - Todos los derechos reservados</p>
+    </div>
+</body>
+</html>
+

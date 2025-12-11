@@ -1,5 +1,5 @@
 """
-DIGT SOFT - Módulo de Clientes
+DIGIT SOFT - Módulo de Clientes
 Models - HU1: Gestión de Clientes
 """
 

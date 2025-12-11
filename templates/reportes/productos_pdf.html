@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Productos</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #2C3E50;
+            padding-bottom: 10px;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #2C3E50;
+            font-size: 24px;
+        }
+
+        .header p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .info {
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .info p {
+            margin: 5px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th {
+            background-color: #2C3E50;
+            color: white;
+            padding: 8px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 9px;
+        }
+
+        td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #ddd;
+            font-size: 9px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .badge {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 8px;
+            font-weight: bold;
+        }
+
+        .badge-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 8px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+
+        .totales {
+            margin-top: 15px;
+            background-color: #e8f8f5;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📦 REPORTE DE PRODUCTOS</h1>
+        <p><strong>DIGITSOFT - Sistema de Gestión Empresarial</strong></p>
+    </div>
+
+    <div class="info">
+        <p><strong>Fecha de Generación:</strong> {{ fecha|date:"d/m/Y H:i:s" }}</p>
+        <p><strong>Generado por:</strong> {{ usuario.get_full_name|default:usuario.username }}</p>
+        <p><strong>Total de Productos:</strong> {{ total_productos }}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Marca</th>
+                <th class="text-center">Stock</th>
+                <th class="text-right">P. Compra</th>
+                <th class="text-right">P. Venta</th>
+                <th class="text-center">Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr>
+                <td>{{ producto.codigo_sku }}</td>
+                <td>{{ producto.nombre_producto }}</td>
+                <td>{{ producto.categoria.nombre|default:"Sin categoría" }}</td>
+                <td>{{ producto.marca|default:"-" }}</td>
+                <td class="text-center">{{ producto.stock_actual }}</td>
+                <td class="text-right">${{ producto.precio_compra|floatformat:2 }}</td>
+                <td class="text-right">${{ producto.precio_venta|floatformat:2 }}</td>
+                <td class="text-center">
+                    {% if producto.activo %}
+                    <span class="badge badge-success">Activo</span>
+                    {% else %}
+                    <span class="badge badge-danger">Inactivo</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center">No hay productos registrados</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>Este reporte fue generado automáticamente por DIGITSOFT</p>
+        <p>© 2024 DIGITSOFT - Todos los derechos reservados</p>
+    </div>
+</body>
+</html>
+

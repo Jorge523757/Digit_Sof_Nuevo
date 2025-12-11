@@ -1,4 +1,4 @@
-# 🏢 DIGT SOFT - Sistema de Gestión Empresarial
+# 🏢 DIGITSOFT - Sistema de Gestión Empresarial
 
 Sistema web desarrollado con Django para la gestión integral de empresas de servicios técnicos.
 
@@ -450,7 +450,7 @@ python scripts/check_users.py
 
 ## 🤝 Contribución
 
-Este es un proyecto privado para DIGT SOFT. Para contribuir:
+Este es un proyecto privado para DIGITSOFT. Para contribuir:
 
 1. Crear una rama para tu feature
 2. Realizar los cambios
@@ -546,13 +546,13 @@ Para dudas o problemas:
 ## 📄 Licencia
 
 Proyecto privado - Todos los derechos reservados
-© 2025 DIGT SOFT
+© 2025 DIGIT SOFT
 
 ---
 
 ## 👥 Créditos
 
-- **Desarrollador:** Equipo DIGT SOFT
+- **Desarrollador:** Equipo DIGIT SOFT
 - **Framework:** Django Software Foundation
 - **Iconos:** Font Awesome
 - **Inspiración:** Sistemas modernos de gestión empresarial
