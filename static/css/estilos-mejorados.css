@@ -5,7 +5,7 @@
 /* ===== UTILIDADES GENERALES ===== */
 
 .text-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0716e2 0%, #00f2fe 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -27,7 +27,7 @@
 /* ===== BOTONES MEJORADOS ===== */
 
 .btn-gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0716e2 0%, #00f2fe 100%);
     border: none;
     color: white;
     transition: all 0.3s ease;
@@ -68,7 +68,7 @@
 }
 
 .card-header-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0716e2 0%, #00f2fe 100%);
     color: white;
     padding: 1.5rem;
 }
@@ -76,7 +76,7 @@
 /* ===== BADGES Y LABELS ===== */
 
 .badge-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0716e2 0%, #00f2fe 100%);
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 20px;
@@ -98,7 +98,7 @@
 }
 
 .section-bg-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0716e2 0%, #00f2fe 100%);
     color: white;
 }
 
@@ -117,7 +117,7 @@
     left: 0;
     width: 60px;
     height: 4px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0716e2 0%, #00f2fe 100%);
     border-radius: 2px;
 }
 
@@ -151,7 +151,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0716e2 0%, #00f2fe 100%);
     color: white;
     font-size: 2rem;
     margin: 0 auto 1.5rem;
@@ -268,7 +268,7 @@
 }
 
 .table-modern thead {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0716e2 0%, #00f2fe 100%);
     color: white;
 }
 
@@ -296,7 +296,7 @@
 }
 
 .alert-primary-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0716e2 0%, #00f2fe 100%);
     color: white;
 }
 
@@ -309,7 +309,7 @@
 }
 
 .nav-pills-modern .nav-link.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0716e2 0%, #00f2fe 100%);
 }
 
 /* ===== LOADERS Y SPINNERS ===== */
@@ -332,14 +332,14 @@
 
 .divider-gradient {
     height: 4px;
-    background: linear-gradient(90deg, transparent, #667eea, #764ba2, transparent);
+    background: linear-gradient(90deg, transparent, #0716e2, #00f2fe, transparent);
     margin: 3rem 0;
 }
 
 /* ===== TOOLTIPS PERSONALIZADOS ===== */
 
 .tooltip-modern {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0716e2 0%, #00f2fe 100%);
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 8px;

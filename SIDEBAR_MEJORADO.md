@@ -93,8 +93,7 @@ backdrop-filter: blur(5px);
 
 ### 7. Botón de Menú Toggle
 ```css
-background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-box-shadow: 0 4px 15px rgba(3, 125, 196, 0.3);
+background: linear-gradient(135deg, #0716e2 0%, #00f2fe 100%);
 ```
 - Gradiente azul
 - Sombra 3D
