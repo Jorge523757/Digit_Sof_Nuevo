@@ -1,0 +1,817 @@
+/* ============================================
+   CORRECCIÓN MODO OSCURO - TABLAS Y TEXTOS VISIBLES
+   Solución para letras invisibles en tablas
+   ============================================ */
+
+/* ============================================
+   VARIABLES PARA MODO OSCURO
+   ============================================ */
+body.dark-mode,
+[data-theme="dark"] {
+    --bg-primary: #1a1a1a !important;
+    --bg-secondary: #212529 !important;
+    --bg-card: #2d2d2d !important;
+    --text-primary: #ffffff !important;
+    --text-secondary: #e0e0e0 !important;
+    --text-visible: #f5f5f5 !important;
+    --border-color: #404040 !important;
+}
+
+/* ============================================
+   FONDO GENERAL
+   ============================================ */
+body.dark-mode,
+[data-theme="dark"] {
+    background-color: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+/* ============================================
+   TABLAS - MÁXIMA PRIORIDAD PARA VISIBILIDAD
+   ============================================ */
+
+/* Tabla completa */
+body.dark-mode table,
+body.dark-mode .table,
+[data-theme="dark"] table,
+[data-theme="dark"] .table {
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+    border-color: #404040 !important;
+}
+
+/* Headers de tabla - TEXTO BLANCO PURO */
+body.dark-mode table th,
+body.dark-mode .table th,
+body.dark-mode table thead th,
+body.dark-mode .table thead th,
+body.dark-mode table thead tr th,
+body.dark-mode .table thead tr th,
+[data-theme="dark"] table th,
+[data-theme="dark"] .table th,
+[data-theme="dark"] table thead th,
+[data-theme="dark"] .table thead th {
+    background-color: #343a40 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    border-color: #404040 !important;
+}
+
+/* Celdas de tabla - TEXTO MUY VISIBLE */
+body.dark-mode table td,
+body.dark-mode .table td,
+body.dark-mode table tbody td,
+body.dark-mode .table tbody td,
+body.dark-mode table tbody tr td,
+body.dark-mode .table tbody tr td,
+[data-theme="dark"] table td,
+[data-theme="dark"] .table td,
+[data-theme="dark"] table tbody td,
+[data-theme="dark"] .table tbody td {
+    color: #f5f5f5 !important;
+    background-color: #2d2d2d !important;
+    border-color: #404040 !important;
+}
+
+/* Filas de tabla */
+body.dark-mode table tr,
+body.dark-mode .table tr,
+body.dark-mode table tbody tr,
+body.dark-mode .table tbody tr,
+[data-theme="dark"] table tr,
+[data-theme="dark"] .table tr,
+[data-theme="dark"] table tbody tr,
+[data-theme="dark"] .table tbody tr {
+    background-color: #2d2d2d !important;
+    color: #f5f5f5 !important;
+    border-color: #404040 !important;
+}
+
+/* Hover en filas - MÁS VISIBLE */
+body.dark-mode .table-hover tbody tr:hover,
+body.dark-mode .table-hover tbody tr:hover td,
+body.dark-mode table tbody tr:hover,
+body.dark-mode table tbody tr:hover td,
+[data-theme="dark"] .table-hover tbody tr:hover,
+[data-theme="dark"] .table-hover tbody tr:hover td,
+[data-theme="dark"] table tbody tr:hover,
+[data-theme="dark"] table tbody tr:hover td {
+    background-color: #3a3a3a !important;
+    color: #ffffff !important;
+}
+
+/* Tablas rayadas - filas alternas */
+body.dark-mode .table-striped > tbody > tr:nth-of-type(odd),
+body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) > *,
+body.dark-mode .table-striped tbody tr:nth-of-type(odd),
+body.dark-mode .table-striped tbody tr:nth-of-type(odd) td,
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd),
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > *,
+[data-theme="dark"] .table-striped tbody tr:nth-of-type(odd),
+[data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) td {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: #f5f5f5 !important;
+}
+
+/* TODOS los spans dentro de tabla - CRÍTICO */
+body.dark-mode table span,
+body.dark-mode .table span,
+body.dark-mode table td span,
+body.dark-mode .table td span,
+body.dark-mode table tbody tr td span,
+body.dark-mode .table tbody tr td span,
+[data-theme="dark"] table span,
+[data-theme="dark"] .table span,
+[data-theme="dark"] table td span,
+[data-theme="dark"] .table td span {
+    color: #f5f5f5 !important;
+}
+
+/* TODOS los div dentro de tabla */
+body.dark-mode table div,
+body.dark-mode .table div,
+body.dark-mode table td div,
+body.dark-mode .table td div,
+[data-theme="dark"] table div,
+[data-theme="dark"] .table div,
+[data-theme="dark"] table td div,
+[data-theme="dark"] .table td div {
+    color: #f5f5f5 !important;
+}
+
+/* TODOS los párrafos dentro de tabla */
+body.dark-mode table p,
+body.dark-mode .table p,
+body.dark-mode table td p,
+body.dark-mode .table td p,
+[data-theme="dark"] table p,
+[data-theme="dark"] .table p,
+[data-theme="dark"] table td p,
+[data-theme="dark"] .table td p {
+    color: #f5f5f5 !important;
+}
+
+/* TODOS los iconos en tabla */
+body.dark-mode table i,
+body.dark-mode .table i,
+body.dark-mode table td i,
+body.dark-mode .table td i,
+body.dark-mode table i.fa,
+body.dark-mode .table i.fa,
+body.dark-mode table i.fas,
+body.dark-mode .table i.fas,
+[data-theme="dark"] table i,
+[data-theme="dark"] .table i,
+[data-theme="dark"] table td i,
+[data-theme="dark"] .table td i {
+    color: #f5f5f5 !important;
+}
+
+/* Enlaces en tabla */
+body.dark-mode table a,
+body.dark-mode .table a,
+body.dark-mode table td a,
+body.dark-mode .table td a,
+[data-theme="dark"] table a,
+[data-theme="dark"] .table a {
+    color: #64b5f6 !important;
+}
+
+body.dark-mode table a:hover,
+body.dark-mode .table a:hover,
+[data-theme="dark"] table a:hover,
+[data-theme="dark"] .table a:hover {
+    color: #90caf9 !important;
+}
+
+/* Botones dentro de tabla */
+body.dark-mode table .btn,
+body.dark-mode .table .btn,
+body.dark-mode table td .btn,
+body.dark-mode .table td .btn,
+[data-theme="dark"] table .btn,
+[data-theme="dark"] .table .btn {
+    color: #ffffff !important;
+}
+
+/* Badges dentro de tabla - ESTADOS VISIBLES */
+body.dark-mode table .badge,
+body.dark-mode .table .badge,
+body.dark-mode table td .badge,
+body.dark-mode .table td .badge,
+[data-theme="dark"] table .badge,
+[data-theme="dark"] .table .badge {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+/* Badge Success en tabla */
+body.dark-mode table .badge.bg-success,
+body.dark-mode .table .badge.bg-success,
+[data-theme="dark"] table .badge.bg-success,
+[data-theme="dark"] .table .badge.bg-success {
+    background-color: #51cf66 !important;
+    color: #ffffff !important;
+}
+
+/* Badge Danger en tabla */
+body.dark-mode table .badge.bg-danger,
+body.dark-mode .table .badge.bg-danger,
+[data-theme="dark"] table .badge.bg-danger,
+[data-theme="dark"] .table .badge.bg-danger {
+    background-color: #ff6b6b !important;
+    color: #ffffff !important;
+}
+
+/* ============================================
+   FORZAR VISIBILIDAD - OVERRIDE COMPLETO
+   ============================================ */
+
+/* Forzar cualquier elemento con estilo inline en tablas */
+body.dark-mode table [style*="color"],
+body.dark-mode .table [style*="color"],
+body.dark-mode table td [style*="color"],
+body.dark-mode .table td [style*="color"],
+[data-theme="dark"] table [style*="color"],
+[data-theme="dark"] .table [style*="color"] {
+    color: #f5f5f5 !important;
+}
+
+/* Forzar todo contenido de texto en celdas */
+body.dark-mode table td *,
+body.dark-mode .table td *,
+[data-theme="dark"] table td *,
+[data-theme="dark"] .table td * {
+    color: #f5f5f5 !important;
+}
+
+/* Excepción: Badges y botones mantienen su color */
+body.dark-mode table td .badge,
+body.dark-mode table td .btn,
+body.dark-mode .table td .badge,
+body.dark-mode .table td .btn,
+[data-theme="dark"] table td .badge,
+[data-theme="dark"] table td .btn,
+[data-theme="dark"] .table td .badge,
+[data-theme="dark"] .table td .btn {
+    color: #ffffff !important;
+}
+
+/* ============================================
+   ENCABEZADOS Y TÍTULOS
+   ============================================ */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6,
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+    color: #ffffff !important;
+}
+
+/* Títulos de página específicos */
+body.dark-mode .page-title,
+body.dark-mode .section-title,
+body.dark-mode .module-title,
+body.dark-mode .card-title,
+[data-theme="dark"] .page-title,
+[data-theme="dark"] .section-title,
+[data-theme="dark"] .module-title,
+[data-theme="dark"] .card-title {
+    color: #ffffff !important;
+}
+
+/* Títulos con iconos (como "Gestión de Técnicos") */
+body.dark-mode h1 i,
+body.dark-mode h2 i,
+body.dark-mode h3 i,
+body.dark-mode h1 svg,
+body.dark-mode h2 svg,
+body.dark-mode h3 svg,
+[data-theme="dark"] h1 i,
+[data-theme="dark"] h2 i,
+[data-theme="dark"] h3 i {
+    color: #ffffff !important;
+}
+
+/* Subtítulos y descripciones */
+body.dark-mode .subtitle,
+body.dark-mode .description,
+body.dark-mode .page-description,
+[data-theme="dark"] .subtitle,
+[data-theme="dark"] .description,
+[data-theme="dark"] .page-description {
+    color: #b0b0b0 !important;
+}
+
+/* ============================================
+   TEXTOS GENERALES
+   ============================================ */
+body.dark-mode p,
+body.dark-mode span:not(.badge),
+body.dark-mode div:not(.badge),
+body.dark-mode label,
+body.dark-mode li,
+[data-theme="dark"] p,
+[data-theme="dark"] span:not(.badge),
+[data-theme="dark"] div:not(.badge),
+[data-theme="dark"] label,
+[data-theme="dark"] li {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode small,
+body.dark-mode .text-muted,
+[data-theme="dark"] small,
+[data-theme="dark"] .text-muted {
+    color: #b0b0b0 !important;
+}
+
+/* ============================================
+   TARJETAS Y CONTENEDORES
+   ============================================ */
+body.dark-mode .card,
+body.dark-mode .modal-content,
+[data-theme="dark"] .card,
+[data-theme="dark"] .modal-content {
+    background-color: #2d2d2d !important;
+    color: #e0e0e0 !important;
+    border-color: #404040 !important;
+}
+
+body.dark-mode .card-header,
+[data-theme="dark"] .card-header {
+    background-color: #343a40 !important;
+    color: #ffffff !important;
+    border-bottom-color: #404040 !important;
+}
+
+body.dark-mode .card-body,
+[data-theme="dark"] .card-body {
+    color: #e0e0e0 !important;
+}
+
+/* ============================================
+   FORMULARIOS
+   ============================================ */
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select,
+body.dark-mode .form-control,
+body.dark-mode .form-select,
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select,
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: #343a40 !important;
+    color: #ffffff !important;
+    border-color: #505050 !important;
+}
+
+body.dark-mode input:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus,
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] select:focus {
+    background-color: #404040 !important;
+    color: #ffffff !important;
+    border-color: #667eea !important;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder,
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: #808080 !important;
+}
+
+body.dark-mode label,
+body.dark-mode .form-label,
+[data-theme="dark"] label,
+[data-theme="dark"] .form-label {
+    color: #e0e0e0 !important;
+}
+
+/* ============================================
+   BOTONES GENERALES
+   ============================================ */
+body.dark-mode .btn-light,
+body.dark-mode .btn-outline-secondary,
+[data-theme="dark"] .btn-light,
+[data-theme="dark"] .btn-outline-secondary {
+    background-color: #404040 !important;
+    color: #ffffff !important;
+    border-color: #505050 !important;
+}
+
+body.dark-mode .btn-light:hover,
+body.dark-mode .btn-outline-secondary:hover,
+[data-theme="dark"] .btn-light:hover,
+[data-theme="dark"] .btn-outline-secondary:hover {
+    background-color: #505050 !important;
+    color: #ffffff !important;
+}
+
+/* ============================================
+   BADGES Y ESTADOS GENERALES
+   ============================================ */
+body.dark-mode .badge,
+[data-theme="dark"] .badge {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+body.dark-mode .badge.bg-success,
+body.dark-mode .badge-success,
+[data-theme="dark"] .badge.bg-success,
+[data-theme="dark"] .badge-success {
+    background-color: #51cf66 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .badge.bg-danger,
+body.dark-mode .badge-danger,
+[data-theme="dark"] .badge.bg-danger,
+[data-theme="dark"] .badge-danger {
+    background-color: #ff6b6b !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .badge.bg-warning,
+body.dark-mode .badge-warning,
+[data-theme="dark"] .badge.bg-warning,
+[data-theme="dark"] .badge-warning {
+    background-color: #ffd43b !important;
+    color: #000000 !important;
+}
+
+body.dark-mode .badge.bg-info,
+body.dark-mode .badge-info,
+[data-theme="dark"] .badge.bg-info,
+[data-theme="dark"] .badge-info {
+    background-color: #4dabf7 !important;
+    color: #ffffff !important;
+}
+
+/* ============================================
+   DROPDOWNS
+   ============================================ */
+body.dark-mode .dropdown-menu,
+[data-theme="dark"] .dropdown-menu {
+    background-color: #2d2d2d !important;
+    border-color: #404040 !important;
+}
+
+body.dark-mode .dropdown-item,
+[data-theme="dark"] .dropdown-item {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .dropdown-item:hover,
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: #343a40 !important;
+    color: #ffffff !important;
+}
+
+/* ============================================
+   ALERTAS
+   ============================================ */
+body.dark-mode .alert,
+[data-theme="dark"] .alert {
+    color: #ffffff !important;
+}
+
+body.dark-mode .alert-success,
+[data-theme="dark"] .alert-success {
+    background-color: rgba(81, 207, 102, 0.2) !important;
+    border-color: #51cf66 !important;
+}
+
+body.dark-mode .alert-danger,
+[data-theme="dark"] .alert-danger {
+    background-color: rgba(255, 107, 107, 0.2) !important;
+    border-color: #ff6b6b !important;
+}
+
+/* ============================================
+   NAVEGACIÓN
+   ============================================ */
+body.dark-mode .nav-link,
+[data-theme="dark"] .nav-link {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .nav-link:hover,
+body.dark-mode .nav-link.active,
+[data-theme="dark"] .nav-link:hover,
+[data-theme="dark"] .nav-link.active {
+    color: #ffffff !important;
+    background-color: #343a40 !important;
+}
+
+/* ============================================
+   PAGINACIÓN
+   ============================================ */
+body.dark-mode .pagination .page-link,
+[data-theme="dark"] .pagination .page-link {
+    background-color: #2d2d2d !important;
+    border-color: #404040 !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .pagination .page-link:hover,
+[data-theme="dark"] .pagination .page-link:hover {
+    background-color: #343a40 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .pagination .page-item.active .page-link,
+[data-theme="dark"] .pagination .page-item.active .page-link {
+    background-color: #667eea !important;
+    border-color: #667eea !important;
+    color: #ffffff !important;
+}
+
+/* ============================================
+   MODALES
+   ============================================ */
+body.dark-mode .modal-header,
+[data-theme="dark"] .modal-header {
+    background-color: #343a40 !important;
+    border-bottom-color: #404040 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .modal-footer,
+[data-theme="dark"] .modal-footer {
+    background-color: #343a40 !important;
+    border-top-color: #404040 !important;
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+body.dark-mode .sidebar,
+[data-theme="dark"] .sidebar {
+    background-color: #212529 !important;
+    color: #e0e0e0 !important;
+}
+
+/* ============================================
+   SCROLLBARS
+   ============================================ */
+body.dark-mode ::-webkit-scrollbar,
+[data-theme="dark"] ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+body.dark-mode ::-webkit-scrollbar-track,
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb,
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 5px;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover,
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: #505050;
+}
+
+/* ============================================
+   CLASES DE TEXTO DE BOOTSTRAP
+   ============================================ */
+body.dark-mode .text-dark,
+[data-theme="dark"] .text-dark {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .bg-light,
+[data-theme="dark"] .bg-light {
+    background-color: #2d2d2d !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .bg-white,
+[data-theme="dark"] .bg-white {
+    background-color: #2d2d2d !important;
+    color: #e0e0e0 !important;
+}
+
+/* ============================================
+   CONTENEDORES PRINCIPALES Y HEADERS
+   ============================================ */
+
+/* Contenedor principal que envuelve todo */
+body.dark-mode .container,
+body.dark-mode .container-fluid,
+body.dark-mode .main-content,
+body.dark-mode .content-wrapper,
+body.dark-mode main,
+[data-theme="dark"] .container,
+[data-theme="dark"] .container-fluid,
+[data-theme="dark"] .main-content,
+[data-theme="dark"] .content-wrapper,
+[data-theme="dark"] main {
+    background-color: #1a1a1a !important;
+}
+
+/* Headers de página - TODOS los elementos dentro */
+body.dark-mode .page-header,
+body.dark-mode .section-header,
+body.dark-mode .module-header,
+body.dark-mode .content-header,
+[data-theme="dark"] .page-header,
+[data-theme="dark"] .section-header,
+[data-theme="dark"] .module-header,
+[data-theme="dark"] .content-header {
+    background-color: transparent !important;
+}
+
+body.dark-mode .page-header *,
+body.dark-mode .section-header *,
+body.dark-mode .module-header *,
+body.dark-mode .content-header *,
+[data-theme="dark"] .page-header *,
+[data-theme="dark"] .section-header *,
+[data-theme="dark"] .module-header *,
+[data-theme="dark"] .content-header * {
+    color: #ffffff !important;
+}
+
+/* ============================================
+   MÓDULOS ESPECÍFICOS - MÁXIMA PRIORIDAD
+   ============================================ */
+
+/* Contenedores de módulos */
+body.dark-mode .tecnicos-container,
+body.dark-mode .clientes-container,
+body.dark-mode .usuarios-container,
+body.dark-mode .productos-container,
+body.dark-mode .proveedores-container,
+body.dark-mode .ordenes-container,
+[data-theme="dark"] .tecnicos-container,
+[data-theme="dark"] .clientes-container,
+[data-theme="dark"] .usuarios-container {
+    background-color: #1a1a1a !important;
+}
+
+/* Headers de módulos específicos */
+body.dark-mode .tecnicos-header,
+body.dark-mode .clientes-header,
+body.dark-mode .usuarios-header,
+body.dark-mode .productos-header,
+[data-theme="dark"] .tecnicos-header,
+[data-theme="dark"] .clientes-header,
+[data-theme="dark"] .usuarios-header {
+    background-color: transparent !important;
+}
+
+/* Títulos en headers de módulos - BLANCO PURO */
+body.dark-mode .tecnicos-header h1,
+body.dark-mode .tecnicos-header h2,
+body.dark-mode .tecnicos-header h3,
+body.dark-mode .clientes-header h1,
+body.dark-mode .clientes-header h2,
+body.dark-mode .clientes-header h3,
+body.dark-mode .usuarios-header h1,
+body.dark-mode .usuarios-header h2,
+body.dark-mode .usuarios-header h3,
+[data-theme="dark"] .tecnicos-header h1,
+[data-theme="dark"] .tecnicos-header h2,
+[data-theme="dark"] .clientes-header h1,
+[data-theme="dark"] .clientes-header h2,
+[data-theme="dark"] .usuarios-header h1,
+[data-theme="dark"] .usuarios-header h2 {
+    color: #ffffff !important;
+}
+
+/* Iconos en headers de módulos */
+body.dark-mode .tecnicos-header i,
+body.dark-mode .clientes-header i,
+body.dark-mode .usuarios-header i,
+body.dark-mode .productos-header i,
+[data-theme="dark"] .tecnicos-header i,
+[data-theme="dark"] .clientes-header i,
+[data-theme="dark"] .usuarios-header i {
+    color: #ffffff !important;
+}
+
+/* Descripciones en headers */
+body.dark-mode .tecnicos-header p,
+body.dark-mode .clientes-header p,
+body.dark-mode .usuarios-header p,
+[data-theme="dark"] .tecnicos-header p,
+[data-theme="dark"] .clientes-header p,
+[data-theme="dark"] .usuarios-header p {
+    color: #b0b0b0 !important;
+}
+
+/* ============================================
+   STATS CARDS Y INFO CARDS
+   ============================================ */
+body.dark-mode .stat-card,
+body.dark-mode .stats-card,
+body.dark-mode .info-card,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .stats-card,
+[data-theme="dark"] .info-card {
+    background-color: #2d2d2d !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .stat-card *,
+body.dark-mode .stats-card *,
+body.dark-mode .info-card *,
+[data-theme="dark"] .stat-card *,
+[data-theme="dark"] .stats-card *,
+[data-theme="dark"] .info-card * {
+    color: #ffffff !important;
+}
+
+/* ============================================
+   OVERRIDE DE ESTILOS INLINE - MÁXIMA PRIORIDAD
+   ============================================ */
+
+/* Forzar visibilidad de elementos con color inline */
+body.dark-mode [style*="color"],
+[data-theme="dark"] [style*="color"] {
+    color: #e0e0e0 !important;
+}
+
+/* Headers con estilos inline */
+body.dark-mode h1[style],
+body.dark-mode h2[style],
+body.dark-mode h3[style],
+body.dark-mode h4[style],
+[data-theme="dark"] h1[style],
+[data-theme="dark"] h2[style],
+[data-theme="dark"] h3[style],
+[data-theme="dark"] h4[style] {
+    color: #ffffff !important;
+}
+
+/* Divs con clases específicas que puedan tener títulos */
+body.dark-mode div[class*="header"] h1,
+body.dark-mode div[class*="header"] h2,
+body.dark-mode div[class*="header"] h3,
+body.dark-mode div[class*="title"] h1,
+body.dark-mode div[class*="title"] h2,
+[data-theme="dark"] div[class*="header"] h1,
+[data-theme="dark"] div[class*="header"] h2,
+[data-theme="dark"] div[class*="header"] h3 {
+    color: #ffffff !important;
+}
+
+/* Cualquier elemento dentro de headers o titles */
+body.dark-mode div[class*="header"] *,
+body.dark-mode div[class*="title"] *,
+[data-theme="dark"] div[class*="header"] *,
+[data-theme="dark"] div[class*="title"] * {
+    color: #ffffff !important;
+}
+
+/* ============================================
+   REGLAS GLOBALES MUY ESPECÍFICAS
+   ============================================ */
+
+/* Forzar todos los h1, h2, h3 sin importar dónde estén */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3 {
+    color: #ffffff !important;
+}
+
+/* Forzar color en cualquier elemento que pueda ser título */
+body.dark-mode [class*="title"],
+body.dark-mode [class*="heading"],
+body.dark-mode [class*="header"],
+[data-theme="dark"] [class*="title"],
+[data-theme="dark"] [class*="heading"],
+[data-theme="dark"] [class*="header"] {
+    color: #ffffff !important;
+}
+
+/* ============================================
+   TRANSICIONES SUAVES
+   ============================================ */
+body.dark-mode *,
+[data-theme="dark"] * {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+

@@ -361,21 +361,99 @@ def crear_usuario(request):
     if request.method == 'POST':
         from django.contrib.auth.forms import UserCreationForm
         from .forms import UsuarioCrearForm
+        from clientes.models import Cliente
+        from tecnicos.models import Tecnico
+        from proveedores.models import Proveedor
 
         form = UsuarioCrearForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             user.save()
 
+            # Obtener datos del formulario
+            tipo_usuario = request.POST.get('tipo_usuario', 'CLIENTE')
+            telefono = request.POST.get('telefono', '')
+            direccion = request.POST.get('direccion', '')
+            documento = request.POST.get('documento', '')
+            first_name = user.first_name
+            last_name = user.last_name
+            email = user.email
+
             # Actualizar perfil
             perfil = user.perfil
-            perfil.tipo_usuario = request.POST.get('tipo_usuario', 'CLIENTE')
-            perfil.telefono = request.POST.get('telefono', '')
-            perfil.direccion = request.POST.get('direccion', '')
-            perfil.documento = request.POST.get('documento', '')
+            perfil.tipo_usuario = tipo_usuario
+            perfil.telefono = telefono
+            perfil.direccion = direccion
+            perfil.documento = documento
             perfil.save()
 
-            messages.success(request, f'Usuario {user.username} creado exitosamente.')
+            # Crear registro en la tabla correspondiente según el tipo
+            try:
+                if tipo_usuario == 'CLIENTE':
+                    # Crear Cliente
+                    cliente = Cliente.objects.create(
+                        nombres=first_name,
+                        apellidos=last_name,
+                        numero_documento=documento,
+                        telefono=telefono,
+                        correo=email,
+                        direccion=direccion,
+                        activo=True
+                    )
+                    # Vincular con el perfil
+                    perfil.cliente = cliente
+                    perfil.save()
+                    messages.success(request, f'Usuario {user.username} creado exitosamente como Cliente.')
+
+                elif tipo_usuario == 'TECNICO':
+                    # Crear Técnico
+                    profesion = request.POST.get('profesion', 'Técnico General')
+                    tecnico = Tecnico.objects.create(
+                        nombres=first_name,
+                        apellidos=last_name,
+                        numero_documento=documento,
+                        telefono=telefono,
+                        correo=email,
+                        profesion=profesion,
+                        activo=True
+                    )
+                    # Vincular con el perfil
+                    perfil.tecnico = tecnico
+                    perfil.save()
+                    messages.success(request, f'Usuario {user.username} creado exitosamente como Técnico.')
+
+                elif tipo_usuario == 'PROVEEDOR':
+                    # Crear Proveedor
+                    nombre_empresa = request.POST.get('nombre_empresa', f'{first_name} {last_name}')
+                    # Generar NIT temporal
+                    import time
+                    nit_temporal = f'TEMP-{int(time.time())}'
+
+                    proveedor = Proveedor.objects.create(
+                        nombre_empresa=nombre_empresa,
+                        nit=nit_temporal,
+                        nombre_contacto=f'{first_name} {last_name}',
+                        telefono=telefono or '0000000000',
+                        email=email,
+                        direccion=direccion or 'Sin dirección',
+                        activo=True
+                    )
+                    messages.success(request, f'Usuario {user.username} creado exitosamente como Proveedor.')
+
+                elif tipo_usuario == 'ADMIN':
+                    # Para administradores, no se crea registro adicional
+                    # Solo se marca el usuario como staff y superuser
+                    user.is_staff = True
+                    user.is_superuser = True
+                    user.save()
+                    messages.success(request, f'Usuario {user.username} creado exitosamente como Administrador.')
+
+                else:
+                    messages.success(request, f'Usuario {user.username} creado exitosamente.')
+
+            except Exception as e:
+                messages.warning(request, f'Usuario creado, pero hubo un error al crear el registro adicional: {str(e)}')
+
             return redirect('usuarios:detalle_usuario', user_id=user.id)
         else:
             messages.error(request, 'Por favor, corrige los errores en el formulario.')
@@ -409,6 +487,10 @@ def detalle_usuario(request, user_id):
 @staff_required
 def editar_usuario(request, user_id):
     """Vista para editar un usuario"""
+    from clientes.models import Cliente
+    from tecnicos.models import Tecnico
+    from proveedores.models import Proveedor
+
     usuario = get_object_or_404(User, id=user_id)
     perfil = usuario.perfil
 
@@ -426,14 +508,117 @@ def editar_usuario(request, user_id):
 
         usuario.save()
 
+        # Obtener datos adicionales
+        tipo_usuario_nuevo = request.POST.get('tipo_usuario', perfil.tipo_usuario)
+        tipo_usuario_anterior = perfil.tipo_usuario
+        telefono = request.POST.get('telefono', '')
+        direccion = request.POST.get('direccion', '')
+        documento = request.POST.get('documento', '')
+
         # Actualizar perfil
-        perfil.tipo_usuario = request.POST.get('tipo_usuario', perfil.tipo_usuario)
-        perfil.telefono = request.POST.get('telefono', '')
-        perfil.direccion = request.POST.get('direccion', '')
-        perfil.documento = request.POST.get('documento', '')
+        perfil.tipo_usuario = tipo_usuario_nuevo
+        perfil.telefono = telefono
+        perfil.direccion = direccion
+        perfil.documento = documento
         perfil.save()
 
-        messages.success(request, f'Usuario {usuario.username} actualizado exitosamente.')
+        # SIEMPRE verificar y crear el registro correspondiente según el tipo actual
+        mensaje_exito = None
+
+        try:
+            if tipo_usuario_nuevo == 'CLIENTE':
+                # Verificar si ya tiene cliente vinculado
+                if not perfil.cliente:
+                    # Buscar cliente existente por correo
+                    cliente_existente = Cliente.objects.filter(correo=usuario.email).first()
+
+                    if cliente_existente:
+                        perfil.cliente = cliente_existente
+                        perfil.save()
+                        mensaje_exito = 'Cliente existente vinculado al usuario.'
+                    else:
+                        # Crear nuevo cliente
+                        cliente = Cliente.objects.create(
+                            nombres=usuario.first_name or 'Sin nombre',
+                            apellidos=usuario.last_name or 'Sin apellido',
+                            numero_documento=documento,
+                            telefono=telefono,
+                            correo=usuario.email,
+                            direccion=direccion,
+                            activo=usuario.is_active
+                        )
+                        perfil.cliente = cliente
+                        perfil.save()
+                        mensaje_exito = f'Cliente creado y vinculado exitosamente. Ahora aparece en el módulo de Clientes.'
+
+            elif tipo_usuario_nuevo == 'TECNICO':
+                # Verificar si ya tiene técnico vinculado
+                if not perfil.tecnico:
+                    # Buscar técnico existente por correo
+                    tecnico_existente = Tecnico.objects.filter(correo=usuario.email).first()
+
+                    if tecnico_existente:
+                        perfil.tecnico = tecnico_existente
+                        perfil.save()
+                        mensaje_exito = 'Técnico existente vinculado al usuario.'
+                    else:
+                        # Crear nuevo técnico
+                        profesion = request.POST.get('profesion', 'Técnico General')
+                        tecnico = Tecnico.objects.create(
+                            nombres=usuario.first_name or 'Sin nombre',
+                            apellidos=usuario.last_name or 'Sin apellido',
+                            numero_documento=documento,
+                            telefono=telefono,
+                            correo=usuario.email,
+                            profesion=profesion,
+                            activo=usuario.is_active
+                        )
+                        perfil.tecnico = tecnico
+                        perfil.save()
+                        mensaje_exito = f'Técnico creado y vinculado exitosamente. Ahora aparece en el módulo de Técnicos.'
+
+            elif tipo_usuario_nuevo == 'PROVEEDOR':
+                # Buscar proveedor existente por email
+                proveedor_existente = Proveedor.objects.filter(email=usuario.email).first()
+
+                if not proveedor_existente:
+                    # Crear nuevo proveedor
+                    nombre_empresa = request.POST.get('nombre_empresa', f'{usuario.first_name} {usuario.last_name}')
+                    # Generar NIT temporal basado en timestamp
+                    import time
+                    nit_temporal = f'TEMP-{int(time.time())}'
+
+                    Proveedor.objects.create(
+                        nombre_empresa=nombre_empresa,
+                        nit=nit_temporal,
+                        nombre_contacto=f'{usuario.first_name} {usuario.last_name}',
+                        telefono=telefono or '0000000000',
+                        email=usuario.email,
+                        direccion=direccion or 'Sin dirección',
+                        activo=usuario.is_active
+                    )
+                    mensaje_exito = f'Proveedor creado exitosamente. Ahora aparece en el módulo de Proveedores.'
+                else:
+                    mensaje_exito = 'Usuario actualizado como Proveedor (proveedor ya existía).'
+
+            elif tipo_usuario_nuevo == 'ADMIN':
+                # Actualizar permisos de administrador
+                usuario.is_staff = True
+                usuario.is_superuser = True
+                usuario.save()
+                mensaje_exito = 'Permisos de administrador asignados. Usuario ahora tiene acceso completo.'
+
+            # Mostrar mensaje de éxito
+            if mensaje_exito:
+                messages.success(request, mensaje_exito)
+            else:
+                messages.success(request, f'Usuario {usuario.username} actualizado exitosamente.')
+
+        except Exception as e:
+            messages.error(request, f'Error al procesar el usuario: {str(e)}')
+            import traceback
+            print(traceback.format_exc())  # Para debug
+
         return redirect('usuarios:detalle_usuario', user_id=usuario.id)
 
     context = {

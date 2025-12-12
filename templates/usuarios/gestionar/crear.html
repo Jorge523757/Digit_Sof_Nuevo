@@ -1,0 +1,371 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Crear Usuario - DIGITSOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'usuarios:listar_usuarios' %}">Usuarios</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Crear Usuario</li>
+                </ol>
+            </nav>
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-user-plus text-primary"></i>
+                    Crear Nuevo Usuario
+                </h1>
+                <a href="{% url 'usuarios:listar_usuarios' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </div>
+
+            <!-- Formulario -->
+            <div class="row">
+                <div class="col-lg-8 col-xl-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-user-circle"></i>
+                                Información del Usuario
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" id="formCrearUsuario">
+                                {% csrf_token %}
+
+                                <!-- Mensajes de error -->
+                                {% if form.errors %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <strong>¡Error!</strong> Por favor, corrige los siguientes errores:
+                                    <ul class="mb-0 mt-2">
+                                        {% for field in form %}
+                                            {% for error in field.errors %}
+                                                <li>{{ field.label }}: {{ error }}</li>
+                                            {% endfor %}
+                                        {% endfor %}
+                                        {% for error in form.non_field_errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endif %}
+
+                                <!-- Tipo de Usuario -->
+                                <div class="mb-4">
+                                    <label for="tipo_usuario" class="form-label required">
+                                        <i class="fas fa-user-tag"></i>
+                                        Tipo de Usuario
+                                    </label>
+                                    <select name="tipo_usuario" id="tipo_usuario" class="form-select" required>
+                                        <option value="">Seleccionar tipo...</option>
+                                        {% for valor, etiqueta in tipos_usuario %}
+                                        <option value="{{ valor }}">{{ etiqueta }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <small class="form-text text-muted">
+                                        Esto determinará los permisos y módulos accesibles
+                                    </small>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <!-- Datos de Autenticación -->
+                                <h6 class="mb-3 text-primary">
+                                    <i class="fas fa-key"></i>
+                                    Datos de Autenticación
+                                </h6>
+
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        {{ form.username.label_tag }}
+                                        {{ form.username }}
+                                        {% if form.username.help_text %}
+                                        <small class="form-text text-muted">{{ form.username.help_text }}</small>
+                                        {% endif %}
+                                        {% if form.username.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.username.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-12 mb-3">
+                                        {{ form.email.label_tag }}
+                                        {{ form.email }}
+                                        {% if form.email.help_text %}
+                                        <small class="form-text text-muted">{{ form.email.help_text }}</small>
+                                        {% endif %}
+                                        {% if form.email.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.password1.label_tag }}
+                                        {{ form.password1 }}
+                                        {% if form.password1.help_text %}
+                                        <small class="form-text text-muted">{{ form.password1.help_text }}</small>
+                                        {% endif %}
+                                        {% if form.password1.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.password1.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.password2.label_tag }}
+                                        {{ form.password2 }}
+                                        {% if form.password2.help_text %}
+                                        <small class="form-text text-muted">{{ form.password2.help_text }}</small>
+                                        {% endif %}
+                                        {% if form.password2.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.password2.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <!-- Datos Personales -->
+                                <h6 class="mb-3 text-primary">
+                                    <i class="fas fa-user"></i>
+                                    Datos Personales
+                                </h6>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.first_name.label_tag }}
+                                        {{ form.first_name }}
+                                        {% if form.first_name.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.first_name.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.last_name.label_tag }}
+                                        {{ form.last_name }}
+                                        {% if form.last_name.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.last_name.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="documento" class="form-label">
+                                            <i class="fas fa-id-card"></i>
+                                            Documento de Identidad
+                                        </label>
+                                        <input type="text" name="documento" id="documento" class="form-control"
+                                               placeholder="Ej: 1234567890" maxlength="20">
+                                        <small class="form-text text-muted">Cédula, RUC, pasaporte, etc.</small>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="telefono" class="form-label">
+                                            <i class="fas fa-phone"></i>
+                                            Teléfono
+                                        </label>
+                                        <input type="tel" name="telefono" id="telefono" class="form-control"
+                                               placeholder="Ej: 0999999999" maxlength="15">
+                                    </div>
+
+                                    <div class="col-md-12 mb-3">
+                                        <label for="direccion" class="form-label">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            Dirección
+                                        </label>
+                                        <textarea name="direccion" id="direccion" class="form-control" rows="2"
+                                                  placeholder="Dirección completa"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Campos específicos según tipo -->
+                                <div id="campos-especificos">
+                                    <!-- Campos para técnico -->
+                                    <div id="campos-tecnico" style="display: none;">
+                                        <hr class="my-4">
+                                        <h6 class="mb-3 text-primary">
+                                            <i class="fas fa-wrench"></i>
+                                            Información Técnica
+                                        </h6>
+                                        <div class="mb-3">
+                                            <label for="profesion" class="form-label">
+                                                <i class="fas fa-briefcase"></i>
+                                                Profesión / Especialidad
+                                            </label>
+                                            <input type="text" name="profesion" id="profesion" class="form-control"
+                                                   placeholder="Ej: Técnico en Reparación de Computadoras">
+                                            <small class="form-text text-muted">
+                                                Área de especialización del técnico
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campos para proveedor -->
+                                    <div id="campos-proveedor" style="display: none;">
+                                        <hr class="my-4">
+                                        <h6 class="mb-3 text-primary">
+                                            <i class="fas fa-building"></i>
+                                            Información del Proveedor
+                                        </h6>
+                                        <div class="mb-3">
+                                            <label for="nombre_empresa" class="form-label">
+                                                <i class="fas fa-building"></i>
+                                                Nombre de la Empresa
+                                            </label>
+                                            <input type="text" name="nombre_empresa" id="nombre_empresa" class="form-control"
+                                                   placeholder="Ej: TechStore S.A.">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <!-- Permisos -->
+                                <h6 class="mb-3 text-primary">
+                                    <i class="fas fa-shield-alt"></i>
+                                    Permisos y Estado
+                                </h6>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check">
+                                            {{ form.is_staff }}
+                                            <label class="form-check-label" for="{{ form.is_staff.id_for_label }}">
+                                                {{ form.is_staff.label }}
+                                            </label>
+                                            <small class="form-text text-muted d-block">
+                                                Permite acceso al panel administrativo
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check">
+                                            {{ form.is_active }}
+                                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                                {{ form.is_active.label }}
+                                            </label>
+                                            <small class="form-text text-muted d-block">
+                                                El usuario puede iniciar sesión
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Botones -->
+                                <div class="d-flex justify-content-between mt-4">
+                                    <a href="{% url 'usuarios:listar_usuarios' %}" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Crear Usuario
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de ayuda -->
+                <div class="col-lg-4 col-xl-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle"></i>
+                                Información
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="text-primary">Tipos de Usuario:</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <strong><i class="fas fa-user-shield text-danger"></i> Administrador:</strong>
+                                    <small class="d-block text-muted">Acceso total al sistema. Puede gestionar todos los módulos.</small>
+                                </li>
+                                <li class="mb-2">
+                                    <strong><i class="fas fa-wrench text-warning"></i> Técnico:</strong>
+                                    <small class="d-block text-muted">Ejecuta órdenes de servicio. Accede a órdenes asignadas.</small>
+                                </li>
+                                <li class="mb-2">
+                                    <strong><i class="fas fa-user text-info"></i> Cliente:</strong>
+                                    <small class="d-block text-muted">Solicita servicios y compra productos. Acceso limitado.</small>
+                                </li>
+                                <li class="mb-2">
+                                    <strong><i class="fas fa-building text-success"></i> Proveedor:</strong>
+                                    <small class="d-block text-muted">Gestiona productos y procesa pedidos.</small>
+                                </li>
+                            </ul>
+
+                            <hr>
+
+                            <h6 class="text-primary">Nota Importante:</h6>
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <small>
+                                    Al crear un usuario con tipo <strong>Cliente</strong>, <strong>Técnico</strong>
+                                    o <strong>Proveedor</strong>, se creará automáticamente un registro en su
+                                    respectivo módulo.
+                                </small>
+                            </div>
+
+                            <h6 class="text-primary">Campos Requeridos:</h6>
+                            <ul class="small">
+                                <li>Tipo de Usuario</li>
+                                <li>Nombre de usuario</li>
+                                <li>Correo electrónico</li>
+                                <li>Contraseña (mínimo 8 caracteres)</li>
+                                <li>Nombres y apellidos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.required:after {
+    content: " *";
+    color: red;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoUsuario = document.getElementById('tipo_usuario');
+    const camposTecnico = document.getElementById('campos-tecnico');
+    const camposProveedor = document.getElementById('campos-proveedor');
+    const profesionInput = document.getElementById('profesion');
+    const nombreEmpresaInput = document.getElementById('nombre_empresa');
+
+    tipoUsuario.addEventListener('change', function() {
+        const tipo = this.value;
+
+        // Ocultar todos los campos específicos
+        camposTecnico.style.display = 'none';
+        camposProveedor.style.display = 'none';
+
+        // Quitar required de todos
+        profesionInput.removeAttribute('required');
+        nombreEmpresaInput.removeAttribute('required');
+
+        // Mostrar campos según tipo
+        if (tipo === 'TECNICO') {
+            camposTecnico.style.display = 'block';
+            profesionInput.setAttribute('required', 'required');
+        } else if (tipo === 'PROVEEDOR') {
+            camposProveedor.style.display = 'block';
+            nombreEmpresaInput.setAttribute('required', 'required');
+        }
+    });
+});
+</script>
+{% endblock %}
+

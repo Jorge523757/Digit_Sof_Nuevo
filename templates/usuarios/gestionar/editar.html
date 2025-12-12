@@ -176,13 +176,17 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Tipo de Usuario <span class="text-danger">*</span></label>
-                                <select name="tipo_usuario" class="form-select" required>
+                                <select name="tipo_usuario" id="tipo_usuario" class="form-select" required>
                                     {% for codigo, nombre in tipos_usuario %}
                                     <option value="{{ codigo }}" {% if perfil.tipo_usuario == codigo %}selected{% endif %}>
                                         {{ nombre }}
                                     </option>
                                     {% endfor %}
                                 </select>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle"></i>
+                                    Si cambias el tipo, se creará el registro correspondiente
+                                </small>
                             </div>
 
                             <div class="col-md-6">
@@ -203,6 +207,50 @@
                                         <small class="d-block text-muted">Puede acceder al panel de administración</small>
                                     </div>
                                     {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campos específicos según tipo -->
+                        <div id="campos-especificos">
+                            <!-- Campos para técnico -->
+                            <div id="campos-tecnico" style="display: {% if perfil.tipo_usuario == 'TECNICO' %}block{% else %}none{% endif %};">
+                                <hr class="my-3">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-wrench"></i>
+                                    Información Técnica
+                                </h6>
+                                <div class="mb-3">
+                                    <label for="profesion" class="form-label">
+                                        <i class="fas fa-briefcase"></i>
+                                        Profesión / Especialidad
+                                    </label>
+                                    <input type="text" name="profesion" id="profesion" class="form-control"
+                                           value="{% if perfil.tecnico %}{{ perfil.tecnico.profesion }}{% endif %}"
+                                           placeholder="Ej: Técnico en Reparación de Computadoras">
+                                    <small class="form-text text-muted">
+                                        Área de especialización del técnico
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Campos para proveedor -->
+                            <div id="campos-proveedor" style="display: {% if perfil.tipo_usuario == 'PROVEEDOR' %}block{% else %}none{% endif %};">
+                                <hr class="my-3">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-building"></i>
+                                    Información del Proveedor
+                                </h6>
+                                <div class="mb-3">
+                                    <label for="nombre_empresa" class="form-label">
+                                        <i class="fas fa-building"></i>
+                                        Nombre de la Empresa
+                                    </label>
+                                    <input type="text" name="nombre_empresa" id="nombre_empresa" class="form-control"
+                                           placeholder="Ej: TechStore S.A.">
+                                    <small class="form-text text-muted">
+                                        Nombre comercial o razón social
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -252,5 +300,44 @@
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoUsuario = document.getElementById('tipo_usuario');
+    const camposTecnico = document.getElementById('campos-tecnico');
+    const camposProveedor = document.getElementById('campos-proveedor');
+    const profesionInput = document.getElementById('profesion');
+    const nombreEmpresaInput = document.getElementById('nombre_empresa');
+
+    function actualizarCampos() {
+        const tipo = tipoUsuario.value;
+
+        // Ocultar todos los campos específicos
+        camposTecnico.style.display = 'none';
+        camposProveedor.style.display = 'none';
+
+        // Quitar required de todos
+        if (profesionInput) profesionInput.removeAttribute('required');
+        if (nombreEmpresaInput) nombreEmpresaInput.removeAttribute('required');
+
+        // Mostrar campos según tipo
+        if (tipo === 'TECNICO') {
+            camposTecnico.style.display = 'block';
+            if (profesionInput) profesionInput.setAttribute('required', 'required');
+        } else if (tipo === 'PROVEEDOR') {
+            camposProveedor.style.display = 'block';
+            if (nombreEmpresaInput) nombreEmpresaInput.setAttribute('required', 'required');
+        }
+    }
+
+    // Actualizar al cambiar el selector
+    tipoUsuario.addEventListener('change', actualizarCampos);
+
+    // Actualizar al cargar la página
+    actualizarCampos();
+});
+</script>
+{% endblock %}
 {% endblock %}
 
