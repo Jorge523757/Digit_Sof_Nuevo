@@ -338,11 +338,11 @@ body.high-contrast .card {
 /* ========== ACCESSIBILITY STATES ========== */
 /* Transición suave para todos los cambios */
 body {
-    transition: background-color 0.3s ease, color 0.3s ease, filter 0.3s ease;
+    transition: background-color  linear-gradient(135deg, #0716e2 0%, #00f2fe 100%);
 }
 
 body * {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    transition: background-color  linear-gradient(135deg, #0716e2 0%, #00f2fe 100%);
 }
 
 /* Tamaños de fuente */
