@@ -1,0 +1,117 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    DIGITSOFT - PROYECTO DOCKERIZADO                          ║
+║                        COMMIT REVERTIDO - 2 FEB 2026                         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+✅ ESTADO ACTUAL DEL PROYECTO
+────────────────────────────────────────────────────────────────────────────────
+El proyecto ha sido REVERTIDO al commit anterior exitosamente.
+
+📌 Commit actual: cdfe90a - "Subiendo cambios del boton claro a oscuro"
+🗑️  Commit eliminado: cc0e279 - "Implementación completa del sistema de registro..."
+
+════════════════════════════════════════════════════════════════════════════════
+🐳 INSTRUCCIONES PARA USAR DOCKER
+════════════════════════════════════════════════════════════════════════════════
+
+PASO 1: INICIAR DOCKER DESKTOP
+────────────────────────────────────────────────────────────────────────────────
+Antes de continuar, asegúrate de que Docker Desktop esté ejecutándose:
+• Abre Docker Desktop desde el menú de inicio
+• Espera a que aparezca el ícono de Docker en la bandeja del sistema
+• Verifica que el ícono no tenga ningún error
+
+PASO 2: LEVANTAR LOS CONTENEDORES
+────────────────────────────────────────────────────────────────────────────────
+Ejecuta el siguiente comando en la terminal:
+
+    docker-compose up -d
+
+O usa el archivo por lotes:
+
+    DOCKERIZAR_AHORA.bat
+
+PASO 3: CREAR SUPERUSUARIO
+────────────────────────────────────────────────────────────────────────────────
+Una vez que los contenedores estén corriendo, crea un superusuario con:
+
+    docker-compose exec web python manage.py createsuperuser
+
+O usa el archivo por lotes:
+
+    CREAR_SUPERUSER_DOCKER.bat
+
+PASO 4: ACCEDER A LA APLICACIÓN
+────────────────────────────────────────────────────────────────────────────────
+• Aplicación web: http://localhost:8000
+• Panel de administración: http://localhost:8000/admin
+
+════════════════════════════════════════════════════════════════════════════════
+🔧 SOLUCIÓN DE PROBLEMAS
+════════════════════════════════════════════════════════════════════════════════
+
+❌ ERROR: "Cannot connect to Docker daemon"
+────────────────────────────────────────────────────────────────────────────────
+CAUSA: Docker Desktop no está ejecutándose
+SOLUCIÓN:
+    1. Abre Docker Desktop
+    2. Espera a que se inicie completamente
+    3. Intenta nuevamente
+
+❌ ERROR: "Port 8000 is already in use"
+────────────────────────────────────────────────────────────────────────────────
+CAUSA: El puerto 8000 ya está siendo usado
+SOLUCIÓN:
+    1. Detén cualquier servidor Django local: Ctrl+C
+    2. O cambia el puerto en docker-compose.yml
+
+❌ ERROR: Localhost no abre
+────────────────────────────────────────────────────────────────────────────────
+CAUSA: Los contenedores no están corriendo o hay un error
+SOLUCIÓN:
+    1. Verifica que los contenedores estén corriendo:
+       docker-compose ps
+
+    2. Ve los logs para ver errores:
+       docker-compose logs web
+
+    3. Reinicia los contenedores:
+       docker-compose restart
+
+════════════════════════════════════════════════════════════════════════════════
+📂 ARCHIVOS IMPORTANTES
+════════════════════════════════════════════════════════════════════════════════
+• docker-compose.yml       → Configuración de Docker
+• Dockerfile               → Imagen de Docker
+• DOCKERIZAR_AHORA.bat     → Script para iniciar Docker
+• CREAR_SUPERUSER_DOCKER.bat → Script para crear superusuario
+
+════════════════════════════════════════════════════════════════════════════════
+🔄 RECUPERAR EL COMMIT ELIMINADO (Si lo necesitas)
+════════════════════════════════════════════════════════════════════════════════
+Si necesitas recuperar el commit que fue eliminado hoy:
+
+    git branch                          # Ver todas las ramas
+    git checkout backup-20260202-XXXX   # Cambiar a la rama de respaldo
+    git log                             # Verificar que el commit esté ahí
+
+════════════════════════════════════════════════════════════════════════════════
+📞 COMANDOS ÚTILES
+════════════════════════════════════════════════════════════════════════════════
+Ver estado de contenedores:     docker-compose ps
+Ver logs:                        docker-compose logs -f
+Detener contenedores:            docker-compose down
+Reiniciar contenedores:          docker-compose restart
+Entrar al contenedor:            docker-compose exec web bash
+Ejecutar comando en Django:      docker-compose exec web python manage.py [comando]
+
+════════════════════════════════════════════════════════════════════════════════
+✨ PRÓXIMOS PASOS
+════════════════════════════════════════════════════════════════════════════════
+1. Inicia Docker Desktop
+2. Ejecuta: docker-compose up -d
+3. Crea el superusuario
+4. Accede a http://localhost:8000
+
+¡Listo para trabajar!
+
