@@ -11,8 +11,8 @@ from .models import OrdenServicio, RepuestoOrden, SeguimientoOrden
 
 
 def ordenes_lista(request):
-    """Lista de órdenes con búsqueda y filtros"""
-    ordenes = OrdenServicio.objects.select_related('cliente', 'tecnico_asignado').all()
+    """Lista de órdenes con búsqueda y filtros avanzados"""
+    ordenes = OrdenServicio.objects.select_related('cliente', 'tecnico_asignado').all().order_by('-fecha_recepcion')
 
     # Búsqueda simple
     busqueda = request.GET.get('busqueda', '')
@@ -22,14 +22,62 @@ def ordenes_lista(request):
             Q(cliente__nombres__icontains=busqueda) |
             Q(cliente__apellidos__icontains=busqueda) |
             Q(marca__icontains=busqueda) |
-            Q(modelo__icontains=busqueda)
+            Q(modelo__icontains=busqueda) |
+            Q(tipo_equipo__icontains=busqueda)
         )
+
+    # Filtros avanzados
+    estado = request.GET.get('estado', '')
+    if estado:
+        ordenes = ordenes.filter(estado=estado)
+
+    prioridad = request.GET.get('prioridad', '')
+    if prioridad:
+        ordenes = ordenes.filter(prioridad=prioridad)
+
+    cliente = request.GET.get('cliente', '')
+    if cliente:
+        ordenes = ordenes.filter(
+            Q(cliente__nombres__icontains=cliente) |
+            Q(cliente__apellidos__icontains=cliente)
+        )
+
+    tecnico = request.GET.get('tecnico', '')
+    if tecnico:
+        ordenes = ordenes.filter(
+            Q(tecnico_asignado__nombres__icontains=tecnico) |
+            Q(tecnico_asignado__apellidos__icontains=tecnico)
+        )
+
+    equipo = request.GET.get('equipo', '')
+    if equipo:
+        ordenes = ordenes.filter(tipo_equipo__icontains=equipo)
+
+    # Filtro por rango de fechas
+    fecha_desde = request.GET.get('fecha_desde', '')
+    fecha_hasta = request.GET.get('fecha_hasta', '')
+
+    if fecha_desde:
+        try:
+            from datetime import datetime
+            fecha_desde_obj = datetime.strptime(fecha_desde, '%Y-%m-%d')
+            ordenes = ordenes.filter(fecha_recepcion__date__gte=fecha_desde_obj.date())
+        except ValueError:
+            pass
+
+    if fecha_hasta:
+        try:
+            from datetime import datetime
+            fecha_hasta_obj = datetime.strptime(fecha_hasta, '%Y-%m-%d')
+            ordenes = ordenes.filter(fecha_recepcion__date__lte=fecha_hasta_obj.date())
+        except ValueError:
+            pass
 
     # Paginación
     paginator = Paginator(ordenes, 20)
     page_obj = paginator.get_page(request.GET.get('page'))
 
-    # Estadísticas
+    # Estadísticas generales
     total_ordenes = OrdenServicio.objects.count()
     en_proceso = OrdenServicio.objects.filter(
         estado__in=['RECIBIDA', 'EN_DIAGNOSTICO', 'EN_REPARACION']
@@ -37,12 +85,29 @@ def ordenes_lista(request):
     listas_entrega = OrdenServicio.objects.filter(estado='LISTA_ENTREGA').count()
     entregadas = OrdenServicio.objects.filter(estado='ENTREGADA').count()
 
+    # Obtener listas para filtros
+    from clientes.models import Cliente
+    from tecnicos.models import Tecnico
+    
+    clientes = Cliente.objects.filter(activo=True).order_by('nombres')[:100]
+    tecnicos = Tecnico.objects.filter(activo=True).order_by('nombres')[:100]
+
     context = {
         'page_obj': page_obj,
         'total_ordenes': total_ordenes,
         'en_proceso': en_proceso,
         'listas_entrega': listas_entrega,
         'entregadas': entregadas,
+        'busqueda': busqueda,
+        'estado': estado,
+        'prioridad': prioridad,
+        'cliente': cliente,
+        'tecnico': tecnico,
+        'equipo': equipo,
+        'fecha_desde': fecha_desde,
+        'fecha_hasta': fecha_hasta,
+        'clientes': clientes,
+        'tecnicos': tecnicos,
     }
 
     return render(request, 'ordenes/lista.html', context)
