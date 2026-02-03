@@ -20,6 +20,10 @@ urlpatterns = [
     # Acciones
     path('<int:pk>/cambiar-estado/', views.orden_cambiar_estado, name='cambiar_estado'),
     path('<int:pk>/repuestos/', views.orden_agregar_repuesto, name='agregar_repuesto'),
+
+    # API para autocompletado
+    path('api/clientes/', views.api_clientes_autocomplete, name='api_clientes'),
+    path('api/tecnicos/', views.api_tecnicos_autocomplete, name='api_tecnicos'),
 ]
 """
 DIGT SOFT - Formularios del Módulo de Órdenes de Servicio

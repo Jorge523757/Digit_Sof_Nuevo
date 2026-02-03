@@ -31,8 +31,8 @@ ENV/
 *.log
 *.pot
 local_settings.py
-db.sqlite3
-db.sqlite3-journal
+# db.sqlite3  ← COMENTADO: Ahora SÍ se sube para compartir datos
+# db.sqlite3-journal
 /media
 /staticfiles
 /static/admin

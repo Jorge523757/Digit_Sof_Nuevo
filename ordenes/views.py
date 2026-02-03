@@ -174,3 +174,63 @@ def ordenes_tablero(request):
     return render(request, 'ordenes/tablero.html', context)
 
 
+# API para autocompletado
+from django.http import JsonResponse
+
+def api_clientes_autocomplete(request):
+    """API para autocompletar clientes"""
+    term = request.GET.get('term', '')
+
+    if len(term) < 2:
+        return JsonResponse([], safe=False)
+
+    from clientes.models import Cliente
+
+    clientes = Cliente.objects.filter(
+        Q(nombres__icontains=term) |
+        Q(apellidos__icontains=term) |
+        Q(numero_documento__icontains=term)
+    ).filter(activo=True)[:10]
+
+    results = [
+        {
+            'id': cliente.id,
+            'value': cliente.nombre_completo,
+            'label': f"{cliente.nombre_completo} - {cliente.numero_documento}",
+            'documento': cliente.numero_documento,
+            'telefono': cliente.telefono,
+            'correo': cliente.correo,
+        }
+        for cliente in clientes
+    ]
+
+    return JsonResponse(results, safe=False)
+
+
+def api_tecnicos_autocomplete(request):
+    """API para autocompletar técnicos"""
+    term = request.GET.get('term', '')
+
+    if len(term) < 2:
+        return JsonResponse([], safe=False)
+
+    from tecnicos.models import Tecnico
+
+    tecnicos = Tecnico.objects.filter(
+        Q(nombres__icontains=term) |
+        Q(apellidos__icontains=term) |
+        Q(numero_documento__icontains=term)
+    ).filter(activo=True)[:10]
+
+    results = [
+        {
+            'id': tecnico.id,
+            'value': tecnico.nombre_completo,
+            'label': f"{tecnico.nombre_completo} - {tecnico.profesion}",
+            'documento': tecnico.numero_documento,
+            'telefono': tecnico.telefono,
+        }
+        for tecnico in tecnicos
+    ]
+
+    return JsonResponse(results, safe=False)
