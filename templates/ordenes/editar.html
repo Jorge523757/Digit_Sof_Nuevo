@@ -1,0 +1,273 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Editar Orden {{ orden.numero_orden }} - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ordenes-modern.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css">
+<style>
+    .form-section {
+        background: #fff;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #1e3c72;
+    }
+
+    .form-section h4 {
+        color: #1e3c72;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .required-field::after {
+        content: '*';
+        color: #ff6b35;
+        margin-left: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Encabezado -->
+    <div class="ordenes-header-modern mb-4">
+        <div class="header-content">
+            <div class="icon-badge-modern">
+                <i class="fas fa-edit"></i>
+            </div>
+            <div class="header-text">
+                <h1 class="header-title-modern">
+                    <i class="fas fa-edit me-2"></i>
+                    Editar Orden {{ orden.numero_orden }}
+                </h1>
+                <p class="header-subtitle-modern">
+                    <i class="fas fa-user me-2"></i>
+                    Cliente: {{ orden.cliente.nombre_completo }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" id="ordenForm">
+        {% csrf_token %}
+
+        <!-- Sección: Información del Cliente -->
+        <div class="form-section">
+            <h4>
+                <i class="fas fa-user"></i>
+                Información del Cliente
+            </h4>
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <label class="form-label required-field">Cliente</label>
+                    {{ form.cliente }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Técnico Asignado</label>
+                    {{ form.tecnico_asignado }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Datos del Equipo -->
+        <div class="form-section">
+            <h4>
+                <i class="fas fa-laptop"></i>
+                Información del Equipo
+            </h4>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label required-field">Tipo de Equipo</label>
+                    {{ form.tipo_equipo }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label required-field">Marca</label>
+                    {{ form.marca }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label required-field">Modelo</label>
+                    {{ form.modelo }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Número de Serie</label>
+                    {{ form.serie }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Accesorios Incluidos</label>
+                    {{ form.accesorios_incluidos }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Problema Reportado -->
+        <div class="form-section">
+            <h4>
+                <i class="fas fa-exclamation-triangle"></i>
+                Problema Reportado
+            </h4>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label required-field">Falla Reportada</label>
+                    {{ form.falla_reportada }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Estado Físico del Equipo</label>
+                    {{ form.estado_fisico }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Diagnóstico -->
+        <div class="form-section">
+            <h4>
+                <i class="fas fa-stethoscope"></i>
+                Diagnóstico y Solución
+            </h4>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Diagnóstico Técnico</label>
+                    {{ form.diagnostico }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Solución Aplicada</label>
+                    {{ form.solucion_aplicada }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Estado y Prioridad -->
+        <div class="form-section">
+            <h4>
+                <i class="fas fa-flag"></i>
+                Estado y Prioridad
+            </h4>
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label class="form-label required-field">Estado</label>
+                    {{ form.estado }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label required-field">Prioridad</label>
+                    {{ form.prioridad }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Fecha Estimada de Entrega</label>
+                    {{ form.fecha_compromiso }}
+                </div>
+                <div class="col-md-12 mb-3" id="descripcionCambioContainer" style="display:none;">
+                    <label class="form-label">Descripción del cambio de estado</label>
+                    <textarea name="descripcion_cambio" class="form-control" rows="2"
+                              placeholder="Describa el motivo del cambio de estado..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Costos -->
+        <div class="form-section">
+            <h4>
+                <i class="fas fa-dollar-sign"></i>
+                Costos del Servicio
+            </h4>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Costo de Diagnóstico</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        {{ form.costo_diagnostico }}
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Costo de Mano de Obra</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        {{ form.costo_mano_obra }}
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="alert alert-info mb-0" style="margin-top: 32px;">
+                        <strong>Costo Total:</strong> ${{ orden.costo_total|floatformat:2 }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Garantía y Notas -->
+        <div class="form-section">
+            <h4>
+                <i class="fas fa-shield-alt"></i>
+                Garantía y Observaciones
+            </h4>
+            <div class="row">
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Garantía</label>
+                    <div class="form-check form-switch">
+                        {{ form.tiene_garantia }}
+                        <label class="form-check-label" for="{{ form.tiene_garantia.id_for_label }}">
+                            Incluye garantía
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Días de Garantía</label>
+                    {{ form.dias_garantia }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Observaciones</label>
+                    {{ form.observaciones }}
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">Notas Internas</label>
+                    {{ form.notas_internas }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="form-section text-center">
+            <button type="submit" class="btn btn-submit-modern me-3">
+                <i class="fas fa-save me-2"></i>
+                Guardar Cambios
+            </button>
+            <a href="{% url 'ordenes:detalle' orden.pk %}" class="btn btn-cancel-modern">
+                <i class="fas fa-times me-2"></i>
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Inicializar Select2
+    $('#id_cliente, #id_tecnico_asignado').select2({
+        theme: 'bootstrap4',
+        width: '100%',
+        placeholder: 'Seleccione...',
+        allowClear: true
+    });
+
+    // Guardar el estado original
+    const estadoOriginal = $('#id_estado').val();
+
+    // Detectar cambio de estado
+    $('#id_estado').on('change', function() {
+        if ($(this).val() !== estadoOriginal) {
+            $('#descripcionCambioContainer').slideDown();
+        } else {
+            $('#descripcionCambioContainer').slideUp();
+        }
+    });
+});
+</script>
+{% endblock %}
+

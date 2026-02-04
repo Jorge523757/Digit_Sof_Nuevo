@@ -1,18 +1,404 @@
 {% extends 'base_dashboard.html' %}
 {% load static %}
 
-{% block title %}Detalle Orden - DIGT SOFT{% endblock %}
+{% block title %}Orden {{ orden.numero_orden }} - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ordenes-modern.css' %}">
+<style>
+    .detalle-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #1e3c72;
+    }
+
+    .detalle-card h4 {
+        color: #1e3c72;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-row {
+        display: flex;
+        padding: 1rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        min-width: 200px;
+    }
+
+    .info-value {
+        color: #212529;
+        flex: 1;
+    }
+
+    .btn-action-modern {
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        border: 2px solid;
+        transition: all 0.3s;
+    }
+
+    .btn-action-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
-    <h2><i class="fas fa-tools"></i> Detalle de Orden de Servicio</h2>
-    <div class="card mt-3">
-        <div class="card-body">
-            <h5>Orden: {{ orden.numero_orden }}</h5>
-            <p><strong>Cliente:</strong> {{ orden.cliente.nombre_completo }}</p>
-            <p><strong>Equipo:</strong> {{ orden.marca }} {{ orden.modelo }}</p>
-            <p><strong>Estado:</strong> {{ orden.get_estado_display }}</p>
-            <p><strong>Técnico:</strong> {{ orden.tecnico_asignado.nombre_completo|default:"Sin asignar" }}</p>
+    <!-- Encabezado -->
+    <div class="ordenes-header-modern mb-4">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="header-content">
+                    <div class="icon-badge-modern">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="header-text">
+                        <h1 class="header-title-modern">
+                            Orden {{ orden.numero_orden }}
+                        </h1>
+                        <p class="header-subtitle-modern">
+                            <i class="fas fa-calendar me-2"></i>
+                            Recibida: {{ orden.fecha_recepcion|date:"d/m/Y H:i" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-end">
+                <span class="badge-estado badge-{{ orden.estado|lower }}">
+                    <i class="fas fa-circle"></i>
+                    {{ orden.get_estado_display }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Columna Izquierda: Información Principal -->
+        <div class="col-lg-8">
+            <!-- Información del Cliente -->
+            <div class="registro-card">
+                <div class="registro-header">
+                    <div class="registro-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0" style="color: #1e3c72;">Información del Cliente</h4>
+                        <small class="text-muted">Datos del cliente y contacto</small>
+                    </div>
+                </div>
+                <div class="registro-info">
+                    <div class="registro-campo">
+                        <div class="registro-label">Cliente</div>
+                        <div class="registro-valor">{{ orden.cliente.nombre_completo }}</div>
+                    </div>
+                    <div class="registro-campo">
+                        <div class="registro-label">Documento</div>
+                        <div class="registro-valor">{{ orden.cliente.numero_documento }}</div>
+                    </div>
+                    <div class="registro-campo">
+                        <div class="registro-label">Teléfono</div>
+                        <div class="registro-valor">{{ orden.cliente.telefono }}</div>
+                    </div>
+                    <div class="registro-campo">
+                        <div class="registro-label">Correo</div>
+                        <div class="registro-valor">{{ orden.cliente.correo|default:"No registrado" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información del Equipo -->
+            <div class="registro-card">
+                <div class="registro-header">
+                    <div class="registro-icon" style="background: linear-gradient(135deg, #00b4d8, #0096c7);">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0" style="color: #1e3c72;">Información del Equipo</h4>
+                        <small class="text-muted">Detalles técnicos del equipo</small>
+                    </div>
+                </div>
+                <div class="registro-info">
+                    <div class="registro-campo">
+                        <div class="registro-label">Tipo de Equipo</div>
+                        <div class="registro-valor">{{ orden.tipo_equipo }}</div>
+                    </div>
+                    <div class="registro-campo">
+                        <div class="registro-label">Marca</div>
+                        <div class="registro-valor">{{ orden.marca }}</div>
+                    </div>
+                    <div class="registro-campo">
+                        <div class="registro-label">Modelo</div>
+                        <div class="registro-valor">{{ orden.modelo }}</div>
+                    </div>
+                    <div class="registro-campo">
+                        <div class="registro-label">Serie</div>
+                        <div class="registro-valor">{{ orden.serie|default:"No registrado" }}</div>
+                    </div>
+                    <div class="registro-campo" style="grid-column: 1 / -1;">
+                        <div class="registro-label">Accesorios</div>
+                        <div class="registro-valor">{{ orden.accesorios_incluidos|default:"Ninguno" }}</div>
+                    </div>
+                    <div class="registro-campo" style="grid-column: 1 / -1;">
+                        <div class="registro-label">Estado Físico al Recibir</div>
+                        <div class="registro-valor">{{ orden.estado_fisico|default:"No registrado" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Falla y Diagnóstico -->
+            <div class="detalle-card">
+                <h4>
+                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                    Falla Reportada
+                </h4>
+                <p class="mb-0">{{ orden.falla_reportada }}</p>
+            </div>
+
+            {% if orden.diagnostico %}
+            <div class="detalle-card">
+                <h4>
+                    <i class="fas fa-stethoscope"></i>
+                    Diagnóstico Técnico
+                </h4>
+                <p class="mb-3">{{ orden.diagnostico }}</p>
+
+                {% if orden.solucion_aplicada %}
+                <h6 class="text-primary mb-2">
+                    <i class="fas fa-wrench me-2"></i>Solución Aplicada
+                </h6>
+                <p class="mb-0">{{ orden.solucion_aplicada }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Historial de Estados (Timeline) -->
+            <div class="detalle-card">
+                <h4>
+                    <i class="fas fa-history"></i>
+                    Historial de Estados
+                </h4>
+
+                <div class="estado-timeline">
+                    {% for seguimiento in seguimientos %}
+                    <div class="estado-item {{ seguimiento.estado_nuevo|lower }}">
+                        <div class="estado-header">
+                            <div class="estado-titulo">
+                                <i class="fas fa-circle"></i>
+                                {{ seguimiento.get_estado_nuevo_display|default:seguimiento.estado_nuevo }}
+                            </div>
+                            <div class="estado-fecha">
+                                <i class="far fa-clock me-1"></i>
+                                {{ seguimiento.fecha|date:"d/m/Y H:i" }}
+                            </div>
+                        </div>
+                        <div class="estado-contenido">
+                            {{ seguimiento.descripcion }}
+                        </div>
+                        {% if seguimiento.usuario %}
+                        <div class="estado-responsable">
+                            <i class="fas fa-user-tie me-1"></i>
+                            <strong>Responsable:</strong> {{ seguimiento.usuario }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No hay seguimientos registrados aún
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Acciones y Detalles -->
+        <div class="col-lg-4">
+            <!-- Técnico Asignado -->
+            <div class="registro-card">
+                <div class="registro-header">
+                    <div class="registro-icon" style="background: linear-gradient(135deg, #06d6a0, #00b894);">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0" style="color: #1e3c72;">Técnico Responsable</h5>
+                    </div>
+                </div>
+                {% if orden.tecnico_asignado %}
+                <div class="registro-info">
+                    <div class="registro-campo" style="grid-column: 1 / -1;">
+                        <div class="registro-label">Nombre</div>
+                        <div class="registro-valor">{{ orden.tecnico_asignado.nombre_completo }}</div>
+                    </div>
+                    <div class="registro-campo" style="grid-column: 1 / -1;">
+                        <div class="registro-label">Teléfono</div>
+                        <div class="registro-valor">{{ orden.tecnico_asignado.telefono }}</div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-warning mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Sin técnico asignado
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Fechas Importantes -->
+            <div class="detalle-card">
+                <h5 class="mb-3" style="color: #1e3c72;">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Fechas
+                </h5>
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-calendar-check me-2"></i>
+                        Recepción
+                    </div>
+                    <div class="info-value">
+                        {{ orden.fecha_recepcion|date:"d/m/Y H:i" }}
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-clock me-2"></i>
+                        Compromiso
+                    </div>
+                    <div class="info-value">
+                        {{ orden.fecha_compromiso|date:"d/m/Y H:i"|default:"No definida" }}
+                    </div>
+                </div>
+                {% if orden.fecha_entrega %}
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Entrega
+                    </div>
+                    <div class="info-value">
+                        {{ orden.fecha_entrega|date:"d/m/Y H:i" }}
+                    </div>
+                </div>
+                {% endif %}
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-hourglass-half me-2"></i>
+                        Días en servicio
+                    </div>
+                    <div class="info-value">
+                        <strong>{{ orden.dias_en_servicio }} días</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Costos -->
+            <div class="detalle-card">
+                <h5 class="mb-3" style="color: #1e3c72;">
+                    <i class="fas fa-dollar-sign me-2"></i>
+                    Costos
+                </h5>
+                <div class="info-row">
+                    <div class="info-label">Diagnóstico</div>
+                    <div class="info-value">${{ orden.costo_diagnostico|floatformat:2 }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Mano de Obra</div>
+                    <div class="info-value">${{ orden.costo_mano_obra|floatformat:2 }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Repuestos</div>
+                    <div class="info-value">${{ orden.costo_repuestos|floatformat:2 }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label"><strong>TOTAL</strong></div>
+                    <div class="info-value">
+                        <strong style="color: #1e3c72; font-size: 1.3rem;">
+                            ${{ orden.costo_total|floatformat:2 }}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div class="detalle-card">
+                <h5 class="mb-3" style="color: #1e3c72;">
+                    <i class="fas fa-bolt me-2"></i>
+                    Acciones
+                </h5>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'ordenes:editar' orden.pk %}" class="btn btn-action-modern btn-primary">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar Orden
+                    </a>
+
+                    <button type="button" class="btn btn-action-modern btn-info text-white" data-bs-toggle="modal" data-bs-target="#cambiarEstadoModal">
+                        <i class="fas fa-sync-alt me-2"></i>
+                        Cambiar Estado
+                    </button>
+
+                    <a href="{% url 'ordenes:lista' %}" class="btn btn-action-modern btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Volver al Listado
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cambiar Estado -->
+<div class="modal fade" id="cambiarEstadoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #1e3c72, #2a5298); color: #fff;">
+                <h5 class="modal-title">
+                    <i class="fas fa-sync-alt me-2"></i>
+                    Cambiar Estado de Orden
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'ordenes:cambiar_estado' orden.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nuevo Estado</label>
+                        <select name="estado" class="form-select" required>
+                            {% for estado_code, estado_nombre in orden.ESTADO_CHOICES %}
+                            <option value="{{ estado_code }}" {% if estado_code == orden.estado %}selected{% endif %}>
+                                {{ estado_nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción del Cambio</label>
+                        <textarea name="descripcion" class="form-control" rows="3"
+                                  placeholder="Describa el motivo del cambio de estado..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>
+                        Guardar Cambio
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

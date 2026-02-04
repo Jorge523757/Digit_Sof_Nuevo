@@ -115,8 +115,52 @@ def ordenes_lista(request):
 
 def orden_crear(request):
     """Crear nueva orden de servicio"""
-    messages.info(request, 'Formulario de creación en desarrollo')
-    return redirect('ordenes:lista')
+    from .forms import OrdenServicioForm
+    from clientes.models import Cliente
+    from tecnicos.models import Tecnico
+
+    if request.method == 'POST':
+        form = OrdenServicioForm(request.POST)
+        if form.is_valid():
+            orden = form.save()
+
+            # Crear seguimiento inicial
+            SeguimientoOrden.objects.create(
+                orden=orden,
+                estado_anterior='',
+                estado_nuevo='RECIBIDA',
+                descripcion=f'Orden creada - Equipo recibido: {orden.tipo_equipo} {orden.marca} {orden.modelo}',
+                usuario=request.user.username if request.user.is_authenticated else 'Sistema'
+            )
+
+            # Crear notificación para el cliente
+            try:
+                from usuarios.models import Notificacion
+                Notificacion.objects.create(
+                    tipo='ORDEN_CREADA',
+                    titulo=f'Orden {orden.numero_orden} creada',
+                    mensaje=f'Su equipo {orden.tipo_equipo} {orden.marca} {orden.modelo} ha sido recibido. Fecha estimada de entrega: {orden.fecha_compromiso.strftime("%d/%m/%Y") if orden.fecha_compromiso else "Por definir"}',
+                    url=f'/ordenes/{orden.pk}/',
+                    icono='fas fa-tools',
+                    color='primary'
+                )
+            except:
+                pass
+
+            messages.success(request, f'✅ Orden {orden.numero_orden} creada exitosamente')
+            return redirect('ordenes:detalle', pk=orden.pk)
+    else:
+        form = OrdenServicioForm()
+
+    clientes = Cliente.objects.filter(activo=True).order_by('nombres')[:100]
+    tecnicos = Tecnico.objects.filter(activo=True).order_by('nombres')[:100]
+
+    context = {
+        'form': form,
+        'clientes': clientes,
+        'tecnicos': tecnicos,
+    }
+    return render(request, 'ordenes/crear.html', context)
 
 
 def orden_detalle(request, pk):
@@ -135,9 +179,57 @@ def orden_detalle(request, pk):
 
 def orden_editar(request, pk):
     """Editar orden existente"""
+    from .forms import OrdenServicioForm
+    from clientes.models import Cliente
+    from tecnicos.models import Tecnico
+
     orden = get_object_or_404(OrdenServicio, pk=pk)
-    messages.info(request, 'Formulario de edición en desarrollo')
-    return redirect('ordenes:detalle', pk=pk)
+    estado_anterior = orden.estado
+
+    if request.method == 'POST':
+        form = OrdenServicioForm(request.POST, instance=orden)
+        if form.is_valid():
+            orden = form.save()
+
+            # Si cambió el estado, crear seguimiento
+            if estado_anterior != orden.estado:
+                SeguimientoOrden.objects.create(
+                    orden=orden,
+                    estado_anterior=estado_anterior,
+                    estado_nuevo=orden.estado,
+                    descripcion=request.POST.get('descripcion_cambio', f'Estado cambiado de {dict(OrdenServicio.ESTADO_CHOICES).get(estado_anterior)} a {dict(OrdenServicio.ESTADO_CHOICES).get(orden.estado)}'),
+                    usuario=request.user.username if request.user.is_authenticated else 'Sistema'
+                )
+
+                # Notificar cambio de estado
+                try:
+                    from usuarios.models import Notificacion
+                    Notificacion.objects.create(
+                        tipo='CAMBIO_ESTADO_ORDEN',
+                        titulo=f'Actualización Orden {orden.numero_orden}',
+                        mensaje=f'El estado de su equipo {orden.tipo_equipo} cambió a: {dict(OrdenServicio.ESTADO_CHOICES).get(orden.estado)}',
+                        url=f'/ordenes/{orden.pk}/',
+                        icono='fas fa-sync-alt',
+                        color='info'
+                    )
+                except:
+                    pass
+
+            messages.success(request, f'✅ Orden {orden.numero_orden} actualizada exitosamente')
+            return redirect('ordenes:detalle', pk=pk)
+    else:
+        form = OrdenServicioForm(instance=orden)
+
+    clientes = Cliente.objects.filter(activo=True).order_by('nombres')[:100]
+    tecnicos = Tecnico.objects.filter(activo=True).order_by('nombres')[:100]
+
+    context = {
+        'form': form,
+        'orden': orden,
+        'clientes': clientes,
+        'tecnicos': tecnicos,
+    }
+    return render(request, 'ordenes/editar.html', context)
 
 
 def orden_agregar_repuesto(request, pk):
@@ -151,7 +243,61 @@ def orden_cambiar_estado(request, pk):
     """Cambiar estado de una orden"""
     if request.method == 'POST':
         orden = get_object_or_404(OrdenServicio, pk=pk)
-        messages.success(request, f'Estado de orden actualizado')
+        estado_anterior = orden.estado
+        nuevo_estado = request.POST.get('estado')
+        descripcion = request.POST.get('descripcion', '')
+
+        if nuevo_estado and nuevo_estado in dict(OrdenServicio.ESTADO_CHOICES):
+            orden.estado = nuevo_estado
+            orden.save()
+
+            # Crear seguimiento
+            SeguimientoOrden.objects.create(
+                orden=orden,
+                estado_anterior=estado_anterior,
+                estado_nuevo=nuevo_estado,
+                descripcion=descripcion or f'Estado cambiado de {dict(OrdenServicio.ESTADO_CHOICES).get(estado_anterior)} a {dict(OrdenServicio.ESTADO_CHOICES).get(nuevo_estado)}',
+                usuario=request.user.username if request.user.is_authenticated else 'Sistema'
+            )
+
+            # Enviar notificación
+            try:
+                from usuarios.models import Notificacion
+                estado_nombre = dict(OrdenServicio.ESTADO_CHOICES).get(nuevo_estado)
+
+                # Mensajes personalizados según el estado
+                if nuevo_estado == 'LISTA_ENTREGA':
+                    mensaje = f'¡Buenas noticias! Su equipo {orden.tipo_equipo} está listo para ser retirado.'
+                    icono = 'fas fa-check-circle'
+                    color = 'success'
+                elif nuevo_estado == 'EN_REPARACION':
+                    mensaje = f'Su equipo {orden.tipo_equipo} está siendo reparado por nuestros técnicos.'
+                    icono = 'fas fa-tools'
+                    color = 'warning'
+                elif nuevo_estado == 'ENTREGADA':
+                    mensaje = f'Su equipo {orden.tipo_equipo} ha sido entregado. ¡Gracias por confiar en nosotros!'
+                    icono = 'fas fa-handshake'
+                    color = 'success'
+                else:
+                    mensaje = f'El estado de su equipo {orden.tipo_equipo} cambió a: {estado_nombre}'
+                    icono = 'fas fa-sync-alt'
+                    color = 'info'
+
+                Notificacion.objects.create(
+                    tipo='CAMBIO_ESTADO_ORDEN',
+                    titulo=f'Orden {orden.numero_orden} - {estado_nombre}',
+                    mensaje=mensaje,
+                    url=f'/ordenes/{orden.pk}/',
+                    icono=icono,
+                    color=color
+                )
+            except Exception as e:
+                print(f"Error al crear notificación: {e}")
+
+            messages.success(request, f'✅ Estado actualizado a: {dict(OrdenServicio.ESTADO_CHOICES).get(nuevo_estado)}')
+        else:
+            messages.error(request, '❌ Estado inválido')
+
         return redirect('ordenes:detalle', pk=pk)
 
     return redirect('ordenes:lista')
