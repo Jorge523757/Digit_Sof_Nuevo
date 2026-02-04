@@ -1,0 +1,362 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Nueva Orden de Servicio - DIGT SOFT{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ordenes-modern.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css">
+<style>
+    .form-section {
+        background: #fff;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #1e3c72;
+    }
+
+    .form-section h4 {
+        color: #1e3c72;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-section h4 i {
+        color: #00b4d8;
+    }
+
+    .required-field::after {
+        content: '*';
+        color: #ff6b35;
+        margin-left: 4px;
+    }
+
+    .btn-submit-modern {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: #fff;
+        font-weight: 600;
+        padding: 1rem 3rem;
+        border-radius: 50px;
+        border: none;
+        box-shadow: 0 8px 25px rgba(30, 60, 114, 0.3);
+        transition: all 0.3s;
+        font-size: 1.1rem;
+    }
+
+    .btn-submit-modern:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(30, 60, 114, 0.5);
+        color: #fff;
+    }
+
+    .btn-cancel-modern {
+        background: #fff;
+        color: #6c757d;
+        font-weight: 600;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s;
+    }
+
+    .btn-cancel-modern:hover {
+        border-color: #1e3c72;
+        color: #1e3c72;
+        transform: translateY(-2px);
+    }
+
+    .select2-container--bootstrap4 .select2-selection {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        min-height: 45px;
+    }
+
+    .select2-container--bootstrap4.select2-container--focus .select2-selection {
+        border-color: #1e3c72;
+        box-shadow: 0 0 0 0.2rem rgba(30, 60, 114, 0.15);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Encabezado -->
+    <div class="ordenes-header-modern mb-4">
+        <div class="header-content">
+            <div class="icon-badge-modern">
+                <i class="fas fa-plus-circle"></i>
+            </div>
+            <div class="header-text">
+                <h1 class="header-title-modern">
+                    <i class="fas fa-file-alt me-2"></i>
+                    Nueva Orden de Servicio
+                </h1>
+                <p class="header-subtitle-modern">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Complete los datos del equipo y cliente
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" id="ordenForm">
+        {% csrf_token %}
+
+        <!-- Sección: Información del Cliente -->
+        <div class="form-section animate-fade-in">
+            <h4>
+                <i class="fas fa-user"></i>
+                Información del Cliente
+            </h4>
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <label class="form-label required-field">Cliente</label>
+                    {{ form.cliente }}
+                    <small class="form-text text-muted">Seleccione el cliente propietario del equipo</small>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Técnico Asignado</label>
+                    {{ form.tecnico_asignado }}
+                    <small class="form-text text-muted">Puede asignarse después</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Datos del Equipo -->
+        <div class="form-section animate-fade-in" style="animation-delay: 0.1s">
+            <h4>
+                <i class="fas fa-laptop"></i>
+                Información del Equipo
+            </h4>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label required-field">Tipo de Equipo</label>
+                    {{ form.tipo_equipo }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label required-field">Marca</label>
+                    {{ form.marca }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label required-field">Modelo</label>
+                    {{ form.modelo }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Número de Serie</label>
+                    {{ form.serie }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Accesorios Incluidos</label>
+                    {{ form.accesorios_incluidos }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Problema Reportado -->
+        <div class="form-section animate-fade-in" style="animation-delay: 0.2s">
+            <h4>
+                <i class="fas fa-exclamation-triangle"></i>
+                Problema Reportado
+            </h4>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label required-field">Falla Reportada</label>
+                    {{ form.falla_reportada }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Estado Físico del Equipo</label>
+                    {{ form.estado_fisico }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Diagnóstico (Opcional al crear) -->
+        <div class="form-section animate-fade-in" style="animation-delay: 0.3s">
+            <h4>
+                <i class="fas fa-stethoscope"></i>
+                Diagnóstico y Solución <small class="text-muted">(Opcional)</small>
+            </h4>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Diagnóstico Técnico</label>
+                    {{ form.diagnostico }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Solución Aplicada</label>
+                    {{ form.solucion_aplicada }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Estado y Prioridad -->
+        <div class="form-section animate-fade-in" style="animation-delay: 0.4s">
+            <h4>
+                <i class="fas fa-flag"></i>
+                Estado y Prioridad
+            </h4>
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label class="form-label required-field">Estado</label>
+                    {{ form.estado }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label required-field">Prioridad</label>
+                    {{ form.prioridad }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Fecha Estimada de Entrega</label>
+                    {{ form.fecha_compromiso }}
+                    <small class="form-text text-muted">Fecha comprometida con el cliente</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Costos -->
+        <div class="form-section animate-fade-in" style="animation-delay: 0.5s">
+            <h4>
+                <i class="fas fa-dollar-sign"></i>
+                Costos del Servicio
+            </h4>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Costo de Diagnóstico</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        {{ form.costo_diagnostico }}
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Costo de Mano de Obra</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        {{ form.costo_mano_obra }}
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="alert alert-info mb-0" style="margin-top: 32px;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Repuestos:</strong> Se agregan después
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Garantía y Notas -->
+        <div class="form-section animate-fade-in" style="animation-delay: 0.6s">
+            <h4>
+                <i class="fas fa-shield-alt"></i>
+                Garantía y Observaciones
+            </h4>
+            <div class="row">
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Garantía</label>
+                    <div class="form-check form-switch">
+                        {{ form.tiene_garantia }}
+                        <label class="form-check-label" for="{{ form.tiene_garantia.id_for_label }}">
+                            Incluye garantía
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Días de Garantía</label>
+                    {{ form.dias_garantia }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Observaciones</label>
+                    {{ form.observaciones }}
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">Notas Internas</label>
+                    {{ form.notas_internas }}
+                    <small class="form-text text-muted">Estas notas solo son visibles para el personal</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="form-section text-center animate-fade-in" style="animation-delay: 0.7s">
+            <button type="submit" class="btn btn-submit-modern me-3">
+                <i class="fas fa-save me-2"></i>
+                Crear Orden de Servicio
+            </button>
+            <a href="{% url 'ordenes:lista' %}" class="btn btn-cancel-modern">
+                <i class="fas fa-times me-2"></i>
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Inicializar Select2 para selectores
+    $('#id_cliente, #id_tecnico_asignado').select2({
+        theme: 'bootstrap4',
+        width: '100%',
+        placeholder: 'Seleccione...',
+        allowClear: true
+    });
+
+    // Validación antes de enviar
+    $('#ordenForm').on('submit', function(e) {
+        var errors = [];
+
+        if (!$('#id_cliente').val()) {
+            errors.push('Debe seleccionar un cliente');
+        }
+        if (!$('#id_tipo_equipo').val()) {
+            errors.push('Debe indicar el tipo de equipo');
+        }
+        if (!$('#id_marca').val()) {
+            errors.push('Debe indicar la marca');
+        }
+        if (!$('#id_modelo').val()) {
+            errors.push('Debe indicar el modelo');
+        }
+        if (!$('#id_falla_reportada').val()) {
+            errors.push('Debe describir la falla reportada');
+        }
+
+        if (errors.length > 0) {
+            e.preventDefault();
+            alert('Por favor complete los siguientes campos:\n\n- ' + errors.join('\n- '));
+            return false;
+        }
+    });
+
+    // Animaciones
+    $('.form-section').each(function(i) {
+        $(this).css({
+            'animation': 'fadeInUp 0.5s ease-out forwards',
+            'animation-delay': (i * 0.1) + 's',
+            'opacity': '0'
+        });
+    });
+});
+
+// Animación CSS
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}
+
