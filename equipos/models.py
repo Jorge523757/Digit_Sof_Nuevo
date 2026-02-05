@@ -42,6 +42,16 @@ class Equipo(models.Model):
     ubicacion = models.CharField(max_length=200, blank=True, verbose_name="Ubicación")
     responsable = models.CharField(max_length=150, blank=True, verbose_name="Responsable")
 
+    # Relación con Cliente
+    cliente = models.ForeignKey(
+        'clientes.Cliente',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='equipos',
+        verbose_name="Cliente Propietario"
+    )
+
     observaciones = models.TextField(blank=True, verbose_name="Observaciones")
     activo = models.BooleanField(default=True, verbose_name="Activo")
 

@@ -59,13 +59,15 @@ class OrdenServicioForm(forms.ModelForm):
             'prioridad': forms.Select(attrs={'class': 'form-select'}),
             'costo_diagnostico': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'step': '0.01',
-                'min': '0'
+                'step': '1',
+                'min': '0',
+                'placeholder': 'Ej: 50000'
             }),
             'costo_mano_obra': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'step': '0.01',
-                'min': '0'
+                'step': '1',
+                'min': '0',
+                'placeholder': 'Ej: 100000'
             }),
             'fecha_compromiso': forms.DateTimeInput(attrs={
                 'class': 'form-control',
@@ -89,8 +91,9 @@ class RepuestoOrdenForm(forms.ModelForm):
             'cantidad': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
             'precio_unitario': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'step': '0.01',
-                'min': '0'
+                'step': '1',
+                'min': '0',
+                'placeholder': 'Precio'
             }),
         }
 

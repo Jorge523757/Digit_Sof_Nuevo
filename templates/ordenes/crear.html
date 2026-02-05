@@ -305,7 +305,27 @@ $(document).ready(function() {
         allowClear: true
     });
 
-    // Validación antes de enviar
+    // Formateo automático de campos de moneda (pesos colombianos)
+    function formatearPesosColombianos(input) {
+        // Obtener solo números
+        let valor = input.value.replace(/\D/g, '');
+
+        // Si está vacío, limpiar
+        if (!valor) {
+            input.value = '';
+            return;
+        }
+
+        // Formatear con separador de miles (punto)
+        input.value = parseInt(valor).toLocaleString('es-CO');
+    }
+
+    // Aplicar a los campos de costo
+    $('#id_costo_diagnostico, #id_costo_mano_obra').on('input', function() {
+        formatearPesosColombianos(this);
+    });
+
+    // Validación y formateo antes de enviar
     $('#ordenForm').on('submit', function(e) {
         var errors = [];
 
@@ -330,6 +350,11 @@ $(document).ready(function() {
             alert('Por favor complete los siguientes campos:\n\n- ' + errors.join('\n- '));
             return false;
         }
+
+        // Quitar el formato antes de enviar
+        $('#id_costo_diagnostico, #id_costo_mano_obra').each(function() {
+            this.value = this.value.replace(/\./g, '');
+        });
     });
 
     // Animaciones

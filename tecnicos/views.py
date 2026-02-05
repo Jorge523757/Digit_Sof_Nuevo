@@ -5,15 +5,24 @@ Views - Vistas para gestión de técnicos
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
 from django.core.paginator import Paginator
 from .models import Tecnico
 from .forms import TecnicoForm, TecnicoBusquedaForm
 
 
+def es_staff(user):
+    """Verifica si el usuario es staff o superusuario"""
+    return user.is_staff or user.is_superuser
+
+
+@login_required
+@user_passes_test(es_staff, login_url='dashboard:index')
 def lista_tecnicos(request):
     """
     Vista para listar técnicos con búsqueda y filtros
+    Solo accesible para staff/admin
     """
     form_busqueda = TecnicoBusquedaForm(request.GET)
     tecnicos = Tecnico.objects.all()
@@ -54,9 +63,12 @@ def lista_tecnicos(request):
     return render(request, 'tecnicos/lista.html', context)
 
 
+@login_required
+@user_passes_test(es_staff, login_url='dashboard:index')
 def crear_tecnico(request):
     """
     Vista para crear un nuevo técnico
+    Solo accesible para staff/admin
     """
     if request.method == 'POST':
         form = TecnicoForm(request.POST)
@@ -75,9 +87,12 @@ def crear_tecnico(request):
     return render(request, 'tecnicos/form.html', context)
 
 
+@login_required
+@user_passes_test(es_staff, login_url='dashboard:index')
 def editar_tecnico(request, pk):
     """
     Vista para editar un técnico existente
+    Solo accesible para staff/admin
     """
     tecnico = get_object_or_404(Tecnico, pk=pk)
 
@@ -99,9 +114,12 @@ def editar_tecnico(request, pk):
     return render(request, 'tecnicos/form.html', context)
 
 
+@login_required
+@user_passes_test(es_staff, login_url='dashboard:index')
 def detalle_tecnico(request, pk):
     """
     Vista para ver el detalle de un técnico
+    Solo accesible para staff/admin
     """
     tecnico = get_object_or_404(Tecnico, pk=pk)
 
@@ -112,9 +130,12 @@ def detalle_tecnico(request, pk):
     return render(request, 'tecnicos/detalle.html', context)
 
 
+@login_required
+@user_passes_test(es_staff, login_url='dashboard:index')
 def eliminar_tecnico(request, pk):
     """
     Vista para eliminar un técnico
+    Solo accesible para staff/admin
     """
     tecnico = get_object_or_404(Tecnico, pk=pk)
 
@@ -131,9 +152,12 @@ def eliminar_tecnico(request, pk):
     return render(request, 'tecnicos/eliminar.html', context)
 
 
+@login_required
+@user_passes_test(es_staff, login_url='dashboard:index')
 def buscar_tecnico(request):
     """
     Vista para búsqueda de técnicos (AJAX)
+    Solo accesible para staff/admin
     """
     if request.method == 'GET':
         busqueda = request.GET.get('busqueda', '')
@@ -153,4 +177,3 @@ def buscar_tecnico(request):
 
         from django.http import JsonResponse
         return JsonResponse({'tecnicos': resultados})
-

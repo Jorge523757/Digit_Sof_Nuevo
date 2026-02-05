@@ -1,5 +1,6 @@
 {% extends 'base_dashboard.html' %}
 {% load static %}
+{% load currency_filters %}
 
 {% block title %}Editar Orden {{ orden.numero_orden }} - DIGT SOFT{% endblock %}
 
@@ -192,7 +193,20 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <div class="alert alert-info mb-0" style="margin-top: 32px;">
-                        <strong>Costo Total:</strong> ${{ orden.costo_total|floatformat:2 }}
+                        <i class="fas fa-calculator me-2"></i>
+                        <strong>Costo Total:</strong>
+                        <div class="input-group mt-2">
+                            <span class="input-group-text">$</span>
+                            <input type="text"
+                                   id="costo-total-manual"
+                                   class="form-control fw-bold"
+                                   placeholder="Escribe aquí o se calcula automático"
+                                   style="font-size: 1.2em; color: #1e3c72;">
+                        </div>
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Editable manualmente o se calcula automático
+                        </small>
                     </div>
                 </div>
             </div>
@@ -267,6 +281,93 @@ $(document).ready(function() {
             $('#descripcionCambioContainer').slideUp();
         }
     });
+
+    // ============= VERSIÓN SIN JQUERY - JAVASCRIPT PURO =============
+
+    // Función para limpiar formato de números
+    function limpiarFormato(valor) {
+        if (!valor) return '';
+        return valor.toString().replace(/[.\s]/g, '');
+    }
+
+    // Función para calcular el total automáticamente
+    function calcularTotal() {
+        const inputDiagnostico = document.getElementById('id_costo_diagnostico');
+        const inputManoObra = document.getElementById('id_costo_mano_obra');
+        const displayTotal = document.getElementById('costo-total-display');
+
+        if (!inputDiagnostico || !inputManoObra || !displayTotal) {
+            console.log('❌ No se encontraron los elementos necesarios');
+            return;
+        }
+
+        const diagnostico = inputDiagnostico.value || '0';
+        const manoObra = inputManoObra.value || '0';
+        const valorDiagnostico = parseInt(limpiarFormato(diagnostico)) || 0;
+        const valorManoObra = parseInt(limpiarFormato(manoObra)) || 0;
+        const total = valorDiagnostico + valorManoObra;
+        const totalFormateado = total.toLocaleString('es-CO');
+
+        displayTotal.textContent = '$' + totalFormateado;
+        console.log('✅ TOTAL CALCULADO:', valorDiagnostico, '+', valorManoObra, '=', total);
+    }
+
+    // Formateo automático de campos de moneda (pesos colombianos)
+    function formatearPesosColombianos(input) {
+        let valor = input.value.replace(/\D/g, '');
+
+        if (!valor) {
+            input.value = '';
+            calcularTotal();
+            return;
+        }
+
+        input.value = parseInt(valor).toLocaleString('es-CO');
+        calcularTotal();
+    }
+
+    // Aplicar eventos a los campos de costo
+    const inputDiagnostico = document.getElementById('id_costo_diagnostico');
+    const inputManoObra = document.getElementById('id_costo_mano_obra');
+
+    if (inputDiagnostico && inputManoObra) {
+        // Formatear valores existentes al cargar
+        if (inputDiagnostico.value && inputDiagnostico.value !== '0') {
+            formatearPesosColombianos(inputDiagnostico);
+        }
+        if (inputManoObra.value && inputManoObra.value !== '0') {
+            formatearPesosColombianos(inputManoObra);
+        }
+
+        // Aplicar formato mientras se escribe
+        inputDiagnostico.addEventListener('input', function() {
+            formatearPesosColombianos(this);
+        });
+
+        inputManoObra.addEventListener('input', function() {
+            formatearPesosColombianos(this);
+        });
+
+        console.log('✅ Sistema de cálculo inicializado (JavaScript puro)');
+    }
+
+    // FORZAR cálculo del total al cargar la página
+    setTimeout(function() {
+        calcularTotal();
+    }, 500);
+
+    // Al enviar el formulario, quitar el formato
+    const formulario = document.getElementById('ordenForm');
+    if (formulario) {
+        formulario.addEventListener('submit', function() {
+            if (inputDiagnostico) {
+                inputDiagnostico.value = limpiarFormato(inputDiagnostico.value);
+            }
+            if (inputManoObra) {
+                inputManoObra.value = limpiarFormato(inputManoObra.value);
+            }
+        });
+    }
 });
 </script>
 {% endblock %}

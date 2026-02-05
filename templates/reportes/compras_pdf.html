@@ -172,7 +172,7 @@
 
     {% if datos %}
     <div class="totales">
-        <p>TOTAL GENERAL: ${{ total_gastado|floatformat:2 }}</p>
+        <p>TOTAL GENERAL: {{ total_gastado|peso_colombiano }}</p>
     </div>
     {% endif %}
 

@@ -1,0 +1,50 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Mis Reportes de Daño - DIGT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-clipboard-list me-2"></i> Mis Reportes de Daño</h2>
+        <div>
+            <a href="{% url 'reportes_dano:exportar_excel' %}" class="btn btn-success me-2">
+                <i class="fas fa-file-excel me-2"></i>
+                Exportar a Excel
+            </a>
+            <a href="{% url 'reportes_dano:registrar' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>
+                Nuevo Reporte
+            </a>
+        </div>
+    </div>
+
+    {% if reportes %}
+        <div class="row">
+            {% for reporte in reportes %}
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ reporte.numero_factura }}</h5>
+                        <p class="card-text">{{ reporte.descripcion_dano|truncatewords:20 }}</p>
+                        <p class="text-muted mb-2">
+                            <i class="fas fa-calendar me-1"></i>
+                            {{ reporte.fecha_reporte|date:"d/m/Y H:i" }}
+                        </p>
+                        <a href="{% url 'reportes_dano:detalle_reporte' reporte.pk %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-eye me-1"></i> Ver Detalles
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            No tienes reportes de daño registrados.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+

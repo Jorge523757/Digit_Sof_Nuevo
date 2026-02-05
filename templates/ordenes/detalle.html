@@ -1,5 +1,6 @@
 {% extends 'base_dashboard.html' %}
 {% load static %}
+{% load currency_filters %}
 
 {% block title %}Orden {{ orden.numero_orden }} - DIGT SOFT{% endblock %}
 
@@ -312,22 +313,22 @@
                     <i class="fas fa-dollar-sign me-2"></i>
                     Costos
                 </h5>
-                <div class="info-row">
-                    <div class="info-label">Diagnóstico</div>
-                    <div class="info-value">${{ orden.costo_diagnostico|floatformat:2 }}</div>
+                <div class="info-item">
+                    <div class="info-label">💰 Costo Diagnóstico</div>
+                    <div class="info-value">{{ orden.costo_diagnostico|peso_colombiano }}</div>
                 </div>
-                <div class="info-row">
-                    <div class="info-label">Mano de Obra</div>
-                    <div class="info-value">${{ orden.costo_mano_obra|floatformat:2 }}</div>
+                <div class="info-item">
+                    <div class="info-label">🔧 Costo Mano de Obra</div>
+                    <div class="info-value">{{ orden.costo_mano_obra|peso_colombiano }}</div>
                 </div>
-                <div class="info-row">
-                    <div class="info-label">Repuestos</div>
-                    <div class="info-value">${{ orden.costo_repuestos|floatformat:2 }}</div>
+                <div class="info-item">
+                    <div class="info-label">⚙️ Costo Repuestos</div>
+                    <div class="info-value">{{ orden.costo_repuestos|peso_colombiano }}</div>
                 </div>
-                <div class="info-row">
-                    <div class="info-label"><strong>TOTAL</strong></div>
+                <div class="info-item total-cost">
+                    <div class="info-label"><strong>💵 COSTO TOTAL</strong></div>
                     <div class="info-value">
-                        <strong style="color: #1e3c72; font-size: 1.3rem;">
+                        <strong>{{ orden.costo_total|peso_colombiano }}</strong>
                             ${{ orden.costo_total|floatformat:2 }}
                         </strong>
                     </div>

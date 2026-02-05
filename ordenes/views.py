@@ -147,6 +147,33 @@ def orden_crear(request):
             except:
                 pass
 
+            # Enviar notificaciones multicanal al cliente
+            try:
+                from notificaciones.services import ServicioNotificaciones
+                ServicioNotificaciones.enviar_notificacion(
+                    orden=orden,
+                    evento='ORDEN_CREADA',
+                    destinatario_tipo='CLIENTE',
+                    destinatario=orden.cliente
+                )
+            except Exception as e:
+                print(f"Error enviando notificación multicanal: {e}")
+
+            # Si hay técnico asignado, notificarle
+            if orden.tecnico_asignado:
+                try:
+                    from notificaciones.services import ServicioNotificaciones, ServicioMonitoreo
+                    ServicioNotificaciones.enviar_notificacion(
+                        orden=orden,
+                        evento='ORDEN_ASIGNADA',
+                        destinatario_tipo='TECNICO',
+                        destinatario=orden.tecnico_asignado
+                    )
+                    # Actualizar estado del técnico
+                    ServicioMonitoreo.actualizar_estado_tecnico(orden.tecnico_asignado)
+                except Exception as e:
+                    print(f"Error notificando al técnico: {e}")
+
             messages.success(request, f'✅ Orden {orden.numero_orden} creada exitosamente')
             return redirect('ordenes:detalle', pk=orden.pk)
     else:

@@ -145,8 +145,8 @@
                 <td>{{ producto.categoria.nombre|default:"Sin categoría" }}</td>
                 <td>{{ producto.marca|default:"-" }}</td>
                 <td class="text-center">{{ producto.stock_actual }}</td>
-                <td class="text-right">${{ producto.precio_compra|floatformat:2 }}</td>
-                <td class="text-right">${{ producto.precio_venta|floatformat:2 }}</td>
+                <td class="text-right">{{ producto.precio_compra|peso_colombiano }}</td>
+                <td class="text-right">{{ producto.precio_venta|peso_colombiano }}</td>
                 <td class="text-center">
                     {% if producto.activo %}
                     <span class="badge badge-success">Activo</span>

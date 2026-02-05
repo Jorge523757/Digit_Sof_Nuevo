@@ -1,0 +1,132 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Reporte de Daño - DIGT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Encabezado -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 style="color: #1e3c72;">
+                        <i class="fas fa-file-invoice me-2"></i>
+                        Reporte: {{ registro.numero_factura|default:"Sin número" }}
+                    </h1>
+                    <p class="mb-0">
+                        <i class="fas fa-calendar me-2"></i>
+                        Reportado el {{ registro.fecha_reporte|date:"d/m/Y H:i" }}
+                    </p>
+                </div>
+                <div class="col-lg-4 text-end">
+                    <a href="{% url 'reportes_dano:mis_reportes' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Información Principal -->
+        <div class="col-lg-8">
+            <!-- Descripción del Daño -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                        Descripción del Daño
+                    </h4>
+                    <p class="card-text">{{ registro.descripcion_dano }}</p>
+                </div>
+            </div>
+
+            <!-- Evidencia Fotográfica -->
+            {% if imagenes %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        <i class="fas fa-images me-2"></i>
+                        Evidencia Fotográfica ({{ imagenes.count }} imagen{{ imagenes.count|pluralize:"es" }})
+                    </h4>
+                    <div class="row">
+                        {% for imagen in imagenes %}
+                        <div class="col-md-4 mb-3">
+                            <img src="{{ imagen.imagen.url }}"
+                                 alt="Evidencia {{ forloop.counter }}"
+                                 class="img-fluid rounded shadow"
+                                 style="cursor: pointer; max-height: 200px; width: 100%; object-fit: cover;"
+                                 onclick="window.open('{{ imagen.imagen.url }}', '_blank')">
+                            {% if imagen.es_principal %}
+                            <span class="badge bg-success mt-2">
+                                <i class="fas fa-star me-1"></i>Principal
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Información Lateral -->
+        <div class="col-lg-4">
+            <!-- Información General -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Información General
+                    </h5>
+                    <hr>
+                    <p><strong>Número de Factura:</strong><br>{{ registro.numero_factura|default:"Sin asignar" }}</p>
+                    <p><strong>Fecha de Reporte:</strong><br>{{ registro.fecha_reporte|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Usuario:</strong><br>{{ registro.usuario.get_full_name|default:registro.usuario.username }}</p>
+                    {% if registro.orden %}
+                    <hr>
+                    <p><strong>Orden de Servicio:</strong><br>
+                        <a href="{% url 'ordenes:detalle' registro.orden.pk %}" class="btn btn-sm btn-info">
+                            <i class="fas fa-file-alt me-1"></i>
+                            {{ registro.orden.numero_orden }}
+                        </a>
+                    </p>
+                    {% if registro.orden.tecnico %}
+                    <p><strong>Técnico Asignado:</strong><br>{{ registro.orden.tecnico.nombres }} {{ registro.orden.tecnico.apellidos }}</p>
+                    {% endif %}
+                    <p><strong>Estado:</strong><br>
+                        <span class="badge bg-primary">{{ registro.orden.get_estado_display }}</span>
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-download me-2"></i>
+                        Descargas
+                    </h5>
+                    <hr>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'reportes_dano:descargar_factura' registro.pk 'pdf' %}"
+                           class="btn btn-primary">
+                            <i class="fas fa-file-pdf me-2"></i>
+                            Descargar PDF
+                        </a>
+                        <a href="{% url 'reportes_dano:descargar_factura' registro.pk 'txt' %}"
+                           class="btn btn-success">
+                            <i class="fas fa-file-alt me-2"></i>
+                            Descargar TXT
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

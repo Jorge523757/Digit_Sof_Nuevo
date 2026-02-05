@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'facturacion',
     'equipos',
     'capacitaciones',
+    'reportes_dano',  # Sistema de reporte de daños
+    'utils',  # Utilidades y filtros personalizados
 ]
 
 MIDDLEWARE = [
