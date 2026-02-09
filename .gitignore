@@ -50,6 +50,14 @@ local_settings.py
 .env.local
 .env.*.local
 
+# Archivos con credenciales sensibles (NO SUBIR A GIT)
+limpiar_google_oauth.py
+INSTRUCCIONES_DAVID.txt
+SERVIDOR_INICIADO_LISTO.txt
+*_CREDENCIALES.txt
+*_SECRETS.py
+config_local.py
+
 # Coverage reports
 htmlcov/
 .tox/
