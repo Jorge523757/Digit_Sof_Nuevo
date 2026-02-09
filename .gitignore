@@ -52,6 +52,14 @@ local_settings.py
 
 # Archivos con credenciales sensibles (NO SUBIR A GIT)
 limpiar_google_oauth.py
+limpieza_nuclear_google.py
+limpieza_total_google.py
+forzar_limpieza_google.py
+configurar_google_oauth.py
+verificar_google_final.py
+verificar_configuracion_google.py
+mostrar_uri_callback.py
+ARREGLAR_GOOGLE_DEFINITIVO.py
 INSTRUCCIONES_DAVID.txt
 SERVIDOR_INICIADO_LISTO.txt
 *_CREDENCIALES.txt
