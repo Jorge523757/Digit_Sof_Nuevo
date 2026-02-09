@@ -7,6 +7,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),  # Página principal
 
+    # Django Allauth (Login con Google)
+    path('accounts/', include('allauth.urls')),
+
     # E-commerce
     path('tienda/', include('ecommerce_urls')),  # URLs del e-commerce
 

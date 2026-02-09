@@ -496,3 +496,26 @@ def toggle_staff(request, user_id):
     return redirect('usuarios:detalle_usuario', user_id=user_id)
 
 
+@login_required
+@admin_required
+def admin_gestionar_contrasenas(request):
+    """Vista para que el administrador gestione las solicitudes de recuperación de contraseña"""
+    from .models import PasswordResetToken
+    from .models_tokens import TokenRecuperacion
+    from django.utils import timezone
+
+    # Obtener todos los tokens de recuperación (sistema antiguo)
+    tokens_antiguos = PasswordResetToken.objects.select_related('user').order_by('-created_at')[:50]
+
+    # Obtener todos los códigos de recuperación (sistema nuevo con código de 6 dígitos)
+    tokens_nuevos = TokenRecuperacion.objects.select_related('usuario').order_by('-fecha_creacion')[:50]
+
+    context = {
+        'tokens_antiguos': tokens_antiguos,
+        'tokens_nuevos': tokens_nuevos,
+        'now': timezone.now()
+    }
+
+    return render(request, 'usuarios/admin_gestionar_contrasenas.html', context)
+
+

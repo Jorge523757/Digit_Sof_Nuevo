@@ -118,6 +118,7 @@ def orden_crear(request):
     from .forms import OrdenServicioForm
     from clientes.models import Cliente
     from tecnicos.models import Tecnico
+    from .notifications import ServicioNotificaciones
 
     if request.method == 'POST':
         form = OrdenServicioForm(request.POST)
@@ -132,6 +133,12 @@ def orden_crear(request):
                 descripcion=f'Orden creada - Equipo recibido: {orden.tipo_equipo} {orden.marca} {orden.modelo}',
                 usuario=request.user.username if request.user.is_authenticated else 'Sistema'
             )
+
+            # NOTIFICAR AL ADMINISTRADOR - NUEVO
+            try:
+                ServicioNotificaciones.notificar_nueva_orden_admin(orden)
+            except Exception as e:
+                print(f"Error notificando al administrador: {e}")
 
             # Crear notificación para el cliente
             try:
@@ -149,8 +156,8 @@ def orden_crear(request):
 
             # Enviar notificaciones multicanal al cliente
             try:
-                from notificaciones.services import ServicioNotificaciones
-                ServicioNotificaciones.enviar_notificacion(
+                from notificaciones.services import ServicioNotificaciones as ServicioNotif
+                ServicioNotif.enviar_notificacion(
                     orden=orden,
                     evento='ORDEN_CREADA',
                     destinatario_tipo='CLIENTE',
@@ -162,8 +169,8 @@ def orden_crear(request):
             # Si hay técnico asignado, notificarle
             if orden.tecnico_asignado:
                 try:
-                    from notificaciones.services import ServicioNotificaciones, ServicioMonitoreo
-                    ServicioNotificaciones.enviar_notificacion(
+                    from notificaciones.services import ServicioNotificaciones as ServicioNotif, ServicioMonitoreo
+                    ServicioNotif.enviar_notificacion(
                         orden=orden,
                         evento='ORDEN_ASIGNADA',
                         destinatario_tipo='TECNICO',
@@ -209,14 +216,24 @@ def orden_editar(request, pk):
     from .forms import OrdenServicioForm
     from clientes.models import Cliente
     from tecnicos.models import Tecnico
+    from .notifications import ServicioNotificaciones
 
     orden = get_object_or_404(OrdenServicio, pk=pk)
     estado_anterior = orden.estado
+    tecnico_anterior = orden.tecnico_asignado
 
     if request.method == 'POST':
         form = OrdenServicioForm(request.POST, instance=orden)
         if form.is_valid():
             orden = form.save()
+
+            # Si cambió el técnico asignado, notificarle
+            if orden.tecnico_asignado and orden.tecnico_asignado != tecnico_anterior:
+                try:
+                    ServicioNotificaciones.notificar_asignacion_tecnico(orden, orden.tecnico_asignado)
+                    messages.success(request, f'✅ Técnico {orden.tecnico_asignado.nombre_completo} notificado')
+                except Exception as e:
+                    print(f"Error notificando al técnico: {e}")
 
             # Si cambió el estado, crear seguimiento
             if estado_anterior != orden.estado:
@@ -268,6 +285,8 @@ def orden_agregar_repuesto(request, pk):
 
 def orden_cambiar_estado(request, pk):
     """Cambiar estado de una orden"""
+    from .notifications import ServicioNotificaciones
+
     if request.method == 'POST':
         orden = get_object_or_404(OrdenServicio, pk=pk)
         estado_anterior = orden.estado
@@ -287,7 +306,25 @@ def orden_cambiar_estado(request, pk):
                 usuario=request.user.username if request.user.is_authenticated else 'Sistema'
             )
 
-            # Enviar notificación
+            # NOTIFICAR AL CLIENTE - EMAIL + IN-APP
+            try:
+                ServicioNotificaciones.notificar_cambio_estado_cliente(
+                    orden,
+                    estado_anterior,
+                    nuevo_estado,
+                    descripcion
+                )
+            except Exception as e:
+                print(f"Error notificando al cliente: {e}")
+
+            # Si el estado es LISTA_ENTREGA, enviar notificación especial
+            if nuevo_estado == 'LISTA_ENTREGA':
+                try:
+                    ServicioNotificaciones.notificar_orden_lista_entrega(orden)
+                except Exception as e:
+                    print(f"Error enviando notificación de orden lista: {e}")
+
+            # Enviar notificación in-app
             try:
                 from usuarios.models import Notificacion
                 estado_nombre = dict(OrdenServicio.ESTADO_CHOICES).get(nuevo_estado)
@@ -345,6 +382,84 @@ def ordenes_tablero(request):
     }
 
     return render(request, 'ordenes/tablero.html', context)
+
+
+def tecnico_notificar_actualizacion(request, pk):
+    """
+    Vista para que el técnico notifique demoras, adelantos o incidencias al administrador
+    """
+    from .notifications import ServicioNotificaciones
+    from datetime import datetime
+
+    orden = get_object_or_404(OrdenServicio, pk=pk)
+
+    # Verificar que el usuario sea técnico asignado o admin
+    if not request.user.is_staff:
+        # Verificar si es el técnico asignado
+        try:
+            from tecnicos.models import Tecnico
+            tecnico = Tecnico.objects.get(usuario=request.user)
+            if orden.tecnico_asignado != tecnico:
+                messages.error(request, '❌ No tienes permiso para notificar esta orden')
+                return redirect('ordenes:detalle', pk=pk)
+        except:
+            messages.error(request, '❌ No tienes permiso para acceder a esta función')
+            return redirect('ordenes:lista')
+
+    if request.method == 'POST':
+        tipo = request.POST.get('tipo')
+        mensaje = request.POST.get('mensaje')
+        nueva_fecha_str = request.POST.get('nueva_fecha')
+
+        nueva_fecha = None
+        if nueva_fecha_str:
+            try:
+                nueva_fecha = datetime.strptime(nueva_fecha_str, '%Y-%m-%d').date()
+                # Si hay nueva fecha, actualizar la orden
+                orden.fecha_compromiso = nueva_fecha
+                orden.save()
+            except:
+                pass
+
+        # Obtener el técnico
+        try:
+            from tecnicos.models import Tecnico
+            if request.user.is_staff:
+                tecnico = orden.tecnico_asignado
+            else:
+                tecnico = Tecnico.objects.get(usuario=request.user)
+        except:
+            messages.error(request, '❌ Error al identificar el técnico')
+            return redirect('ordenes:detalle', pk=pk)
+
+        # Registrar en el seguimiento
+        SeguimientoOrden.objects.create(
+            orden=orden,
+            estado_anterior=orden.estado,
+            estado_nuevo=orden.estado,
+            descripcion=f'[{tipo}] {mensaje}',
+            usuario=request.user.username
+        )
+
+        # Notificar al administrador
+        try:
+            ServicioNotificaciones.notificar_tecnico_a_admin(
+                orden,
+                tecnico,
+                tipo,
+                mensaje,
+                nueva_fecha
+            )
+            messages.success(request, f'✅ Notificación de {tipo.lower()} enviada al administrador')
+        except Exception as e:
+            messages.error(request, f'❌ Error al enviar notificación: {e}')
+
+        return redirect('ordenes:detalle', pk=pk)
+
+    context = {
+        'orden': orden,
+    }
+    return render(request, 'ordenes/notificar_tecnico.html', context)
 
 
 # API para autocompletado

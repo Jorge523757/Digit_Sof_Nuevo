@@ -1,0 +1,315 @@
+{% extends "auth_base.html" %}
+{% load static %}
+
+{% block title %}Completar Registro con Google - DIGIT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .google-signup-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+    }
+
+    .google-signup-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        width: 100%;
+        padding: 40px;
+        animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .google-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .google-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .google-icon svg {
+        width: 40px;
+        height: 40px;
+        fill: white;
+    }
+
+    .google-header h1 {
+        font-size: 28px;
+        color: #2d3748;
+        margin: 0 0 10px 0;
+        font-weight: 700;
+    }
+
+    .google-header p {
+        color: #718096;
+        font-size: 16px;
+        margin: 0;
+    }
+
+    .success-message {
+        background: #f0fdf4;
+        border: 2px solid #86efac;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .success-message svg {
+        width: 24px;
+        height: 24px;
+        fill: #16a34a;
+        flex-shrink: 0;
+    }
+
+    .success-message-text {
+        color: #166534;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .success-message-text strong {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group input:disabled {
+        background: #f1f5f9;
+        color: #64748b;
+        cursor: not-allowed;
+    }
+
+    .form-group small {
+        display: block;
+        margin-top: 6px;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .form-actions {
+        margin-top: 30px;
+    }
+
+    .btn-complete {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-complete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-complete:active {
+        transform: translateY(0);
+    }
+
+    .google-account-info {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    .google-account-info h3 {
+        font-size: 14px;
+        color: #475569;
+        margin: 0 0 12px 0;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .account-detail {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+    }
+
+    .account-detail svg {
+        width: 20px;
+        height: 20px;
+        fill: #667eea;
+    }
+
+    .account-detail-text {
+        flex: 1;
+    }
+
+    .account-detail-label {
+        font-size: 12px;
+        color: #64748b;
+        display: block;
+    }
+
+    .account-detail-value {
+        font-size: 15px;
+        color: #1e293b;
+        font-weight: 600;
+    }
+
+    .info-note {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        border-radius: 8px;
+        padding: 12px;
+        margin-top: 20px;
+        font-size: 13px;
+        color: #92400e;
+        line-height: 1.5;
+    }
+
+    @media (max-width: 640px) {
+        .google-signup-card {
+            padding: 30px 20px;
+        }
+
+        .google-header h1 {
+            font-size: 24px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="google-signup-container">
+    <div class="google-signup-card">
+        <div class="google-header">
+            <div class="google-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+            </div>
+            <h1>¡Casi listo!</h1>
+            <p>Completa tu registro con Google</p>
+        </div>
+
+        <div class="success-message">
+            <svg viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+            </svg>
+            <div class="success-message-text">
+                <strong>✓ Autenticación exitosa</strong>
+                Tu cuenta de Google ha sido verificada correctamente
+            </div>
+        </div>
+
+        <div class="google-account-info">
+            <h3>Tu cuenta de Google</h3>
+            <div class="account-detail">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                <div class="account-detail-text">
+                    <span class="account-detail-label">Correo electrónico</span>
+                    <span class="account-detail-value">{{ account.extra_data.email }}</span>
+                </div>
+            </div>
+        </div>
+
+        <form method="post" action="{% url 'socialaccount_signup' %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">
+                    Correo electrónico
+                </label>
+                {{ form.email }}
+                <small>Este correo se usará para iniciar sesión y recibir notificaciones</small>
+            </div>
+
+            {% if form.username %}
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">
+                    Usuario (opcional)
+                </label>
+                {{ form.username }}
+                <small>Puedes dejarlo en blanco y usar solo tu correo para iniciar sesión</small>
+            </div>
+            {% endif %}
+
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+
+            <div class="form-actions">
+                <button type="submit" class="btn-complete">
+                    ✓ Completar Registro
+                </button>
+            </div>
+
+            <div class="info-note">
+                <strong>💡 Nota:</strong> Al completar el registro, podrás acceder a todas las funcionalidades de DIGIT SOFT con tu cuenta de Google.
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

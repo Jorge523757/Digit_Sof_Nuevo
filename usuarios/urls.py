@@ -12,14 +12,11 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('registro/', views.registro_cliente, name='registro'),
 
-    # Recuperación de contraseña (NUEVO)
-    path('solicitar-recuperacion/', views_recuperacion.solicitar_recuperacion, name='solicitar_recuperacion'),
-    path('recuperar-contrasena/<str:token>/', views_recuperacion.recuperar_contrasena, name='recuperar_contrasena'),
-
-    # Panel de administrador para gestionar contraseñas (NUEVO)
-    path('admin/gestionar-contrasenas/', views_recuperacion.admin_gestionar_contrasenas, name='admin_gestionar_contrasenas'),
-    path('admin/cambiar-contrasena/<str:tipo>/<int:id>/', views_recuperacion.admin_cambiar_contrasena, name='admin_cambiar_contrasena'),
-    path('admin/generar-temporal/<str:tipo>/<int:id>/', views_recuperacion.admin_generar_contrasena_temporal, name='admin_generar_contrasena_temporal'),
+    # Recuperación de contraseña con código por email (NUEVO - 30 min)
+    path('recuperar/', views_recuperacion.solicitar_recuperacion, name='solicitar_recuperacion'),
+    path('verificar-codigo/', views_recuperacion.verificar_codigo, name='verificar_codigo'),
+    path('nueva-password/', views_recuperacion.nueva_password, name='nueva_password'),
+    path('reenviar-codigo/', views_recuperacion.reenviar_codigo, name='reenviar_codigo'),
 
     # Recuperación de contraseña (antiguo - mantener por compatibilidad)
     path('recuperar-password/', views.recuperar_password, name='recuperar_password'),
@@ -38,6 +35,9 @@ urlpatterns = [
     path('gestionar/<int:user_id>/bloquear/', views.bloquear_usuario, name='bloquear_usuario'),
     path('gestionar/<int:user_id>/desbloquear/', views.desbloquear_usuario, name='desbloquear_usuario'),
     path('gestionar/<int:user_id>/toggle-staff/', views.toggle_staff, name='toggle_staff'),
+
+    # Admin - Gestión de contraseñas
+    path('admin/gestionar-contrasenas/', views.admin_gestionar_contrasenas, name='admin_gestionar_contrasenas'),
 
     # Notificaciones
     path('notificaciones/', views_notificaciones.listar_notificaciones, name='notificaciones'),

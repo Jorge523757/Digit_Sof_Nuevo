@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Recuperar Contraseña - Paso 1{% endblock %}
+
+{% block extra_css %}
+<style>
+    .recovery-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+    }
+    .recovery-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        max-width: 500px;
+        width: 100%;
+        padding: 40px;
+    }
+    .recovery-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 40px;
+        color: white;
+    }
+    .recovery-title {
+        text-align: center;
+        color: #1e3c72;
+        margin-bottom: 10px;
+    }
+    .recovery-subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #1e3c72;
+        margin-bottom: 8px;
+    }
+    .form-control {
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 12px 15px;
+        font-size: 16px;
+    }
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .btn-recovery {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 16px;
+        width: 100%;
+        margin-top: 20px;
+    }
+    .btn-recovery:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    .info-box {
+        background-color: #e3f2fd;
+        border-left: 4px solid #2196F3;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
+    }
+    .back-link {
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="recovery-container">
+    <div class="recovery-card">
+        <div class="recovery-icon">
+            <i class="fas fa-lock"></i>
+        </div>
+
+        <h2 class="recovery-title">¿Olvidaste tu contraseña?</h2>
+        <p class="recovery-subtitle">Te enviaremos un código de verificación a tu email</p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="fas fa-envelope me-2"></i>
+                    Email registrado
+                </label>
+                <input type="email"
+                       name="email"
+                       class="form-control"
+                       placeholder="tu@email.com"
+                       required
+                       autofocus>
+                <small class="text-muted">Ingresa el email con el que te registraste</small>
+            </div>
+
+            <div class="info-box">
+                <p style="margin: 0; font-size: 14px;">
+                    <strong><i class="fas fa-info-circle me-2"></i>¿Qué sigue?</strong>
+                </p>
+                <p style="margin: 10px 0 0 0; font-size: 14px;">
+                    1. Te enviaremos un código de 6 dígitos<br>
+                    2. El código expira en 30 minutos<br>
+                    3. Lo usarás para crear tu nueva contraseña
+                </p>
+            </div>
+
+            <button type="submit" class="btn btn-recovery">
+                <i class="fas fa-paper-plane me-2"></i>
+                Enviar Código
+            </button>
+        </form>
+
+        <div class="back-link">
+            <a href="{% url 'usuarios:login' %}" class="text-decoration-none">
+                <i class="fas fa-arrow-left me-2"></i>
+                Volver al inicio de sesión
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

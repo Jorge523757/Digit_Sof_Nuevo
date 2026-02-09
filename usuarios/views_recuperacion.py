@@ -1,326 +1,158 @@
 """
-DIGITSOFT - Módulo de Recuperación de Contraseña
+Vistas para Recuperación de Contraseña
 """
 
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.contrib.auth import update_session_auth_hash
-from django.core.mail import send_mail
-from django.conf import settings
-from django.utils.crypto import get_random_string
-from usuarios.decorators import staff_required
-from clientes.models import Cliente
-from tecnicos.models import Tecnico
-from proveedores.models import Proveedor
+from django.views.decorators.http import require_http_methods
+from .services_password import ServicioRecuperacionPassword
 
 
+def get_client_ip(request):
+    """Obtiene la IP del cliente"""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
+@require_http_methods(["GET", "POST"])
 def solicitar_recuperacion(request):
-    """Formulario público para solicitar recuperación de contraseña"""
+    """Paso 1: Solicitar código de recuperación"""
+
     if request.method == 'POST':
         email = request.POST.get('email', '').strip()
-        tipo_usuario = request.POST.get('tipo_usuario', 'usuario')
 
         if not email:
-            messages.error(request, 'Por favor ingresa tu correo electrónico.')
-            return redirect('usuarios:solicitar_recuperacion')
+            messages.error(request, '❌ Por favor ingresa tu email.')
+            return render(request, 'usuarios/recuperar_paso1.html')
 
-        # Buscar usuario según el tipo
-        usuario_encontrado = None
-        nombre_usuario = None
+        # Obtener IP del cliente
+        ip = get_client_ip(request)
 
-        try:
-            if tipo_usuario == 'usuario':
-                user = User.objects.get(email=email)
-                usuario_encontrado = user
-                nombre_usuario = user.get_full_name() or user.username
+        # Solicitar recuperación
+        exito, mensaje, token = ServicioRecuperacionPassword.solicitar_recuperacion(email, ip)
 
-            elif tipo_usuario == 'cliente':
-                cliente = Cliente.objects.get(email=email)
-                if cliente.usuario:
-                    usuario_encontrado = cliente.usuario
-                    nombre_usuario = cliente.nombre_completo
-
-            elif tipo_usuario == 'tecnico':
-                tecnico = Tecnico.objects.get(email=email)
-                if tecnico.usuario:
-                    usuario_encontrado = tecnico.usuario
-                    nombre_usuario = tecnico.nombre_completo
-
-            elif tipo_usuario == 'proveedor':
-                proveedor = Proveedor.objects.get(email=email)
-                nombre_usuario = proveedor.nombre_contacto
-
-        except (User.DoesNotExist, Cliente.DoesNotExist, Tecnico.DoesNotExist, Proveedor.DoesNotExist):
-            # Por seguridad, no revelamos si el email existe o no
-            messages.info(request,
-                'Si el correo está registrado, recibirás instrucciones para recuperar tu contraseña.')
-            return redirect('main:index')
-
-        if usuario_encontrado:
-            # Generar token de recuperación
-            token = get_random_string(32)
-
-            # Guardar token en sesión temporalmente (o en modelo si prefieres)
-            request.session[f'reset_token_{token}'] = {
-                'user_id': usuario_encontrado.id,
-                'email': email,
-                'tipo': tipo_usuario
-            }
-
-            # Enviar correo con enlace
-            try:
-                reset_url = request.build_absolute_uri(
-                    f'/usuarios/recuperar-contrasena/{token}/'
-                )
-
-                send_mail(
-                    'Recuperación de Contraseña - DIGITSOFT',
-                    f'Hola {nombre_usuario},\n\n'
-                    f'Has solicitado recuperar tu contraseña.\n\n'
-                    f'Haz clic en el siguiente enlace para establecer una nueva contraseña:\n'
-                    f'{reset_url}\n\n'
-                    f'Este enlace expirará en 1 hora.\n\n'
-                    f'Si no solicitaste este cambio, ignora este correo.\n\n'
-                    f'Saludos,\nEquipo DIGITSOFT',
-                    settings.DEFAULT_FROM_EMAIL,
-                    [email],
-                    fail_silently=False,
-                )
-
-                messages.success(request,
-                    'Se ha enviado un correo con instrucciones para recuperar tu contraseña.')
-            except Exception as e:
-                messages.warning(request,
-                    'Tu solicitud ha sido recibida. Un administrador te contactará pronto.')
+        if exito:
+            # Guardar email en sesión para el siguiente paso
+            request.session['recovery_email'] = email
+            messages.success(request, f'✅ {mensaje}')
+            return redirect('usuarios:verificar_codigo')
         else:
-            messages.info(request,
-                'Si el correo está registrado, recibirás instrucciones para recuperar tu contraseña.')
+            messages.warning(request, mensaje)
+            return render(request, 'usuarios/recuperar_paso1.html')
 
-        return redirect('main:index')
-
-    return render(request, 'usuarios/recuperacion/solicitar.html')
+    return render(request, 'usuarios/recuperar_paso1.html')
 
 
-def recuperar_contrasena(request, token):
-    """Formulario para establecer nueva contraseña con token"""
-    # Verificar token
-    session_key = f'reset_token_{token}'
-    token_data = request.session.get(session_key)
+@require_http_methods(["GET", "POST"])
+def verificar_codigo(request):
+    """Paso 2: Verificar código recibido por email"""
 
-    if not token_data:
-        messages.error(request, 'El enlace de recuperación es inválido o ha expirado.')
+    # Verificar que hay email en sesión
+    email = request.session.get('recovery_email')
+    if not email:
+        messages.error(request, '❌ Sesión expirada. Inicia el proceso nuevamente.')
         return redirect('usuarios:solicitar_recuperacion')
 
     if request.method == 'POST':
-        password1 = request.POST.get('password1')
-        password2 = request.POST.get('password2')
+        codigo = request.POST.get('codigo', '').strip()
 
-        if not password1 or not password2:
-            messages.error(request, 'Por favor completa todos los campos.')
-            return redirect('usuarios:recuperar_contrasena', token=token)
+        if not codigo:
+            messages.error(request, '❌ Por favor ingresa el código.')
+            return render(request, 'usuarios/recuperar_paso2.html', {'email': email})
 
-        if password1 != password2:
-            messages.error(request, 'Las contraseñas no coinciden.')
-            return redirect('usuarios:recuperar_contrasena', token=token)
+        # Verificar código
+        valido, mensaje, token = ServicioRecuperacionPassword.verificar_codigo(email, codigo)
 
-        if len(password1) < 8:
-            messages.error(request, 'La contraseña debe tener al menos 8 caracteres.')
-            return redirect('usuarios:recuperar_contrasena', token=token)
+        if valido:
+            # Guardar token ID en sesión
+            request.session['recovery_token_id'] = token.id
+            messages.success(request, f'✅ {mensaje}')
+            return redirect('usuarios:nueva_password')
+        else:
+            messages.error(request, f'❌ {mensaje}')
+            return render(request, 'usuarios/recuperar_paso2.html', {'email': email})
 
-        try:
-            user = User.objects.get(id=token_data['user_id'])
-            user.set_password(password1)
-            user.save()
-
-            # Eliminar token usado
-            del request.session[session_key]
-
-            messages.success(request,
-                '¡Contraseña actualizada exitosamente! Ya puedes iniciar sesión.')
-            return redirect('usuarios:login')
-
-        except User.DoesNotExist:
-            messages.error(request, 'Usuario no encontrado.')
-            return redirect('usuarios:solicitar_recuperacion')
-
-    return render(request, 'usuarios/recuperacion/nueva_contrasena.html', {
-        'token': token,
-        'email': token_data.get('email')
-    })
+    return render(request, 'usuarios/recuperar_paso2.html', {'email': email})
 
 
-@login_required
-@staff_required
-def admin_gestionar_contrasenas(request):
-    """Panel de administrador para gestionar contraseñas de usuarios"""
+@require_http_methods(["GET", "POST"])
+def nueva_password(request):
+    """Paso 3: Establecer nueva contraseña"""
 
-    # Obtener todos los usuarios
-    usuarios_sistema = User.objects.all().order_by('username')
-    clientes = Cliente.objects.all().order_by('nombres')
-    tecnicos = Tecnico.objects.all().order_by('nombres')
-    proveedores = Proveedor.objects.all().order_by('nombre_empresa')
+    # Verificar que hay token en sesión
+    token_id = request.session.get('recovery_token_id')
+    if not token_id:
+        messages.error(request, '❌ Sesión expirada. Inicia el proceso nuevamente.')
+        return redirect('usuarios:solicitar_recuperacion')
 
-    context = {
-        'usuarios_sistema': usuarios_sistema,
-        'clientes': clientes,
-        'tecnicos': tecnicos,
-        'proveedores': proveedores,
-    }
+    # Obtener token
+    from .models_tokens import TokenRecuperacion
+    token = TokenRecuperacion.objects.filter(id=token_id).first()
 
-    return render(request, 'usuarios/recuperacion/admin_panel.html', context)
-
-
-@login_required
-@staff_required
-def admin_cambiar_contrasena(request, tipo, id):
-    """Administrador cambia contraseña de un usuario"""
+    if not token or not token.es_valido:
+        messages.error(request, '❌ El código ha expirado. Solicita uno nuevo.')
+        # Limpiar sesión
+        request.session.pop('recovery_email', None)
+        request.session.pop('recovery_token_id', None)
+        return redirect('usuarios:solicitar_recuperacion')
 
     if request.method == 'POST':
-        nueva_contrasena = request.POST.get('nueva_contrasena')
-        enviar_correo = request.POST.get('enviar_correo') == 'on'
+        password1 = request.POST.get('password1', '')
+        password2 = request.POST.get('password2', '')
 
-        if not nueva_contrasena:
-            messages.error(request, 'Debes especificar una nueva contraseña.')
-            return redirect('usuarios:admin_gestionar_contrasenas')
+        # Validar que no estén vacías
+        if not password1 or not password2:
+            messages.error(request, '❌ Por favor completa ambos campos.')
+            return render(request, 'usuarios/recuperar_paso3.html')
 
-        usuario = None
-        email = None
-        nombre = None
+        # Validar que coincidan
+        if password1 != password2:
+            messages.error(request, '❌ Las contraseñas no coinciden.')
+            return render(request, 'usuarios/recuperar_paso3.html')
 
-        try:
-            if tipo == 'usuario':
-                user = get_object_or_404(User, id=id)
-                user.set_password(nueva_contrasena)
-                user.save()
-                usuario = user
-                email = user.email
-                nombre = user.get_full_name() or user.username
+        # Validar fortaleza de la contraseña
+        valida, mensaje = ServicioRecuperacionPassword.validar_password(password1)
+        if not valida:
+            messages.error(request, f'❌ {mensaje}')
+            return render(request, 'usuarios/recuperar_paso3.html')
 
-            elif tipo == 'cliente':
-                cliente = get_object_or_404(Cliente, id=id)
-                if cliente.usuario:
-                    cliente.usuario.set_password(nueva_contrasena)
-                    cliente.usuario.save()
-                    usuario = cliente.usuario
-                    email = cliente.email
-                    nombre = cliente.nombre_completo
-                else:
-                    messages.error(request, 'Este cliente no tiene usuario asociado.')
-                    return redirect('usuarios:admin_gestionar_contrasenas')
+        # Cambiar contraseña
+        exito, mensaje = ServicioRecuperacionPassword.cambiar_password(token, password1)
 
-            elif tipo == 'tecnico':
-                tecnico = get_object_or_404(Tecnico, id=id)
-                if tecnico.usuario:
-                    tecnico.usuario.set_password(nueva_contrasena)
-                    tecnico.usuario.save()
-                    usuario = tecnico.usuario
-                    email = tecnico.email
-                    nombre = tecnico.nombre_completo
-                else:
-                    messages.error(request, 'Este técnico no tiene usuario asociado.')
-                    return redirect('usuarios:admin_gestionar_contrasenas')
+        if exito:
+            # Limpiar sesión
+            request.session.pop('recovery_email', None)
+            request.session.pop('recovery_token_id', None)
 
-            elif tipo == 'proveedor':
-                proveedor = get_object_or_404(Proveedor, id=id)
-                # Los proveedores no tienen usuario, solo almacenamos en sesión
-                messages.info(request,
-                    f'Contraseña registrada para proveedor: {proveedor.nombre_empresa}')
-                email = proveedor.email
-                nombre = proveedor.nombre_contacto
-
-            # Enviar correo si se solicitó
-            if enviar_correo and email:
-                try:
-                    send_mail(
-                        'Nueva Contraseña - DIGITSOFT',
-                        f'Hola {nombre},\n\n'
-                        f'El administrador ha actualizado tu contraseña.\n\n'
-                        f'Tu nueva contraseña es: {nueva_contrasena}\n\n'
-                        f'Por seguridad, te recomendamos cambiarla después de iniciar sesión.\n\n'
-                        f'Saludos,\nEquipo DIGITSOFT',
-                        settings.DEFAULT_FROM_EMAIL,
-                        [email],
-                        fail_silently=False,
-                    )
-                    messages.success(request,
-                        f'Contraseña actualizada y correo enviado a {email}')
-                except Exception as e:
-                    messages.warning(request,
-                        f'Contraseña actualizada pero no se pudo enviar el correo: {str(e)}')
-            else:
-                messages.success(request,
-                    f'Contraseña actualizada exitosamente para {nombre}')
-
-        except Exception as e:
-            messages.error(request, f'Error al cambiar contraseña: {str(e)}')
-
-        return redirect('usuarios:admin_gestionar_contrasenas')
-
-    return redirect('usuarios:admin_gestionar_contrasenas')
-
-
-@login_required
-@staff_required
-def admin_generar_contrasena_temporal(request, tipo, id):
-    """Generar contraseña temporal automática y enviar por correo"""
-
-    # Generar contraseña aleatoria
-    contrasena_temporal = get_random_string(12)
-
-    usuario = None
-    email = None
-    nombre = None
-
-    try:
-        if tipo == 'usuario':
-            user = get_object_or_404(User, id=id)
-            user.set_password(contrasena_temporal)
-            user.save()
-            email = user.email
-            nombre = user.get_full_name() or user.username
-
-        elif tipo == 'cliente':
-            cliente = get_object_or_404(Cliente, id=id)
-            if cliente.usuario:
-                cliente.usuario.set_password(contrasena_temporal)
-                cliente.usuario.save()
-                email = cliente.email
-                nombre = cliente.nombre_completo
-
-        elif tipo == 'tecnico':
-            tecnico = get_object_or_404(Tecnico, id=id)
-            if tecnico.usuario:
-                tecnico.usuario.set_password(contrasena_temporal)
-                tecnico.usuario.save()
-                email = tecnico.email
-                nombre = tecnico.nombre_completo
-
-        # Enviar correo
-        if email:
-            try:
-                send_mail(
-                    'Contraseña Temporal - DIGITSOFT',
-                    f'Hola {nombre},\n\n'
-                    f'Se ha generado una contraseña temporal para tu cuenta.\n\n'
-                    f'Contraseña temporal: {contrasena_temporal}\n\n'
-                    f'Por favor, cámbiala después de iniciar sesión.\n\n'
-                    f'Saludos,\nEquipo DIGITSOFT',
-                    settings.DEFAULT_FROM_EMAIL,
-                    [email],
-                    fail_silently=False,
-                )
-                messages.success(request,
-                    f'Contraseña temporal generada y enviada a {email}')
-            except Exception as e:
-                messages.warning(request,
-                    f'Contraseña generada: {contrasena_temporal} (No se pudo enviar correo)')
+            messages.success(request, f'✅ {mensaje}')
+            return redirect('usuarios:login')
         else:
-            messages.info(request, f'Contraseña temporal generada: {contrasena_temporal}')
+            messages.error(request, f'❌ {mensaje}')
+            return render(request, 'usuarios/recuperar_paso3.html')
 
-    except Exception as e:
-        messages.error(request, f'Error al generar contraseña: {str(e)}')
+    return render(request, 'usuarios/recuperar_paso3.html')
 
-    return redirect('usuarios:admin_gestionar_contrasenas')
+
+@require_http_methods(["POST"])
+def reenviar_codigo(request):
+    """Reenvía el código de recuperación"""
+
+    email = request.session.get('recovery_email')
+    if not email:
+        messages.error(request, '❌ Sesión expirada.')
+        return redirect('usuarios:solicitar_recuperacion')
+
+    ip = get_client_ip(request)
+    exito, mensaje, token = ServicioRecuperacionPassword.solicitar_recuperacion(email, ip)
+
+    if exito:
+        messages.success(request, '✅ Código reenviado a tu email.')
+    else:
+        messages.error(request, '❌ Error al reenviar el código.')
+
+    return redirect('usuarios:verificar_codigo')
 

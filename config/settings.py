@@ -28,6 +28,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # Requerido por allauth
+
+    # Django Allauth (Login con Google)
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 
     # Apps del proyecto
     'main',  # App principal con modelos Cart y CartItem
@@ -57,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  # Requerido por allauth
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -112,7 +120,105 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'es-es'
 TIME_ZONE = 'America/Mexico_City'
 USE_I18N = True
-USE_TZ = True
+
+# ============================================================================
+# CONFIGURACIÓN DE EMAIL PARA NOTIFICACIONES
+# ============================================================================
+
+# Backend de email - MODO PRUEBA (muestra emails en consola)
+# Cambia a 'django.core.mail.backends.smtp.EmailBackend' cuando configures Gmail
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Configuración SMTP para Gmail (puedes cambiar por otro proveedor)
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# Credenciales (MODO PRUEBA - Los emails se mostrarán en la consola)
+EMAIL_HOST_USER = 'noreply@digitsoft.com'  # Email de prueba
+EMAIL_HOST_PASSWORD = ''  # No necesario en modo consola
+
+# Email por defecto para envíos
+DEFAULT_FROM_EMAIL = 'DIGIT SOFT <noreply@digitsoft.com>'
+
+# Email del administrador para recibir notificaciones
+ADMIN_EMAIL = 'admin@digitsoft.com'  # Email de prueba
+ADMIN_EMAIL = 'admin@digitsoft.com'  # Cambiar por el email del admin
+
+# URL del sitio (para enlaces en emails)
+SITE_URL = 'http://localhost:8000'  # En producción cambiar a tu dominio
+
+# ============================================================================
+# INSTRUCCIONES PARA CONFIGURAR GMAIL:
+# ============================================================================
+# 1. Ve a: https://myaccount.google.com/apppasswords
+# 2. Activa la verificación en dos pasos
+# 3. Genera una contraseña de aplicación para "Correo"
+# 4. Copia la contraseña generada y úsala en EMAIL_HOST_PASSWORD
+# ============================================================================
+
+# ============================================================================
+# CONFIGURACIÓN DE DJANGO-ALLAUTH (LOGIN CON GOOGLE)
+# ============================================================================
+
+SITE_ID = 1
+
+# Configuración de autenticación
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Backend por defecto
+    'allauth.account.auth_backends.AuthenticationBackend',  # Backend de allauth
+]
+
+# Configuración de allauth (actualizada para Django-allauth 6.x)
+ACCOUNT_LOGIN_METHODS = {'email', 'username'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username', 'password1*', 'password2*']
+ACCOUNT_EMAIL_VERIFICATION = 'optional'  # Puedes cambiarlo a 'mandatory' si quieres
+
+# Permitir vincular cuentas de Google a usuarios existentes con el mismo email
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'optional'
+ACCOUNT_UNIQUE_EMAIL = True
+
+# Adaptadores personalizados
+ACCOUNT_ADAPTER = 'usuarios.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'usuarios.adapters.CustomSocialAccountAdapter'
+
+# Redirecciones
+SOCIALACCOUNT_LOGIN_ON_GET = True
+LOGIN_REDIRECT_URL = 'dashboard:index'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/usuarios/login/'
+LOGOUT_REDIRECT_URL = 'core:home'
+
+# Configuración de Google OAuth
+# NOTA: Las credenciales se manejan desde la base de datos (SocialApp model)
+# No incluir 'APP' aquí porque causa MultipleObjectsReturned
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
+
+# ============================================================================
+# INSTRUCCIONES PARA CONFIGURAR GOOGLE OAUTH:
+# ============================================================================
+# 1. Ve a: https://console.cloud.google.com/
+# 2. Crea un proyecto nuevo o selecciona uno existente
+# 3. Habilita "Google+ API"
+# 4. Ve a "Credenciales" > "Crear credenciales" > "ID de cliente de OAuth 2.0"
+# 5. Tipo de aplicación: "Aplicación web"
+# 6. URIs de redirección autorizados:
+#    - http://localhost:8000/accounts/google/login/callback/
+#    - http://127.0.0.1:8000/accounts/google/login/callback/
+# 7. Copia el Client ID y Client Secret
+# 8. Pégalos arriba en SOCIALACCOUNT_PROVIDERS
+# ============================================================================
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
@@ -127,5 +233,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'usuarios:login'
 LOGIN_REDIRECT_URL = 'dashboard:index'
 LOGOUT_REDIRECT_URL = 'core:home'
-
-

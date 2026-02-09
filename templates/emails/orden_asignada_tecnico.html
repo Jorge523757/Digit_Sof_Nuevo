@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orden Asignada</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .alert {
+            background-color: #fff3e0;
+            border-left: 4px solid #FF9800;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .info-box {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .priority-high {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .priority-medium {
+            background-color: #fff3e0;
+            border-left: 4px solid #FF9800;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #667eea;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            background-color: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Nueva Orden Asignada</h1>
+            <p style="margin: 10px 0 0 0;">{{ orden.numero_orden }}</p>
+        </div>
+
+        <div class="content">
+            <h2 style="color: #667eea;">Hola {{ tecnico.nombres }}</h2>
+
+            <div class="alert">
+                <strong>📋 NUEVA ASIGNACIÓN:</strong> Se te ha asignado una nueva orden de servicio que requiere tu atención.
+            </div>
+
+            {% if orden.prioridad == 'URGENTE' %}
+            <div class="priority-high">
+                <strong>🚨 PRIORIDAD URGENTE:</strong> Esta orden requiere atención inmediata.
+            </div>
+            {% elif orden.prioridad == 'ALTA' %}
+            <div class="priority-medium">
+                <strong>⚠️ PRIORIDAD ALTA:</strong> Esta orden requiere atención prioritaria.
+            </div>
+            {% endif %}
+
+            <h3 style="color: #667eea;">Información del Cliente</h3>
+            <div class="info-box">
+                <p><strong>Nombre:</strong> {{ orden.cliente.nombre_completo }}</p>
+                <p><strong>Teléfono:</strong> {{ orden.cliente.telefono }}</p>
+                <p><strong>Email:</strong> {{ orden.cliente.email }}</p>
+            </div>
+
+            <h3 style="color: #667eea;">Detalles del Equipo</h3>
+            <div class="info-box">
+                <p><strong>Tipo:</strong> {{ orden.tipo_equipo }}</p>
+                <p><strong>Marca:</strong> {{ orden.marca }}</p>
+                <p><strong>Modelo:</strong> {{ orden.modelo }}</p>
+                {% if orden.serie %}
+                <p><strong>Serie:</strong> {{ orden.serie }}</p>
+                {% endif %}
+                {% if orden.accesorios_incluidos %}
+                <p><strong>Accesorios:</strong> {{ orden.accesorios_incluidos }}</p>
+                {% endif %}
+            </div>
+
+            <h3 style="color: #667eea;">Problema Reportado</h3>
+            <div class="info-box">
+                <p><strong>Falla:</strong> {{ orden.falla_reportada }}</p>
+                {% if orden.estado_fisico %}
+                <p><strong>Estado Físico:</strong> {{ orden.estado_fisico }}</p>
+                {% endif %}
+            </div>
+
+            {% if orden.fecha_compromiso %}
+            <div style="background-color: #e3f2fd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <p style="margin: 0;"><strong>⏰ Fecha Compromiso:</strong></p>
+                <p style="margin: 5px 0 0 0; font-size: 18px; font-weight: bold;">
+                    {{ orden.fecha_compromiso|date:"d/m/Y" }}
+                </p>
+            </div>
+            {% endif %}
+
+            <div style="text-align: center;">
+                <a href="{{ url_orden }}" class="btn">Ver Orden Completa</a>
+            </div>
+
+            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 30px 0;">
+                <p style="margin: 0;"><strong>💡 Recuerda:</strong></p>
+                <p style="margin: 10px 0 0 0;">
+                    • Revisa todos los detalles antes de comenzar<br>
+                    • Actualiza el estado según avances<br>
+                    • Notifica cualquier demora o incidencia<br>
+                    • Registra repuestos necesarios
+                </p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>DIGIT SOFT</strong> - Sistema de Gestión de Órdenes</p>
+            <p>¿Problemas? Contacta al administrador</p>
+        </div>
+    </div>
+</body>
+</html>
+

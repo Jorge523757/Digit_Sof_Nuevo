@@ -255,3 +255,7 @@ class PasswordResetToken(models.Model):
         return cls.objects.create(user=user)
 
 
+
+
+# Importar modelo de tokens de recuperación
+from .models_tokens import TokenRecuperacion
