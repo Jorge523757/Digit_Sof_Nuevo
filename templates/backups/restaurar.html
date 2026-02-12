@@ -1,0 +1,148 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Restaurar Backup - DIGIT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> Restaurar Copia de Seguridad
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Advertencia crítica -->
+                    <div class="alert alert-danger">
+                        <h5><i class="fas fa-skull-crossbones"></i> ¡ADVERTENCIA CRÍTICA!</h5>
+                        <p><strong>Esta acción NO se puede deshacer.</strong></p>
+                        <ul class="mb-0">
+                            <li>Se eliminará TODA la información actual de la base de datos</li>
+                            <li>Se reemplazará con los datos del backup seleccionado</li>
+                            <li>Perderá TODOS los cambios realizados después de este backup</li>
+                            <li>Debe reiniciar el servidor después de la restauración</li>
+                        </ul>
+                    </div>
+
+                    <!-- Información del backup -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">Información del Backup a Restaurar</h6>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr>
+                                    <th width="30%">Nombre:</th>
+                                    <td><strong>{{ backup.nombre }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <th>Fecha de Creación:</th>
+                                    <td>{{ backup.fecha_creacion|date:"d/m/Y H:i:s" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Tamaño:</th>
+                                    <td>{{ backup.get_tamaño_mb }} MB</td>
+                                </tr>
+                                <tr>
+                                    <th>Tipo:</th>
+                                    <td>
+                                        {% if backup.tipo == 'MANUAL' %}
+                                            <span class="badge bg-info">Manual</span>
+                                        {% elif backup.tipo == 'AUTOMATICO' %}
+                                            <span class="badge bg-success">Automático</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Programado</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% if backup.descripcion %}
+                                <tr>
+                                    <th>Descripción:</th>
+                                    <td>{{ backup.descripcion }}</td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <th>Creado por:</th>
+                                    <td>
+                                        {% if backup.usuario %}
+                                            {{ backup.usuario.username }}
+                                        {% else %}
+                                            Sistema
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Recomendaciones -->
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-lightbulb"></i> Recomendaciones:</h6>
+                        <ol class="mb-0">
+                            <li>Crear un backup de la base de datos actual antes de restaurar</li>
+                            <li>Asegurar que no hay usuarios activos en el sistema</li>
+                            <li>Cerrar todas las sesiones abiertas</li>
+                            <li>Tener tiempo suficiente para completar el proceso</li>
+                        </ol>
+                    </div>
+
+                    <!-- Formulario de confirmación -->
+                    <form method="POST" action="{% url 'backups:restaurar' backup.id %}">
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label for="confirmacion" class="form-label">
+                                <strong>⚠️ Para confirmar, escriba exactamente: <code>CONFIRMAR</code></strong>
+                            </label>
+                            <input type="text"
+                                   name="confirmacion"
+                                   id="confirmacion"
+                                   class="form-control form-control-lg text-center"
+                                   placeholder="Escriba CONFIRMAR aquí"
+                                   required
+                                   autocomplete="off">
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-info-circle"></i>
+                            Al hacer clic en "Restaurar", acepta que comprende los riesgos y consecuencias de esta acción.
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'backups:lista' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-undo"></i> Restaurar Base de Datos
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('confirmacion').addEventListener('input', function(e) {
+    const btn = document.querySelector('button[type="submit"]');
+    if (e.target.value === 'CONFIRMAR') {
+        btn.classList.remove('btn-secondary');
+        btn.classList.add('btn-danger');
+        btn.disabled = false;
+    } else {
+        btn.classList.remove('btn-danger');
+        btn.classList.add('btn-secondary');
+        btn.disabled = true;
+    }
+});
+
+// Inicialmente deshabilitado
+document.querySelector('button[type="submit"]').disabled = true;
+document.querySelector('button[type="submit"]').classList.remove('btn-danger');
+document.querySelector('button[type="submit"]').classList.add('btn-secondary');
+</script>
+{% endblock %}
+

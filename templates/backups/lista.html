@@ -1,0 +1,197 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Copias de Seguridad - DIGIT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-database"></i> Copias de Seguridad</h2>
+            <p class="text-muted mb-0">Gestión de backups de la base de datos</p>
+        </div>
+        <div>
+            <a href="{% url 'backups:crear' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Crear Backup
+            </a>
+            <a href="{% url 'backups:configuracion' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-cog"></i> Configuración
+            </a>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-database"></i> Total Backups
+                    </h5>
+                    <h2 class="mb-0">{{ total_backups }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-check-circle"></i> Exitosos
+                    </h5>
+                    <h2 class="mb-0">{{ backups|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card {% if config.activo %}bg-info{% else %}bg-secondary{% endif %} text-white">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-sync"></i> Auto Backup
+                    </h5>
+                    <h2 class="mb-0">{% if config.activo %}Activo{% else %}Inactivo{% endif %}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-clock"></i> Frecuencia
+                    </h5>
+                    <h2 class="mb-0">{{ config.frecuencia_horas }}h</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Backups -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Listado de Backups</h5>
+        </div>
+        <div class="card-body">
+            {% if backups %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Tipo</th>
+                                <th>Estado</th>
+                                <th>Tamaño</th>
+                                <th>Fecha</th>
+                                <th>Usuario</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for backup in backups %}
+                            <tr>
+                                <td>
+                                    <i class="fas fa-file-archive text-primary"></i>
+                                    <strong>{{ backup.nombre }}</strong>
+                                    {% if backup.descripcion %}
+                                        <br><small class="text-muted">{{ backup.descripcion }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if backup.tipo == 'MANUAL' %}
+                                        <span class="badge bg-info">Manual</span>
+                                    {% elif backup.tipo == 'AUTOMATICO' %}
+                                        <span class="badge bg-success">Automático</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Programado</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if backup.estado == 'EXITOSO' %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check"></i> Exitoso
+                                        </span>
+                                    {% elif backup.estado == 'FALLIDO' %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-times"></i> Fallido
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-spinner"></i> En Proceso
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ backup.get_tamaño_mb }} MB</td>
+                                <td>{{ backup.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    {% if backup.usuario %}
+                                        {{ backup.usuario.username }}
+                                    {% else %}
+                                        <span class="text-muted">Sistema</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'backups:descargar' backup.id %}"
+                                           class="btn btn-sm btn-primary"
+                                           title="Descargar">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                        <a href="{% url 'backups:restaurar' backup.id %}"
+                                           class="btn btn-sm btn-warning"
+                                           title="Restaurar">
+                                            <i class="fas fa-undo"></i>
+                                        </a>
+                                        <form method="POST" action="{% url 'backups:eliminar' backup.id %}"
+                                              style="display: inline;"
+                                              onsubmit="return confirm('¿Está seguro de eliminar este backup?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginación -->
+                {% if backups.has_other_pages %}
+                <nav aria-label="Paginación">
+                    <ul class="pagination justify-content-center">
+                        {% if backups.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ backups.previous_page_number }}">Anterior</a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in backups.paginator.page_range %}
+                            <li class="page-item {% if backups.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+
+                        {% if backups.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ backups.next_page_number }}">Siguiente</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle fa-3x mb-3"></i>
+                    <h5>No hay backups disponibles</h5>
+                    <p>Cree su primer backup para proteger sus datos</p>
+                    <a href="{% url 'backups:crear' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Crear Primer Backup
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

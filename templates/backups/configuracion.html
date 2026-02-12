@@ -1,0 +1,227 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Configuración de Backups - DIGIT SOFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cog"></i> Configuración de Copias de Seguridad Automáticas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'backups:configuracion' %}">
+                        {% csrf_token %}
+
+                        <!-- Backup Automático -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-sync"></i> Backup Automático</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input"
+                                                   type="checkbox"
+                                                   name="activo"
+                                                   id="activo"
+                                                   {% if config.activo %}checked{% endif %}>
+                                            <label class="form-check-label" for="activo">
+                                                <strong>Activar Backups Automáticos</strong>
+                                            </label>
+                                        </div>
+                                        <small class="text-muted">
+                                            💡 Los backups se crearán automáticamente según la frecuencia configurada
+                                        </small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="alert alert-info mb-0">
+                                            <i class="fas fa-info-circle"></i>
+                                            Estado:
+                                            <strong>
+                                                {% if config.activo %}
+                                                    <span class="text-success">Activo</span>
+                                                {% else %}
+                                                    <span class="text-danger">Inactivo</span>
+                                                {% endif %}
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Frecuencia -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-clock"></i> Frecuencia de Backups</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="frecuencia_horas" class="form-label">
+                                            ⏰ Frecuencia (en horas)
+                                        </label>
+                                        <input type="number"
+                                               name="frecuencia_horas"
+                                               id="frecuencia_horas"
+                                               class="form-control"
+                                               value="{{ config.frecuencia_horas }}"
+                                               min="1"
+                                               max="168"
+                                               required>
+                                        <small class="form-text text-muted">
+                                            💡 Cada cuántas horas se creará un backup automático (1-168 horas)
+                                        </small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Equivalente a:</label>
+                                        <div class="alert alert-secondary mb-0">
+                                            <ul class="mb-0">
+                                                <li><strong>6 horas:</strong> 4 backups por día</li>
+                                                <li><strong>12 horas:</strong> 2 backups por día</li>
+                                                <li><strong>24 horas:</strong> 1 backup diario</li>
+                                                <li><strong>168 horas:</strong> 1 backup semanal</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Retención -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-archive"></i> Retención de Backups</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="max_backups" class="form-label">
+                                            📦 Máximo de Backups a Mantener
+                                        </label>
+                                        <input type="number"
+                                               name="max_backups"
+                                               id="max_backups"
+                                               class="form-control"
+                                               value="{{ config.max_backups }}"
+                                               min="1"
+                                               max="100"
+                                               required>
+                                        <small class="form-text text-muted">
+                                            💡 Los backups más antiguos se eliminarán automáticamente
+                                        </small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Recomendaciones:</label>
+                                        <div class="alert alert-warning mb-0">
+                                            <ul class="mb-0">
+                                                <li><strong>5-10:</strong> Para sistemas pequeños</li>
+                                                <li><strong>10-20:</strong> Para sistemas medianos</li>
+                                                <li><strong>20-50:</strong> Para sistemas grandes</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Opciones Adicionales -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-sliders-h"></i> Opciones Adicionales</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch mb-3">
+                                            <input class="form-check-input"
+                                                   type="checkbox"
+                                                   name="incluir_media"
+                                                   id="incluir_media"
+                                                   {% if config.incluir_media %}checked{% endif %}>
+                                            <label class="form-check-label" for="incluir_media">
+                                                <strong>Incluir Archivos Media</strong>
+                                            </label>
+                                            <br>
+                                            <small class="text-muted">
+                                                💡 Incluir imágenes y archivos subidos (aumenta el tamaño)
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch mb-3">
+                                            <input class="form-check-input"
+                                                   type="checkbox"
+                                                   name="notificar_admin"
+                                                   id="notificar_admin"
+                                                   {% if config.notificar_admin %}checked{% endif %}>
+                                            <label class="form-check-label" for="notificar_admin">
+                                                <strong>Notificar al Administrador</strong>
+                                            </label>
+                                            <br>
+                                            <small class="text-muted">
+                                                💡 Enviar email cuando se cree un backup automático
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información del último backup -->
+                        {% if config.ultimo_backup %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Último Backup Automático:</strong>
+                            {{ config.ultimo_backup|date:"d/m/Y H:i:s" }}
+                        </div>
+                        {% endif %}
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'backups:lista' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Guardar Configuración
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Ayuda -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-question-circle"></i> Ayuda</h6>
+                </div>
+                <div class="card-body">
+                    <h6>¿Cómo funcionan los backups automáticos?</h6>
+                    <ol>
+                        <li>Active la opción "Activar Backups Automáticos"</li>
+                        <li>Configure la frecuencia deseada (cada cuántas horas)</li>
+                        <li>Defina cuántos backups mantener antes de eliminar los antiguos</li>
+                        <li>Guarde la configuración</li>
+                        <li>El sistema creará backups automáticamente según lo configurado</li>
+                    </ol>
+
+                    <h6 class="mt-3">Recomendaciones de seguridad:</h6>
+                    <ul>
+                        <li>Mantener al menos 7-10 backups para tener historial suficiente</li>
+                        <li>Crear backups diarios para sistemas en producción</li>
+                        <li>Descargar backups importantes y guardarlos fuera del servidor</li>
+                        <li>Probar la restauración periódicamente</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

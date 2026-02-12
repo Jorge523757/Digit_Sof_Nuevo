@@ -38,6 +38,9 @@
     <!-- CRÍTICO: Debe cargarse último para fix de clicks -->
     <link rel="stylesheet" href="{% static 'css/click-fix-critical.css' %}">
 
+    <!-- Validaciones CSS -->
+    <link rel="stylesheet" href="{% static 'css/validaciones.css' %}">
+
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -137,6 +140,11 @@
                         <i class="fas fa-key"></i> Gestión de Contraseñas
                     </a>
                 </li>
+                <li>
+                    <a href="{% url 'backups:lista' %}">
+                        <i class="fas fa-database"></i> Copias de Seguridad
+                    </a>
+                </li>
 
                 <div class="sidebar-category">Otros</div>
                 <li>
@@ -151,7 +159,7 @@
                 </li>
 
             {% elif user.perfil.tipo_usuario == 'TECNICO' %}
-                <!-- TÉCNICO - Solo ve: Orden de Servicio Técnico, Cliente, Equipo -->
+                <!-- TÉCNICO - Solo ve: Orden de Servicio Técnico, Cliente, Equipo, Ayuda -->
                 <div class="sidebar-category">Mis Asignaciones</div>
                 <li>
                     <a href="{% url 'ordenes:lista' %}">
@@ -169,6 +177,13 @@
                     </a>
                 </li>
 
+                <div class="sidebar-category">Soporte</div>
+                <li>
+                    <a href="{% url 'ayuda:centro_ayuda' %}">
+                        <i class="fas fa-life-ring"></i> Ayuda y Soporte
+                    </a>
+                </li>
+
                 <div class="sidebar-category">Mi Cuenta</div>
                 <li>
                     <a href="{% url 'usuarios:mi_perfil' %}">
@@ -177,7 +192,7 @@
                 </li>
 
             {% elif user.perfil.tipo_usuario == 'CLIENTE' %}
-                <!-- CLIENTE - Solo ve: Equipo, Orden de Servicio, Factura, Garantía -->
+                <!-- CLIENTE - Solo ve: Equipo, Orden de Servicio, Factura, Garantía, Ayuda -->
                 <div class="sidebar-category">Mis Servicios</div>
                 <li>
                     <a href="{% url 'equipos:lista' %}">
@@ -197,6 +212,13 @@
                 <li>
                     <a href="{% url 'garantias:lista' %}">
                         <i class="fas fa-shield-alt"></i> Garantía
+                    </a>
+                </li>
+
+                <div class="sidebar-category">Soporte</div>
+                <li>
+                    <a href="{% url 'ayuda:centro_ayuda' %}">
+                        <i class="fas fa-life-ring"></i> Ayuda y Soporte
                     </a>
                 </li>
 
@@ -624,6 +646,9 @@
     <!-- Responsive JavaScript -->
     <script src="{% static 'js/responsive.js' %}"></script>
     <script src="{% static 'js/tablas-responsive.js' %}"></script>
+
+    <!-- Validaciones JavaScript -->
+    <script src="{% static 'js/validaciones.js' %}"></script>
 
     {% block extra_js %}{% endblock %}
 </body>

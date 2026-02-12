@@ -1,27 +1,21 @@
 """
 DIGIT SOFT - Módulo de Clientes
-Forms
+Forms con Validaciones Profesionales
 """
 
 from django import forms
-from django.core.validators import RegexValidator
 from .models import Cliente
-import re
+from core.validators import (
+    validar_nombre,
+    validar_telefono_colombiano,
+    validar_cedula,
+    validar_email_profesional,
+    validar_direccion
+)
 
 
 class ClienteForm(forms.ModelForm):
     """Formulario para crear y editar clientes con validaciones mejoradas"""
-
-    # Validadores personalizados
-    telefono_validator = RegexValidator(
-        regex=r'^\+?[\d\s\-\(\)]{7,20}$',
-        message='Ingrese un número de teléfono válido (7-20 caracteres, puede incluir +, espacios, guiones y paréntesis)'
-    )
-
-    documento_validator = RegexValidator(
-        regex=r'^[0-9]{5,20}$',
-        message='El documento debe contener entre 5 y 20 dígitos numéricos'
-    )
 
     class Meta:
         model = Cliente
@@ -29,50 +23,42 @@ class ClienteForm(forms.ModelForm):
         widgets = {
             'nombres': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Ingrese los nombres',
+                'placeholder': '👤 Ingrese los nombres del cliente',
                 'required': True,
-                'minlength': 2,
-                'maxlength': 100,
-                'pattern': '[A-Za-zÁÉÍÓÚáéíóúÑñ ]+',
-                'title': 'Solo se permiten letras y espacios'
+                'autocomplete': 'given-name'
             }),
             'apellidos': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Ingrese los apellidos',
+                'placeholder': '👤 Ingrese los apellidos del cliente',
                 'required': True,
-                'minlength': 2,
-                'maxlength': 100,
-                'pattern': '[A-Za-zÁÉÍÓÚáéíóúÑñ ]+',
-                'title': 'Solo se permiten letras y espacios'
+                'autocomplete': 'family-name'
             }),
             'numero_documento': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Ejemplo: 1234567890',
+                'placeholder': '🪪 Ejemplo: 1234567890',
                 'required': True,
-                'pattern': '[0-9]{5,20}',
-                'title': 'Ingrese un documento válido (solo números, 5-20 dígitos)',
-                'maxlength': 20
+                'pattern': '[0-9]+',
+                'autocomplete': 'off'
             }),
             'telefono': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '+57 300 000 0000',
+                'placeholder': '📱 Ejemplo: 3001234567',
                 'required': True,
                 'type': 'tel',
-                'title': 'Ingrese un teléfono válido'
+                'autocomplete': 'tel'
             }),
             'correo': forms.EmailInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'correo@ejemplo.com',
+                'placeholder': '📧 ejemplo@correo.com',
                 'required': True,
                 'type': 'email',
-                'title': 'Ingrese un correo electrónico válido'
+                'autocomplete': 'email'
             }),
             'direccion': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'Dirección completa (calle, número, ciudad, departamento)',
+                'placeholder': '📍 Calle 123 #45-67, Ciudad, Departamento',
                 'rows': 3,
                 'required': True,
-                'minlength': 10,
                 'maxlength': 300
             }),
             'activo': forms.CheckboxInput(attrs={
@@ -80,91 +66,121 @@ class ClienteForm(forms.ModelForm):
             }),
         }
         labels = {
-            'nombres': 'Nombres *',
-            'apellidos': 'Apellidos *',
-            'numero_documento': 'Número de Documento *',
-            'telefono': 'Teléfono *',
-            'correo': 'Correo Electrónico *',
-            'direccion': 'Dirección *',
-            'activo': 'Cliente Activo',
+            'nombres': '👤 Nombres',
+            'apellidos': '👤 Apellidos',
+            'numero_documento': '🪪 Número de Documento',
+            'telefono': '📱 Teléfono',
+            'correo': '📧 Correo Electrónico',
+            'direccion': '📍 Dirección',
+            'activo': '✓ Cliente Activo',
+        }
+        help_texts = {
+            'nombres': 'Solo letras y espacios (mínimo 2 caracteres)',
+            'apellidos': 'Solo letras y espacios (mínimo 2 caracteres)',
+            'numero_documento': 'Cédula colombiana (6-10 dígitos)',
+            'telefono': 'Teléfono colombiano (7 dígitos fijo o 10 celular)',
+            'correo': 'Correo electrónico válido',
+            'direccion': 'Dirección completa con números',
         }
 
     def clean_nombres(self):
-        """Validar que los nombres solo contengan letras y espacios"""
+        """Validar nombres con validador personalizado"""
         nombres = self.cleaned_data.get('nombres', '').strip()
         if not nombres:
-            raise forms.ValidationError('Este campo es obligatorio.')
-        if len(nombres) < 2:
-            raise forms.ValidationError('Los nombres deben tener al menos 2 caracteres.')
-        if not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$', nombres):
-            raise forms.ValidationError('Los nombres solo pueden contener letras y espacios.')
-        return nombres.title()  # Capitalizar cada palabra
+            raise forms.ValidationError('⚠️ Este campo es obligatorio')
+
+        try:
+            validar_nombre(nombres)
+        except forms.ValidationError as e:
+            raise forms.ValidationError(str(e))
+
+        return nombres.title()
 
     def clean_apellidos(self):
-        """Validar que los apellidos solo contengan letras y espacios"""
+        """Validar apellidos con validador personalizado"""
         apellidos = self.cleaned_data.get('apellidos', '').strip()
         if not apellidos:
-            raise forms.ValidationError('Este campo es obligatorio.')
-        if len(apellidos) < 2:
-            raise forms.ValidationError('Los apellidos deben tener al menos 2 caracteres.')
-        if not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$', apellidos):
-            raise forms.ValidationError('Los apellidos solo pueden contener letras y espacios.')
-        return apellidos.title()  # Capitalizar cada palabra
+            raise forms.ValidationError('⚠️ Este campo es obligatorio')
+
+        try:
+            validar_nombre(apellidos)
+        except forms.ValidationError as e:
+            raise forms.ValidationError(str(e))
+
+        return apellidos.title()
 
     def clean_numero_documento(self):
-        """Validar formato del documento y unicidad"""
+        """Validar número de documento"""
         documento = self.cleaned_data.get('numero_documento', '').strip()
         if not documento:
-            raise forms.ValidationError('Este campo es obligatorio.')
-        if not documento.isdigit():
-            raise forms.ValidationError('El documento debe contener solo números.')
-        if len(documento) < 5 or len(documento) > 20:
-            raise forms.ValidationError('El documento debe tener entre 5 y 20 dígitos.')
+            raise forms.ValidationError('⚠️ Este campo es obligatorio')
 
-        # Verificar unicidad (excluyendo el cliente actual si estamos editando)
-        queryset = Cliente.objects.filter(numero_documento=documento)
-        if self.instance.pk:
-            queryset = queryset.exclude(pk=self.instance.pk)
-        if queryset.exists():
-            raise forms.ValidationError('Ya existe un cliente con este número de documento.')
+        try:
+            validar_cedula(documento)
+        except forms.ValidationError as e:
+            raise forms.ValidationError(str(e))
+
+        # Verificar duplicados
+        if Cliente.objects.filter(numero_documento=documento).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError('🪪 Ya existe un cliente con este número de documento')
 
         return documento
 
     def clean_telefono(self):
-        """Validar formato del teléfono"""
+        """Validar teléfono"""
         telefono = self.cleaned_data.get('telefono', '').strip()
         if not telefono:
-            raise forms.ValidationError('Este campo es obligatorio.')
+            raise forms.ValidationError('⚠️ Este campo es obligatorio')
 
-        # Validar que tenga al menos 7 caracteres (sin contar espacios y símbolos)
-        numeros = re.sub(r'[^\d]', '', telefono)
-        if len(numeros) < 7:
-            raise forms.ValidationError('El teléfono debe tener al menos 7 dígitos.')
-        if len(numeros) > 15:
-            raise forms.ValidationError('El teléfono no puede tener más de 15 dígitos.')
+        try:
+            validar_telefono_colombiano(telefono)
+        except forms.ValidationError as e:
+            raise forms.ValidationError(str(e))
 
         return telefono
 
     def clean_correo(self):
-        """Validar formato del correo electrónico"""
+        """Validar correo electrónico"""
         correo = self.cleaned_data.get('correo', '').strip().lower()
         if not correo:
-            raise forms.ValidationError('Este campo es obligatorio.')
+            raise forms.ValidationError('⚠️ Este campo es obligatorio')
 
-        # Validación adicional de formato
-        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        if not re.match(email_regex, correo):
-            raise forms.ValidationError('Ingrese un correo electrónico válido.')
+        try:
+            validar_email_profesional(correo)
+        except forms.ValidationError as e:
+            raise forms.ValidationError(str(e))
+
+        # Verificar duplicados
+        if Cliente.objects.filter(correo=correo).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError('📧 Ya existe un cliente con este correo electrónico')
 
         return correo
 
     def clean_direccion(self):
-        """Validar que la dirección tenga longitud mínima"""
+        """Validar dirección"""
         direccion = self.cleaned_data.get('direccion', '').strip()
         if not direccion:
-            raise forms.ValidationError('Este campo es obligatorio.')
-        if len(direccion) < 10:
-            raise forms.ValidationError('La dirección debe tener al menos 10 caracteres.')
-        if len(direccion) > 300:
-            raise forms.ValidationError('La dirección no puede exceder 300 caracteres.')
-        return direccion
+            raise forms.ValidationError('⚠️ Este campo es obligatorio')
+
+        try:
+            validar_direccion(direccion)
+        except forms.ValidationError as e:
+            raise forms.ValidationError(str(e))
+
+        return direccion.title()
+
+    def clean(self):
+        """Validación global del formulario"""
+        cleaned_data = super().clean()
+
+        # Verificar que nombres y apellidos no sean iguales
+        nombres = cleaned_data.get('nombres', '')
+        apellidos = cleaned_data.get('apellidos', '')
+
+        if nombres and apellidos and nombres.lower() == apellidos.lower():
+            raise forms.ValidationError(
+                '⚠️ Los nombres y apellidos no pueden ser idénticos'
+            )
+
+        return cleaned_data
+

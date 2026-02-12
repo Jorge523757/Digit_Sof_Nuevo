@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'reportes_dano',  # Sistema de reporte de daños
     'notificaciones',  # Sistema de notificaciones
     'ayuda',  # Sistema de ayuda y soporte
+    'backups',  # Sistema de copias de seguridad
     'utils',  # Utilidades y filtros personalizados
 ]
 
