@@ -147,8 +147,10 @@ def recuperar_password(request):
     """Vista para solicitar recuperación de contraseña"""
     from .forms import RecuperarPasswordForm
     from .models import PasswordResetToken
-    from django.core.mail import send_mail
+    from django.core.mail import EmailMultiAlternatives
     from django.conf import settings
+    from django.template.loader import render_to_string
+    from django.utils.html import strip_tags
 
     if request.user.is_authenticated:
         return redirect('dashboard:index')
@@ -167,11 +169,58 @@ def recuperar_password(request):
                 f'/usuarios/reset-password/{token.token}/'
             )
 
-            # Enviar email (en desarrollo, solo mostrar mensaje)
+            # Enviar email optimizado
             try:
-                # Mensaje de email
+                # Mensaje de email con formato HTML
                 subject = 'Recuperación de Contraseña - DIGITSOFT'
-                message = f"""
+
+                # Mensaje HTML mejorado
+                html_message = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+        .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+        .content {{ background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }}
+        .button {{ display: inline-block; padding: 15px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }}
+        .footer {{ text-align: center; margin-top: 20px; color: #999; font-size: 12px; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Recuperación de Contraseña</h1>
+        </div>
+        <div class="content">
+            <h2>Hola {user.first_name or user.username},</h2>
+            <p>Has solicitado recuperar tu contraseña en <strong>DIGITSOFT</strong>.</p>
+            <p>Para crear una nueva contraseña, haz clic en el siguiente botón:</p>
+            <p style="text-align: center;">
+                <a href="{reset_url}" class="button" style="color: white;">Restablecer Contraseña</a>
+            </p>
+            <p>O copia y pega este enlace en tu navegador:</p>
+            <p style="word-break: break-all; background: #fff; padding: 10px; border-left: 3px solid #667eea;">
+                {reset_url}
+            </p>
+            <p><strong>⏰ Este enlace es válido por 24 horas.</strong></p>
+            <p>Si no solicitaste este cambio, puedes ignorar este mensaje de forma segura.</p>
+            <hr>
+            <p style="margin-top: 20px;"><strong>Saludos,</strong><br>Equipo DIGITSOFT</p>
+        </div>
+        <div class="footer">
+            <p>© 2026 DIGITSOFT - Todos los derechos reservados</p>
+            <p>Este es un correo automático, por favor no responder.</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+
+                # Mensaje de texto plano (fallback)
+                text_message = f"""
 Hola {user.first_name or user.username},
 
 Has solicitado recuperar tu contraseña en DIGITSOFT.
@@ -185,39 +234,67 @@ Si no solicitaste este cambio, puedes ignorar este mensaje.
 
 Saludos,
 Equipo DIGITSOFT
+
+---
+© 2026 DIGITSOFT - Todos los derechos reservados
 """
 
-                # En desarrollo, solo mostrar en consola
+                # Crear email con formato HTML y texto plano
+                email_message = EmailMultiAlternatives(
+                    subject=subject,
+                    body=text_message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[email]
+                )
+                email_message.attach_alternative(html_message, "text/html")
+
+                # Enviar email (fail_silently=False para capturar errores)
+                email_message.send(fail_silently=False)
+
+                # Log en consola para debugging
                 print("=" * 80)
-                print("EMAIL DE RECUPERACIÓN")
+                print("✅ EMAIL DE RECUPERACIÓN ENVIADO")
                 print("=" * 80)
                 print(f"Para: {email}")
                 print(f"Asunto: {subject}")
-                print(message)
-                print("=" * 80)
                 print(f"URL de reset: {reset_url}")
                 print("=" * 80)
-
-                # Intentar enviar email (si está configurado)
-                # send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
 
                 messages.success(
                     request,
                     f'✅ Se ha enviado un correo a {email} con las instrucciones para recuperar tu contraseña. '
-                    f'Por favor revisa tu bandeja de entrada y spam.'
+                    f'Por favor revisa tu bandeja de entrada y spam. El correo debería llegar en menos de 1 minuto.'
                 )
 
-                # En desarrollo, también mostrar el link directamente
-                messages.info(
-                    request,
-                    f'🔗 Link de recuperación (solo en desarrollo): '
-                    f'<a href="{reset_url}" class="alert-link">Click aquí para resetear</a>'
-                )
+                # Solo en modo desarrollo, mostrar el link
+                if settings.DEBUG and settings.EMAIL_BACKEND == 'django.core.mail.backends.console.EmailBackend':
+                    messages.info(
+                        request,
+                        f'🔗 Link de recuperación (solo en desarrollo): '
+                        f'<a href="{reset_url}" class="alert-link">Click aquí para resetear</a>'
+                    )
 
                 return redirect('usuarios:login')
 
             except Exception as e:
-                messages.error(request, f'Error al enviar el correo: {str(e)}')
+                print(f"❌ ERROR al enviar email: {str(e)}")
+                import traceback
+                traceback.print_exc()
+
+                # En caso de error, aún mostrar el link si estamos en desarrollo
+                if settings.DEBUG:
+                    messages.warning(
+                        request,
+                        f'⚠️ No se pudo enviar el correo electrónico, pero puedes usar este enlace: '
+                        f'<a href="{reset_url}" class="alert-link">Click aquí para resetear</a>'
+                    )
+                    return redirect('usuarios:login')
+                else:
+                    messages.error(
+                        request,
+                        f'❌ Error al enviar el correo: {str(e)}. '
+                        f'Por favor, contacta al administrador del sistema.'
+                    )
     else:
         form = RecuperarPasswordForm()
 

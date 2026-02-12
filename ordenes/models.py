@@ -85,6 +85,64 @@ class OrdenServicio(models.Model):
     diagnostico = models.TextField(blank=True, verbose_name="Diagnóstico técnico")
     solucion_aplicada = models.TextField(blank=True, verbose_name="Solución aplicada")
 
+    # Tiempos
+    tiempo_requerido_cliente = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name="Tiempo requerido por cliente",
+        help_text="Tiempo en que el cliente necesita el equipo"
+    )
+    tiempo_estimado_reparacion = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Tiempo estimado de reparación (horas)",
+        help_text="Estimación del técnico en horas"
+    )
+    fecha_diagnostico = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Fecha de diagnóstico"
+    )
+
+    # Notificaciones
+    notificado_admin = models.BooleanField(
+        default=False,
+        verbose_name="Administrador notificado"
+    )
+    notificado_tecnico = models.BooleanField(
+        default=False,
+        verbose_name="Técnico notificado"
+    )
+    notificado_cliente = models.BooleanField(
+        default=False,
+        verbose_name="Cliente notificado"
+    )
+    fecha_notificacion_admin = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Fecha notificación admin"
+    )
+    fecha_notificacion_tecnico = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Fecha notificación técnico"
+    )
+    fecha_notificacion_cliente = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Fecha notificación cliente"
+    )
+
+    # Relación con reporte de equipo dañado
+    reporte_relacionado = models.ForeignKey(
+        'reportes_dano.RegistroDano',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='orden_servicio_generada',
+        verbose_name="Reporte relacionado"
+    )
+
     # Estado y prioridad
     estado = models.CharField(
         max_length=25,

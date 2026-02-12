@@ -4,8 +4,13 @@ Configuración Principal
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Cargar variables de entorno desde .env
+load_dotenv(BASE_DIR / '.env')
 
 SECRET_KEY = 'django-insecure-digt-soft-2024-cambiar-en-produccion'
 DEBUG = True
@@ -53,6 +58,8 @@ INSTALLED_APPS = [
     'equipos',
     'capacitaciones',
     'reportes_dano',  # Sistema de reporte de daños
+    'notificaciones',  # Sistema de notificaciones
+    'ayuda',  # Sistema de ayuda y soporte
     'utils',  # Utilidades y filtros personalizados
 ]
 
@@ -125,28 +132,38 @@ USE_I18N = True
 # CONFIGURACIÓN DE EMAIL PARA NOTIFICACIONES
 # ============================================================================
 
-# Backend de email - MODO PRUEBA (muestra emails en consola)
-# Cambia a 'django.core.mail.backends.smtp.EmailBackend' cuando configures Gmail
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+import os
 
-# Configuración SMTP para Gmail (puedes cambiar por otro proveedor)
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+# Backend de email - SMTP REAL para envío rápido de correos
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 
-# Credenciales (MODO PRUEBA - Los emails se mostrarán en la consola)
-EMAIL_HOST_USER = 'noreply@digitsoft.com'  # Email de prueba
-EMAIL_HOST_PASSWORD = ''  # No necesario en modo consola
+# Configuración SMTP para Gmail optimizada para velocidad
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_USE_SSL = False  # TLS en puerto 587 es más rápido que SSL en 465
+
+# Credenciales de Gmail
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')  # Tu email de Gmail
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')  # Contraseña de aplicación
 
 # Email por defecto para envíos
-DEFAULT_FROM_EMAIL = 'DIGIT SOFT <noreply@digitsoft.com>'
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', f'DIGIT SOFT <{EMAIL_HOST_USER}>')
 
 # Email del administrador para recibir notificaciones
-ADMIN_EMAIL = 'admin@digitsoft.com'  # Email de prueba
-ADMIN_EMAIL = 'admin@digitsoft.com'  # Cambiar por el email del admin
+ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', EMAIL_HOST_USER)
 
 # URL del sitio (para enlaces en emails)
-SITE_URL = 'http://localhost:8000'  # En producción cambiar a tu dominio
+SITE_URL = os.getenv('SITE_URL', 'http://localhost:8000')
+
+# Configuraciones adicionales para optimizar velocidad de envío
+EMAIL_TIMEOUT = 30  # Timeout de 30 segundos
+EMAIL_SSL_CERTFILE = None
+EMAIL_SSL_KEYFILE = None
+
+# ⚠️ FORZAR SMTP REAL - NO cambiar a consola automáticamente
+# Si las credenciales están vacías, el sistema mostrará el código en pantalla
+# pero intentará enviar por SMTP de todas formas
 
 # ============================================================================
 # INSTRUCCIONES PARA CONFIGURAR GMAIL:

@@ -1,190 +1,172 @@
 ﻿"""
-DIGT SOFT - Vistas para Registro de Daños
+DIGIT SOFT - Vistas de Reportes de Daño
+Vistas para que clientes reporten equipos dañados
 """
+
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.contrib import messages
+from django.db.models import Q
 from django.utils import timezone
-from .models import RegistroDano, ImagenDano
-from .forms import RegistroDanoForm
-from .services import GeneradorReportePDF, GeneradorReporteExcel
+
+from .models import RegistroDano
+from .forms import ReporteDanoForm
+from clientes.models import Cliente
+from notificaciones.services import ServicioNotificaciones
+
+
 @login_required
-def registrar_dano(request):
-    equipo_precargado = None
-    equipo_id = request.GET.get('equipo_id')
-    if equipo_id:
-        try:
-            from equipos.models import Equipo
-            equipo_precargado = Equipo.objects.get(pk=equipo_id)
-        except:
-            pass
+def crear_reporte(request):
+    """Vista para que el cliente reporte un equipo dañado"""
+
+    # Obtener el cliente asociado al usuario
+    try:
+        perfil = request.user.perfil
+        if perfil.tipo_usuario != 'CLIENTE':
+            messages.error(request, 'Solo los clientes pueden reportar equipos dañados.')
+            return redirect('dashboard:index')
+
+        cliente = perfil.cliente
+        if not cliente:
+            messages.error(request, 'No se encontró un cliente asociado a tu usuario.')
+            return redirect('dashboard:index')
+    except Exception as e:
+        messages.error(request, 'Error al obtener información del cliente.')
+        return redirect('dashboard:index')
+
     if request.method == 'POST':
-        form = RegistroDanoForm(request.POST)
+        form = ReporteDanoForm(request.POST, cliente=cliente)
         if form.is_valid():
+            reporte = form.save(commit=False)
+            reporte.cliente = cliente
+            reporte.usuario = request.user
+            reporte.estado = 'PENDIENTE'
+            reporte.save()
+
+            # Notificar al administrador
             try:
-                registro = form.save(commit=False)
-                registro.usuario = request.user
-                registro.numero_factura = f'FD-{timezone.now().strftime("%Y%m%d-%H%M%S")}'
-
-                # Crear orden de servicio automáticamente
-                try:
-                    from ordenes.models import OrdenServicio
-                    from clientes.models import Cliente
-
-                    # Obtener o crear cliente
-                    cliente = None
-                    try:
-                        # Buscar cliente por correo del usuario
-                        cliente = Cliente.objects.filter(correo=request.user.email).first()
-                        if not cliente:
-                            # Si no existe, crear uno nuevo
-                            cliente = Cliente.objects.create(
-                                nombres=request.user.first_name or request.user.username,
-                                apellidos=request.user.last_name or '',
-                                numero_documento='TEMP-' + str(request.user.id),
-                                telefono='000-0000000',
-                                correo=request.user.email or f'{request.user.username}@temp.com',
-                                direccion='Por definir'
-                            )
-                    except Exception as e:
-                        messages.warning(request, f'Cliente no encontrado: {str(e)}')
-                        cliente = None
-
-                    if cliente:
-                        # Crear orden de servicio
-                        orden = OrdenServicio.objects.create(
-                            cliente=cliente,
-                            tipo_equipo=request.POST.get('tipo_equipo', 'Por definir'),
-                            marca=request.POST.get('marca', 'Por definir'),
-                            modelo=request.POST.get('modelo', 'Por definir'),
-                            serie=request.POST.get('serie', ''),
-                            falla_reportada=registro.descripcion_dano,
-                            estado_fisico='Reportado por cliente con evidencia fotográfica',
-                            estado='RECIBIDA',
-                            prioridad='MEDIA',
-                            fecha_recepcion=timezone.now()
-                        )
-
-                        registro.orden = orden
-                        messages.info(request, f'Orden de servicio creada: {orden.numero_orden}')
-
-                except Exception as e:
-                    messages.warning(request, f'Orden de servicio no creada: {str(e)}')
-
-                registro.save()
-                imagenes = request.FILES.getlist('imagenes')
-                if imagenes:
-                    for idx, imagen in enumerate(imagenes):
-                        ImagenDano.objects.create(
-                            registro=registro,
-                            imagen=imagen,
-                            es_principal=(idx == 0)
-                        )
-                messages.success(request, 'Reporte registrado exitosamente!')
-                return redirect('reportes_dano:detalle_reporte', pk=registro.pk)
+                ServicioNotificaciones.notificar_admin_reporte_cliente(reporte)
+                messages.success(
+                    request,
+                    f'✅ Reporte #{reporte.numero_reporte} creado exitosamente. '
+                    f'El administrador ha sido notificado y se le asignará un técnico pronto.'
+                )
             except Exception as e:
-                messages.error(request, f'Error: {str(e)}')
-        else:
-            messages.error(request, 'Corrija los errores.')
+                messages.warning(
+                    request,
+                    f'Reporte creado, pero hubo un error al enviar la notificación: {str(e)}'
+                )
+
+            return redirect('reportes_dano:mis_reportes')
     else:
-        form = RegistroDanoForm()
-    return render(request, 'reportes_dano/crear_reporte.html', {
+        form = ReporteDanoForm(cliente=cliente)
+
+    context = {
         'form': form,
-        'equipo_precargado': equipo_precargado,
-    })
-@login_required
-def detalle_reporte(request, pk):
-    registro = get_object_or_404(RegistroDano, pk=pk)
-    if not request.user.is_staff and registro.usuario != request.user:
-        messages.error(request, 'Sin permiso.')
-        return redirect('dashboard:inicio')
-    return render(request, 'reportes_dano/detalle.html', {
-        'registro': registro,
-        'imagenes': registro.imagenes.all(),
-    })
+        'cliente': cliente,
+    }
+    return render(request, 'reportes_dano/crear_reporte.html', context)
+
+
 @login_required
 def mis_reportes(request):
-    reportes = RegistroDano.objects.filter(usuario=request.user).order_by('-fecha_reporte')
-    return render(request, 'reportes_dano/mis_reportes.html', {'reportes': reportes})
-@login_required
-def descargar_factura(request, pk, tipo='pdf'):
-    registro = get_object_or_404(RegistroDano, pk=pk)
-    if not request.user.is_staff and registro.usuario != request.user:
-        messages.error(request, 'Sin permiso.')
-        return redirect('dashboard:inicio')
+    """Vista para que el cliente vea sus reportes"""
 
     try:
-        if tipo.lower() == 'pdf':
-            # Generar PDF
-            buffer = GeneradorReportePDF.generar_reporte_dano(registro)
-            response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
-            response['Content-Disposition'] = f'attachment; filename="reporte_{registro.numero_factura}.pdf"'
-            return response
+        perfil = request.user.perfil
+        if perfil.tipo_usuario != 'CLIENTE':
+            messages.error(request, 'Solo los clientes pueden ver sus reportes.')
+            return redirect('dashboard:index')
 
-        elif tipo.lower() in ['excel', 'xlsx']:
-            # Generar Excel
-            buffer = GeneradorReporteExcel.generar_reporte_dano(registro)
-            response = HttpResponse(
-                buffer.getvalue(),
-                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            )
-            response['Content-Disposition'] = f'attachment; filename="reporte_{registro.numero_factura}.xlsx"'
-            return response
-        else:
-            messages.error(request, 'Formato no soportado.')
-            return redirect('reportes_dano:detalle_reporte', pk=pk)
-
+        cliente = perfil.cliente
+        if not cliente:
+            messages.error(request, 'No se encontró un cliente asociado a tu usuario.')
+            return redirect('dashboard:index')
     except Exception as e:
-        messages.error(request, f'Error al generar reporte: {str(e)}')
-        return redirect('reportes_dano:detalle_reporte', pk=pk)
+        messages.error(request, 'Error al obtener información del cliente.')
+        return redirect('dashboard:index')
+
+    # Obtener reportes del cliente
+    reportes = RegistroDano.objects.filter(cliente=cliente).order_by('-fecha_reporte')
+
+    context = {
+        'reportes': reportes,
+        'cliente': cliente,
+    }
+    return render(request, 'reportes_dano/mis_reportes.html', context)
+
+
 @login_required
-def regenerar_factura(request, pk):
-    if not request.user.is_staff:
-        messages.error(request, 'Sin permiso.')
-        return redirect('dashboard:inicio')
-    messages.info(request, 'Disponible próximamente.')
-    return redirect('reportes_dano:detalle_reporte', pk=pk)
+def detalle_reporte(request, reporte_id):
+    """Vista para ver detalle de un reporte"""
+
+    reporte = get_object_or_404(RegistroDano, id=reporte_id)
+
+    # Verificar permisos
+    perfil = request.user.perfil
+
+    # Cliente solo puede ver sus reportes
+    if perfil.tipo_usuario == 'CLIENTE':
+        if reporte.cliente != perfil.cliente:
+            messages.error(request, 'No tienes permiso para ver este reporte.')
+            return redirect('reportes_dano:mis_reportes')
+
+    # Técnico puede ver reportes de órdenes asignadas
+    elif perfil.tipo_usuario == 'TECNICO':
+        # TODO: Verificar si el técnico tiene una orden relacionada
+        pass
+
+    # Admin puede ver todo
+    elif not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, 'No tienes permiso para ver este reporte.')
+        return redirect('dashboard:index')
+
+    context = {
+        'reporte': reporte,
+    }
+    return render(request, 'reportes_dano/detalle_reporte.html', context)
+
+
 @login_required
 def lista_reportes_admin(request):
-    if not request.user.is_staff:
-        messages.error(request, 'Sin permiso.')
-        return redirect('dashboard:inicio')
+    """Vista para que el admin vea todos los reportes"""
+
+    # Solo admin
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, 'No tienes permiso para acceder a esta página.')
+        return redirect('dashboard:index')
+
+    # Filtros
+    estado = request.GET.get('estado', '')
+    busqueda = request.GET.get('busqueda', '')
+
     reportes = RegistroDano.objects.all().order_by('-fecha_reporte')
-    return render(request, 'reportes_dano/admin_lista.html', {'reportes': reportes})
-@login_required
-def marcar_revisado(request, pk):
-    if not request.user.is_staff:
-        messages.error(request, 'Sin permiso.')
-        return redirect('dashboard:inicio')
-    registro = get_object_or_404(RegistroDano, pk=pk)
-    messages.success(request, f'Reporte {registro.numero_factura} marcado.')
-    return redirect('reportes_dano:admin_lista')
 
+    if estado:
+        reportes = reportes.filter(estado=estado)
 
-@login_required
-def exportar_reportes_excel(request):
-    """Exportar lista de reportes a Excel"""
-    if not request.user.is_staff:
-        # Exportar solo los reportes del usuario
-        reportes = RegistroDano.objects.filter(usuario=request.user).order_by('-fecha_reporte')
-        filename = f'mis_reportes_{timezone.now().strftime("%Y%m%d")}.xlsx'
-    else:
-        # Admin puede exportar todos
-        reportes = RegistroDano.objects.all().order_by('-fecha_reporte')
-        filename = f'todos_reportes_{timezone.now().strftime("%Y%m%d")}.xlsx'
-
-    try:
-        buffer = GeneradorReporteExcel.generar_lista_reportes(reportes)
-        response = HttpResponse(
-            buffer.getvalue(),
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    if busqueda:
+        reportes = reportes.filter(
+            Q(numero_reporte__icontains=busqueda) |
+            Q(cliente__nombre__icontains=busqueda) |
+            Q(cliente__apellido__icontains=busqueda) |
+            Q(descripcion_dano__icontains=busqueda)
         )
-        response['Content-Disposition'] = f'attachment; filename="{filename}"'
-        return response
-    except Exception as e:
-        messages.error(request, f'Error al exportar: {str(e)}')
-        if request.user.is_staff:
-            return redirect('reportes_dano:admin_lista')
-        else:
-            return redirect('reportes_dano:mis_reportes')
+
+    # Estadísticas
+    total_reportes = RegistroDano.objects.count()
+    pendientes = RegistroDano.objects.filter(estado='PENDIENTE').count()
+    en_proceso = RegistroDano.objects.filter(estado__in=['REVISADO', 'ASIGNADO', 'EN_PROCESO']).count()
+    completados = RegistroDano.objects.filter(estado='COMPLETADO').count()
+
+    context = {
+        'reportes': reportes,
+        'total_reportes': total_reportes,
+        'pendientes': pendientes,
+        'en_proceso': en_proceso,
+        'completados': completados,
+        'estado_filter': estado,
+        'busqueda': busqueda,
+    }
+    return render(request, 'reportes_dano/lista_admin.html', context)
+

@@ -1,0 +1,280 @@
+{% extends 'ayuda/base_ayuda.html' %}
+{% load static %}
+
+{% block title %}Centro de Ayuda - DIGIT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .help-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+    }
+
+    .help-search {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .help-search input {
+        padding: 15px 20px;
+        font-size: 1.1rem;
+        border-radius: 50px;
+    }
+
+    .categoria-card {
+        border: none;
+        border-radius: 15px;
+        transition: all 0.3s;
+        height: 100%;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .categoria-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    .categoria-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        color: #667eea;
+    }
+
+    .stats-card {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+
+    .faq-item {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        transition: all 0.3s;
+    }
+
+    .faq-item:hover {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .ticket-badge {
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .badge-abierto { background: #fff3cd; color: #856404; }
+    .badge-en_proceso { background: #cce5ff; color: #004085; }
+    .badge-respondido { background: #d1ecf1; color: #0c5460; }
+    .badge-resuelto { background: #d4edda; color: #155724; }
+    .badge-cerrado { background: #e2e3e5; color: #383d41; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="help-hero">
+    <div class="container text-center">
+        <h1 class="display-4 mb-4">
+            <i class="fas fa-life-ring"></i> Centro de Ayuda
+        </h1>
+        <p class="lead mb-4">¿En qué podemos ayudarte hoy?</p>
+
+        <div class="help-search">
+            <form action="{% url 'ayuda:faqs' %}" method="get">
+                <div class="input-group input-group-lg">
+                    <input type="text" class="form-control" name="busqueda"
+                           placeholder="Busca tu pregunta aquí..." autocomplete="off">
+                    <button class="btn btn-light" type="submit">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <!-- Estadísticas del Usuario -->
+    {% if user.is_authenticated %}
+    <div class="row mb-5">
+        <div class="col-md-4 mb-3">
+            <div class="stats-card">
+                <div class="stats-number">{{ total_tickets }}</div>
+                <div class="text-muted">Total de Tickets</div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stats-card">
+                <div class="stats-number">{{ tickets_abiertos }}</div>
+                <div class="text-muted">Tickets Abiertos</div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stats-card">
+                <div class="stats-number">{{ tickets_resueltos }}</div>
+                <div class="text-muted">Tickets Resueltos</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Categorías de Ayuda -->
+    <div class="row mb-5">
+        <div class="col-12 mb-4">
+            <h2 class="text-center mb-4">
+                <i class="fas fa-folder-open"></i> Categorías de Ayuda
+            </h2>
+        </div>
+
+        {% for categoria in categorias %}
+        <div class="col-md-4 mb-4">
+            <div class="card categoria-card">
+                <div class="card-body text-center">
+                    <div class="categoria-icon">
+                        <i class="fas {{ categoria.icono }}"></i>
+                    </div>
+                    <h5 class="card-title">{{ categoria.nombre }}</h5>
+                    <p class="card-text text-muted">{{ categoria.descripcion }}</p>
+                    <a href="{% url 'ayuda:crear_ticket' %}?categoria={{ categoria.id }}"
+                       class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-ticket-alt"></i> Crear Ticket
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Preguntas Frecuentes Populares -->
+    <div class="row mb-5">
+        <div class="col-12 mb-4">
+            <h2 class="text-center mb-4">
+                <i class="fas fa-question-circle"></i> Preguntas Más Frecuentes
+            </h2>
+        </div>
+
+        <div class="col-12">
+            {% for faq in faqs_populares %}
+            <div class="faq-item">
+                <h5>
+                    <i class="fas fa-question text-primary"></i>
+                    {{ faq.pregunta }}
+                </h5>
+                <p class="text-muted mb-2">{{ faq.respuesta|truncatewords:30 }}</p>
+                <a href="{% url 'ayuda:ver_faq' faq.id %}" class="btn btn-sm btn-link">
+                    Leer más <i class="fas fa-arrow-right"></i>
+                </a>
+                <small class="text-muted float-end">
+                    <i class="fas fa-eye"></i> {{ faq.vistas }} vistas
+                </small>
+            </div>
+            {% empty %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No hay FAQs disponibles aún.
+            </div>
+            {% endfor %}
+
+            <div class="text-center mt-4">
+                <a href="{% url 'ayuda:faqs' %}" class="btn btn-primary">
+                    <i class="fas fa-list"></i> Ver Todas las Preguntas Frecuentes
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tickets Recientes (solo para usuarios autenticados) -->
+    {% if user.is_authenticated and tickets_usuario %}
+    <div class="row mb-5">
+        <div class="col-12 mb-4">
+            <h2 class="text-center mb-4">
+                <i class="fas fa-ticket-alt"></i> Mis Tickets Recientes
+            </h2>
+        </div>
+
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Asunto</th>
+                            <th>Categoría</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets_usuario %}
+                        <tr>
+                            <td>#{{ ticket.id }}</td>
+                            <td>{{ ticket.asunto }}</td>
+                            <td>
+                                {% if ticket.categoria %}
+                                <i class="fas {{ ticket.categoria.icono }}"></i>
+                                {{ ticket.categoria.nombre }}
+                                {% else %}
+                                <span class="text-muted">Sin categoría</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="ticket-badge badge-{{ ticket.estado }}">
+                                    {{ ticket.get_estado_display }}
+                                </span>
+                            </td>
+                            <td>{{ ticket.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'ayuda:ver_ticket' ticket.id %}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center mt-3">
+                <a href="{% url 'ayuda:mis_tickets' %}" class="btn btn-primary">
+                    <i class="fas fa-list"></i> Ver Todos Mis Tickets
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Acciones Rápidas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h4 class="mb-4">¿No encontraste lo que buscabas?</h4>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{% url 'ayuda:crear_ticket' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus-circle"></i> Crear Nuevo Ticket
+                        </a>
+                        <a href="{% url 'ayuda:faqs' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-search"></i> Buscar en FAQs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

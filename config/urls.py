@@ -29,6 +29,7 @@ urlpatterns = [
     path('equipos/', include('equipos.urls')),
     path('capacitaciones/', include('capacitaciones.urls')),
     path('reportes-dano/', include('reportes_dano.urls')),  # Sistema de reporte de daños
+    path('ayuda/', include('ayuda.urls')),  # Sistema de ayuda y soporte
 ]
 
 admin.site.site_header = "DIGIT SOFT - Sistema de Gestión"

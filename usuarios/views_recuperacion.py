@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from .services_password import ServicioRecuperacionPassword
+from .forms import RecuperarPasswordForm, VerificarCodigoForm, NuevaPasswordForm
 
 
 def get_client_ip(request):
@@ -20,30 +21,65 @@ def get_client_ip(request):
 
 @require_http_methods(["GET", "POST"])
 def solicitar_recuperacion(request):
-    """Paso 1: Solicitar código de recuperación"""
+    """Paso 1: Solicitar código de recuperación (SIN reCAPTCHA)"""
 
     if request.method == 'POST':
-        email = request.POST.get('email', '').strip()
+        # Obtener email directamente del POST (sin formulario)
+        email = request.POST.get('email', '').strip().lower()
 
         if not email:
-            messages.error(request, '❌ Por favor ingresa tu email.')
+            messages.error(request, '❌ Por favor ingresa tu correo electrónico.')
+            return render(request, 'usuarios/recuperar_paso1.html')
+
+        # Validar formato de email básico
+        if '@' not in email or '.' not in email:
+            messages.error(request, '❌ Por favor ingresa un correo electrónico válido.')
+            return render(request, 'usuarios/recuperar_paso1.html')
+
+        # Verificar que el email existe en el sistema (case-insensitive)
+        from django.contrib.auth.models import User
+        from django.db.models import Q
+
+        # Buscar usuario sin importar mayúsculas/minúsculas
+        usuario = User.objects.filter(Q(email__iexact=email)).first()
+
+        if not usuario:
+            messages.error(
+                request,
+                f'❌ No existe una cuenta con este correo electrónico.<br>'
+                f'<small style="color: #666;">Email ingresado: <strong>{email}</strong></small><br>'
+                f'<small style="color: #666;">Verifica que sea el correo con el que te registraste.</small>'
+            )
             return render(request, 'usuarios/recuperar_paso1.html')
 
         # Obtener IP del cliente
         ip = get_client_ip(request)
 
-        # Solicitar recuperación
-        exito, mensaje, token = ServicioRecuperacionPassword.solicitar_recuperacion(email, ip)
+        # Solicitar recuperación (usar el email exacto del usuario en la BD)
+        exito, mensaje, token = ServicioRecuperacionPassword.solicitar_recuperacion(
+            usuario.email,  # Email exacto de la base de datos
+            ip
+        )
 
         if exito:
-            # Guardar email en sesión para el siguiente paso
-            request.session['recovery_email'] = email
-            messages.success(request, f'✅ {mensaje}')
+            # Guardar email Y código en sesión para el siguiente paso
+            request.session['recovery_email'] = usuario.email
+
+            # En modo desarrollo, guardar el código en sesión para mostrarlo
+            from django.conf import settings
+            if settings.DEBUG and token:
+                request.session['recovery_code_debug'] = token.codigo
+                request.session['recovery_username'] = usuario.username
+                messages.success(request, f'✅ Código generado para {usuario.username}. Revisa la siguiente pantalla.')
+            else:
+                messages.success(request, f'✅ {mensaje}')
+
             return redirect('usuarios:verificar_codigo')
         else:
             messages.warning(request, mensaje)
             return render(request, 'usuarios/recuperar_paso1.html')
 
+    # GET request - mostrar formulario vacío
     return render(request, 'usuarios/recuperar_paso1.html')
 
 
@@ -58,25 +94,44 @@ def verificar_codigo(request):
         return redirect('usuarios:solicitar_recuperacion')
 
     if request.method == 'POST':
-        codigo = request.POST.get('codigo', '').strip()
+        form = VerificarCodigoForm(request.POST)
 
-        if not codigo:
-            messages.error(request, '❌ Por favor ingresa el código.')
-            return render(request, 'usuarios/recuperar_paso2.html', {'email': email})
+        if form.is_valid():
+            codigo = form.cleaned_data['codigo']
 
-        # Verificar código
-        valido, mensaje, token = ServicioRecuperacionPassword.verificar_codigo(email, codigo)
+            # Verificar código
+            valido, mensaje, token = ServicioRecuperacionPassword.verificar_codigo(email, codigo)
 
-        if valido:
-            # Guardar token ID en sesión
-            request.session['recovery_token_id'] = token.id
-            messages.success(request, f'✅ {mensaje}')
-            return redirect('usuarios:nueva_password')
+            if valido:
+                # Guardar token ID en sesión
+                request.session['recovery_token_id'] = token.id
+                messages.success(request, f'✅ {mensaje}')
+                return redirect('usuarios:nueva_password')
+            else:
+                messages.error(request, f'❌ {mensaje}')
         else:
-            messages.error(request, f'❌ {mensaje}')
-            return render(request, 'usuarios/recuperar_paso2.html', {'email': email})
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
+    else:
+        form = VerificarCodigoForm()
 
-    return render(request, 'usuarios/recuperar_paso2.html', {'email': email})
+    # Obtener código de debug de la sesión (si existe)
+    codigo_debug = request.session.get('recovery_code_debug', None)
+    username_debug = request.session.get('recovery_username', None)
+
+    # Limpiar de la sesión después de leerlo
+    if 'recovery_code_debug' in request.session:
+        del request.session['recovery_code_debug']
+    if 'recovery_username' in request.session:
+        del request.session['recovery_username']
+
+    return render(request, 'usuarios/recuperar_paso2.html', {
+        'form': form,
+        'email': email,
+        'codigo_debug': codigo_debug,
+        'username_debug': username_debug,
+    })
 
 
 @require_http_methods(["GET", "POST"])
@@ -101,40 +156,31 @@ def nueva_password(request):
         return redirect('usuarios:solicitar_recuperacion')
 
     if request.method == 'POST':
-        password1 = request.POST.get('password1', '')
-        password2 = request.POST.get('password2', '')
+        form = NuevaPasswordForm(request.POST)
 
-        # Validar que no estén vacías
-        if not password1 or not password2:
-            messages.error(request, '❌ Por favor completa ambos campos.')
-            return render(request, 'usuarios/recuperar_paso3.html')
+        if form.is_valid():
+            password1 = form.cleaned_data['password1']
 
-        # Validar que coincidan
-        if password1 != password2:
-            messages.error(request, '❌ Las contraseñas no coinciden.')
-            return render(request, 'usuarios/recuperar_paso3.html')
+            # Cambiar contraseña
+            exito, mensaje = ServicioRecuperacionPassword.cambiar_password(token, password1)
 
-        # Validar fortaleza de la contraseña
-        valida, mensaje = ServicioRecuperacionPassword.validar_password(password1)
-        if not valida:
-            messages.error(request, f'❌ {mensaje}')
-            return render(request, 'usuarios/recuperar_paso3.html')
+            if exito:
+                # Limpiar sesión
+                request.session.pop('recovery_email', None)
+                request.session.pop('recovery_token_id', None)
 
-        # Cambiar contraseña
-        exito, mensaje = ServicioRecuperacionPassword.cambiar_password(token, password1)
-
-        if exito:
-            # Limpiar sesión
-            request.session.pop('recovery_email', None)
-            request.session.pop('recovery_token_id', None)
-
-            messages.success(request, f'✅ {mensaje}')
-            return redirect('usuarios:login')
+                messages.success(request, f'✅ {mensaje}')
+                return redirect('usuarios:login')
+            else:
+                messages.error(request, f'❌ {mensaje}')
         else:
-            messages.error(request, f'❌ {mensaje}')
-            return render(request, 'usuarios/recuperar_paso3.html')
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
+    else:
+        form = NuevaPasswordForm()
 
-    return render(request, 'usuarios/recuperar_paso3.html')
+    return render(request, 'usuarios/recuperar_paso3.html', {'form': form})
 
 
 @require_http_methods(["POST"])

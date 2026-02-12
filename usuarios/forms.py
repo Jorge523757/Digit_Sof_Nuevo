@@ -5,7 +5,15 @@ Forms - Formularios de Registro y Gestión
 
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+try:
+    from django_recaptcha.fields import ReCaptchaField
+    from django_recaptcha.widgets import ReCaptchaV2Checkbox
+    RECAPTCHA_AVAILABLE = True
+except ImportError:
+    RECAPTCHA_AVAILABLE = False
+    ReCaptchaField = None
+    ReCaptchaV2Checkbox = None
 from .models import PerfilUsuario
 from clientes.models import Cliente
 
@@ -353,6 +361,206 @@ class ResetPasswordForm(forms.Form):
         cleaned_data = super().clean()
         password1 = cleaned_data.get('new_password1')
         password2 = cleaned_data.get('new_password2')
+
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError('Las contraseñas no coinciden.')
+
+        return cleaned_data
+
+
+# ============================================================================
+# FORMULARIOS CON RECAPTCHA (NO SOY UN ROBOT)
+# ============================================================================
+
+if RECAPTCHA_AVAILABLE and ReCaptchaField is not None:
+    class LoginFormWithCaptcha(AuthenticationForm):
+        """Formulario de login con verificación reCAPTCHA"""
+        
+        captcha = ReCaptchaField(
+            widget=ReCaptchaV2Checkbox(
+                attrs={
+                    'data-theme': 'light',
+                    'data-size': 'normal',
+                }
+            ),
+            label=""
+        )
+        
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields['username'].widget.attrs.update({
+                'class': 'form-control',
+                'placeholder': 'Usuario o Email',
+                'autofocus': True
+            })
+            self.fields['password'].widget.attrs.update({
+                'class': 'form-control',
+                'placeholder': 'Contraseña',
+                'autocomplete': 'current-password'
+            })
+else:
+    # Fallback si reCAPTCHA no está disponible
+    class LoginFormWithCaptcha(AuthenticationForm):
+        """Formulario de login sin reCAPTCHA (fallback)"""
+        
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields['username'].widget.attrs.update({
+                'class': 'form-control',
+                'placeholder': 'Usuario o Email',
+                'autofocus': True
+            })
+            self.fields['password'].widget.attrs.update({
+                'class': 'form-control',
+                'placeholder': 'Contraseña',
+                'autocomplete': 'current-password'
+            })
+
+
+if RECAPTCHA_AVAILABLE and ReCaptchaField is not None:
+    class RecuperarPasswordForm(forms.Form):
+        """Formulario para solicitar recuperación de contraseña con reCAPTCHA"""
+        
+        email = forms.EmailField(
+            label="Correo Electrónico",
+            widget=forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'tu-email@ejemplo.com',
+                'autofocus': True
+            }),
+            help_text="Ingresa el correo asociado a tu cuenta"
+        )
+        
+        captcha = ReCaptchaField(
+            widget=ReCaptchaV2Checkbox(
+                attrs={
+                    'data-theme': 'light',
+                    'data-size': 'normal',
+                }
+            ),
+            label=""
+        )
+        
+        def clean_email(self):
+            email = self.cleaned_data.get('email', '').strip().lower()
+            if not email:
+                raise forms.ValidationError('Por favor ingresa tu correo electrónico.')
+            
+            # Verificar que el email existe en el sistema
+            if not User.objects.filter(email=email).exists():
+                raise forms.ValidationError(
+                    'No existe una cuenta con este correo electrónico. '
+                    'Verifica el correo o regístrate.'
+                )
+            
+            return email
+else:
+    # Fallback sin reCAPTCHA
+    class RecuperarPasswordForm(forms.Form):
+        """Formulario para solicitar recuperación de contraseña sin reCAPTCHA"""
+        
+        email = forms.EmailField(
+            label="Correo Electrónico",
+            widget=forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'tu-email@ejemplo.com',
+                'autofocus': True
+            }),
+            help_text="Ingresa el correo asociado a tu cuenta"
+        )
+        
+        def clean_email(self):
+            email = self.cleaned_data.get('email', '').strip().lower()
+            if not email:
+                raise forms.ValidationError('Por favor ingresa tu correo electrónico.')
+            
+            # Verificar que el email existe en el sistema
+            if not User.objects.filter(email=email).exists():
+                raise forms.ValidationError(
+                    'No existe una cuenta con este correo electrónico. '
+                    'Verifica el correo o regístrate.'
+                )
+            
+            return email
+
+
+class VerificarCodigoForm(forms.Form):
+    """Formulario para verificar código de recuperación"""
+
+    codigo = forms.CharField(
+        label="Código de Verificación",
+        max_length=6,
+        min_length=6,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control text-center',
+            'placeholder': '000000',
+            'autofocus': True,
+            'style': 'font-size: 24px; letter-spacing: 10px; font-weight: bold;',
+            'maxlength': '6',
+            'pattern': '[0-9]{6}',
+            'inputmode': 'numeric'
+        }),
+        help_text="Ingresa el código de 6 dígitos que enviamos a tu correo"
+    )
+
+    def clean_codigo(self):
+        codigo = self.cleaned_data.get('codigo', '').strip()
+        if not codigo:
+            raise forms.ValidationError('Por favor ingresa el código.')
+        if not codigo.isdigit():
+            raise forms.ValidationError('El código debe contener solo números.')
+        if len(codigo) != 6:
+            raise forms.ValidationError('El código debe tener 6 dígitos.')
+        return codigo
+
+
+class NuevaPasswordForm(forms.Form):
+    """Formulario para establecer nueva contraseña"""
+
+    password1 = forms.CharField(
+        label="Nueva Contraseña",
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ingresa tu nueva contraseña',
+            'autocomplete': 'new-password'
+        }),
+        help_text="Mínimo 8 caracteres, debe incluir letras y números"
+    )
+
+    password2 = forms.CharField(
+        label="Confirmar Contraseña",
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Confirma tu nueva contraseña',
+            'autocomplete': 'new-password'
+        })
+    )
+
+    def clean_password1(self):
+        password1 = self.cleaned_data.get('password1', '')
+
+        # Validar longitud mínima
+        if len(password1) < 8:
+            raise forms.ValidationError('La contraseña debe tener al menos 8 caracteres.')
+
+        # Validar que no sea completamente numérica
+        if password1.isdigit():
+            raise forms.ValidationError('La contraseña no puede ser completamente numérica.')
+
+        # Validar que contenga al menos una letra
+        if not any(c.isalpha() for c in password1):
+            raise forms.ValidationError('La contraseña debe contener al menos una letra.')
+
+        # Validar que contenga al menos un número
+        if not any(c.isdigit() for c in password1):
+            raise forms.ValidationError('La contraseña debe contener al menos un número.')
+
+        return password1
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
 
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError('Las contraseñas no coinciden.')

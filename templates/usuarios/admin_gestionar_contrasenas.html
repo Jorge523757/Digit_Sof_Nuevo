@@ -1,251 +1,256 @@
 {% extends 'base_dashboard.html' %}
 {% load static %}
 
-{% block title %}Gestionar Recuperación de Contraseñas - DIGITSOFT{% endblock %}
+{% block title %}Gestión de Contraseñas - DIGIT SOFT{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
-    <!-- Encabezado -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h2 class="mb-1">
-                                <i class="fas fa-key text-primary"></i>
-                                Gestión de Recuperación de Contraseñas
-                            </h2>
-                            <p class="text-muted mb-0">
-                                Panel de administración para monitorear solicitudes de recuperación de contraseña
-                            </p>
-                        </div>
-                        <div>
-                            <a href="{% url 'usuarios:listar_usuarios' %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left"></i> Volver a Usuarios
-                            </a>
-                        </div>
-                    </div>
+    <!-- Título -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+            <div class="icon-wrapper bg-danger text-white me-3" style="width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-key fa-2x"></i>
+            </div>
+            <div>
+                <h2 class="mb-0">🔐 Gestión de Contraseñas</h2>
+                <p class="text-muted mb-0">Cambiar contraseñas de clientes y técnicos</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                    <h3 class="mb-0">{{ total_usuarios }}</h3>
+                    <p class="text-muted mb-0 small">Total Usuarios</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-tag fa-2x text-success mb-2"></i>
+                    <h3 class="mb-0">{{ clientes_count }}</h3>
+                    <p class="text-muted mb-0 small">Clientes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-cog fa-2x text-warning mb-2"></i>
+                    <h3 class="mb-0">{{ tecnicos_count }}</h3>
+                    <p class="text-muted mb-0 small">Técnicos</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Estadísticas Rápidas -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="rounded-circle bg-primary bg-opacity-10 p-3">
-                                <i class="fas fa-code text-primary fa-2x"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted mb-1">Códigos de Recuperación (30 min)</h6>
-                            <h3 class="mb-0">{{ tokens_nuevos|length }}</h3>
-                        </div>
-                    </div>
+    <!-- Filtros -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">
+                        <i class="fas fa-search me-2"></i>Buscar Usuario
+                    </label>
+                    <input type="text"
+                           name="busqueda"
+                           class="form-control"
+                           placeholder="Nombre, usuario, email..."
+                           value="{{ busqueda }}">
                 </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="rounded-circle bg-info bg-opacity-10 p-3">
-                                <i class="fas fa-link text-info fa-2x"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="text-muted mb-1">Tokens Antiguos (24 horas)</h6>
-                            <h3 class="mb-0">{{ tokens_antiguos|length }}</h3>
-                        </div>
-                    </div>
+                <div class="col-md-4">
+                    <label class="form-label">
+                        <i class="fas fa-filter me-2"></i>Filtrar por Tipo
+                    </label>
+                    <select name="tipo" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="CLIENTE" {% if tipo_filtro == 'CLIENTE' %}selected{% endif %}>Clientes</option>
+                        <option value="TECNICO" {% if tipo_filtro == 'TECNICO' %}selected{% endif %}>Técnicos</option>
+                    </select>
                 </div>
-            </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-2"></i>Buscar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Códigos de Recuperación (Sistema Nuevo) -->
-    <div class="card border-0 shadow-sm mb-4">
+    <!-- Lista de Usuarios -->
+    <div class="card shadow-sm">
         <div class="card-header bg-white py-3">
             <h5 class="mb-0">
-                <i class="fas fa-code text-primary"></i>
-                Códigos de Recuperación (Sistema Nuevo - 30 minutos)
+                <i class="fas fa-list me-2"></i>
+                Usuarios Registrados
+                <span class="badge bg-primary ms-2">{{ usuarios.count }}</span>
             </h5>
         </div>
         <div class="card-body p-0">
-            {% if tokens_nuevos %}
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4">Usuario</th>
-                            <th>Email</th>
-                            <th>Código</th>
-                            <th>Fecha Creación</th>
-                            <th>Expira</th>
-                            <th>IP</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for token in tokens_nuevos %}
-                        <tr>
-                            <td class="ps-4">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-sm bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2">
-                                        <i class="fas fa-user text-primary"></i>
-                                    </div>
-                                    <div>
-                                        <strong>{{ token.usuario.username }}</strong>
-                                        <br>
-                                        <small class="text-muted">{{ token.usuario.get_full_name }}</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>{{ token.email }}</td>
-                            <td>
-                                <code class="fs-5 fw-bold text-primary">{{ token.codigo }}</code>
-                            </td>
-                            <td>
-                                <small>{{ token.fecha_creacion|date:"d/m/Y H:i" }}</small>
-                            </td>
-                            <td>
-                                <small>{{ token.fecha_expiracion|date:"d/m/Y H:i" }}</small>
-                                {% if token.esta_expirado %}
-                                <br><span class="badge bg-danger">Expirado</span>
-                                {% else %}
-                                <br><span class="badge bg-success">Válido</span>
-                                {% endif %}
-                            </td>
-                            <td><code class="small">{{ token.ip_solicitud|default:"N/A" }}</code></td>
-                            <td>
-                                {% if token.usado %}
-                                <span class="badge bg-secondary">
-                                    <i class="fas fa-check-circle"></i> Usado
-                                </span>
-                                {% elif token.esta_expirado %}
-                                <span class="badge bg-danger">
-                                    <i class="fas fa-clock"></i> Expirado
-                                </span>
-                                {% else %}
-                                <span class="badge bg-success">
-                                    <i class="fas fa-hourglass-half"></i> Activo
-                                </span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            {% if usuarios %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nombre Completo</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Tipo</th>
+                                <th>Usuario</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in usuarios %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ item.nombre }}</strong>
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-envelope text-muted me-1"></i>
+                                        {{ item.email }}
+                                    </td>
+                                    <td>
+                                        {% if item.telefono %}
+                                            <i class="fas fa-phone text-muted me-1"></i>
+                                            {{ item.telefono }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if item.tipo == 'CLIENTE' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-user me-1"></i>
+                                                Cliente
+                                            </span>
+                                        {% elif item.tipo == 'TECNICO' %}
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-wrench me-1"></i>
+                                                Técnico
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if item.tiene_usuario %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>
+                                                Tiene usuario
+                                            </span>
+                                            <br>
+                                            <small class="text-muted">{{ item.usuario.username }}</small>
+                                        {% else %}
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-times-circle me-1"></i>
+                                                Sin usuario
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if item.tiene_usuario %}
+                                            <a href="{% url 'usuarios:admin_cambiar_contrasena' item.usuario.id %}"
+                                               class="btn btn-sm btn-warning"
+                                               title="Cambiar contraseña">
+                                                <i class="fas fa-key me-1"></i>
+                                                Cambiar Contraseña
+                                            </a>
+                                        {% else %}
+                                            <button class="btn btn-sm btn-secondary" disabled title="Este registro no tiene usuario creado">
+                                                <i class="fas fa-user-plus me-1"></i>
+                                                Crear Usuario Primero
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
-            <div class="text-center py-5">
-                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                <p class="text-muted">No hay códigos de recuperación registrados</p>
-            </div>
+                <div class="p-5 text-center text-muted">
+                    <i class="fas fa-users fa-3x mb-3 opacity-50"></i>
+                    <p class="mb-0">No se encontraron usuarios</p>
+                    {% if busqueda %}
+                        <a href="{% url 'usuarios:admin_gestionar_contrasenas' %}" class="btn btn-sm btn-primary mt-3">
+                            <i class="fas fa-times me-2"></i>Limpiar búsqueda
+                        </a>
+                    {% endif %}
+                </div>
             {% endif %}
         </div>
     </div>
 
-    <!-- Tokens de Recuperación (Sistema Antiguo) -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white py-3">
-            <h5 class="mb-0">
-                <i class="fas fa-link text-info"></i>
-                Tokens de Recuperación (Sistema Antiguo - 24 horas)
-            </h5>
-        </div>
-        <div class="card-body p-0">
-            {% if tokens_antiguos %}
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4">Usuario</th>
-                            <th>Token</th>
-                            <th>Fecha Creación</th>
-                            <th>Estado</th>
-                            <th>Usado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for token in tokens_antiguos %}
-                        <tr>
-                            <td class="ps-4">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-sm bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2">
-                                        <i class="fas fa-user text-info"></i>
-                                    </div>
-                                    <div>
-                                        <strong>{{ token.user.username }}</strong>
-                                        <br>
-                                        <small class="text-muted">{{ token.user.email }}</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <code class="small">{{ token.token|truncatechars:20 }}</code>
-                            </td>
-                            <td>
-                                <small>{{ token.created_at|date:"d/m/Y H:i" }}</small>
-                            </td>
-                            <td>
-                                {% if token.is_valid %}
-                                <span class="badge bg-success">
-                                    <i class="fas fa-check-circle"></i> Válido
-                                </span>
-                                {% else %}
-                                <span class="badge bg-danger">
-                                    <i class="fas fa-times-circle"></i> No Válido
-                                </span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if token.used %}
-                                <span class="badge bg-secondary">
-                                    Sí - {{ token.used_at|date:"d/m/Y H:i" }}
-                                </span>
-                                {% else %}
-                                <span class="badge bg-warning text-dark">
-                                    No
-                                </span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="text-center py-5">
-                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                <p class="text-muted">No hay tokens de recuperación registrados</p>
-            </div>
-            {% endif %}
-        </div>
+    <!-- Información de seguridad -->
+    <div class="alert alert-warning mt-4">
+        <h6 class="alert-heading">
+            <i class="fas fa-shield-alt me-2"></i>
+            Información Importante
+        </h6>
+        <ul class="mb-0">
+            <li>Solo los administradores pueden cambiar contraseñas de otros usuarios</li>
+            <li>Los usuarios recibirán la nueva contraseña y deberán cambiarla en su primer inicio de sesión</li>
+            <li>Se recomienda usar contraseñas seguras con al menos 8 caracteres</li>
+            <li>Esta acción quedará registrada en los logs del sistema</li>
+        </ul>
     </div>
 </div>
 
 <style>
-.avatar-sm {
-    width: 40px;
-    height: 40px;
-}
+    .card {
+        border-radius: 12px;
+        border: none;
+    }
 
-.table > :not(caption) > * > * {
-    padding: 1rem 0.75rem;
-}
+    .card-header {
+        border-bottom: 2px solid #f0f0f0;
+        border-radius: 12px 12px 0 0 !important;
+    }
 
-code {
-    background-color: #f8f9fa;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-}
+    .table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+    .table tbody tr {
+        transition: all 0.2s;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.01);
+    }
+
+    .btn-warning {
+        border-radius: 6px;
+        font-weight: 500;
+    }
+
+    .badge {
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-weight: 500;
+    }
+
+    .icon-wrapper {
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e0e0e0;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
 </style>
 {% endblock %}
 

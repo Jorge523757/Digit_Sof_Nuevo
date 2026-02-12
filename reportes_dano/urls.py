@@ -1,5 +1,5 @@
 """
-DIGT SOFT - URLs para Registro de Daños
+DIGIT SOFT - URLs de Reportes de Daño
 """
 
 from django.urls import path
@@ -8,20 +8,12 @@ from . import views
 app_name = 'reportes_dano'
 
 urlpatterns = [
-    # Flujo de registro de clientes
-    path('registrar/', views.registrar_dano, name='registrar'),
-    path('detalle/<int:pk>/', views.detalle_reporte, name='detalle_reporte'),
+    # Cliente
+    path('crear/', views.crear_reporte, name='crear'),
     path('mis-reportes/', views.mis_reportes, name='mis_reportes'),
+    path('detalle/<int:reporte_id>/', views.detalle_reporte, name='detalle'),
 
-    # Descargar facturas
-    path('descargar/<int:pk>/<str:tipo>/', views.descargar_factura, name='descargar_factura'),
-    path('regenerar/<int:pk>/', views.regenerar_factura, name='regenerar_factura'),
-
-    # Exportar a Excel
-    path('exportar/excel/', views.exportar_reportes_excel, name='exportar_excel'),
-
-    # Administración (staff only)
-    path('admin/lista/', views.lista_reportes_admin, name='admin_lista'),
-    path('admin/marcar-revisado/<int:pk>/', views.marcar_revisado, name='marcar_revisado'),
+    # Admin
+    path('admin/lista/', views.lista_reportes_admin, name='lista_admin'),
 ]
 

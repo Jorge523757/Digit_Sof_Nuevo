@@ -1,95 +1,93 @@
 """
-DIGT SOFT - Módulo de Técnicos
-Forms - Formularios para gestión de técnicos
+DIGIT SOFT - Formularios de Técnicos
+Formularios para gestión de técnicos
 """
 
 from django import forms
+from django.core.validators import RegexValidator
 from .models import Tecnico
 
 
 class TecnicoForm(forms.ModelForm):
-    """
-    Formulario para crear y editar técnicos
-    """
-    
+    """Formulario para crear/editar técnicos"""
+
     class Meta:
         model = Tecnico
-        fields = ['nombres', 'apellidos', 'numero_documento', 'telefono', 'correo', 'profesion', 'activo']
+        fields = [
+            'nombres', 'apellidos', 'numero_documento',
+            'telefono', 'correo', 'profesion', 'activo'
+        ]
         widgets = {
             'nombres': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Ingrese los nombres',
+                'placeholder': 'Nombres del técnico',
                 'required': True
             }),
             'apellidos': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Ingrese los apellidos',
+                'placeholder': 'Apellidos del técnico',
                 'required': True
             }),
             'numero_documento': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Ingrese el número de documento',
+                'placeholder': 'Número de documento',
                 'required': True
             }),
             'telefono': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Ingrese el teléfono',
+                'placeholder': '+57 300 123 4567',
                 'required': True
             }),
             'correo': forms.EmailInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Ingrese el correo electrónico',
+                'placeholder': 'correo@ejemplo.com',
                 'required': True
             }),
             'profesion': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Ingrese la profesión',
+                'placeholder': 'Ej: Técnico en Sistemas',
                 'required': True
             }),
             'activo': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
-            })
+            }),
         }
-    
-    def clean_numero_documento(self):
-        """Valida que el número de documento sea único"""
-        numero_documento = self.cleaned_data.get('numero_documento')
-        tecnico_id = self.instance.pk if self.instance else None
-        
-        if Tecnico.objects.filter(numero_documento=numero_documento).exclude(pk=tecnico_id).exists():
-            raise forms.ValidationError('Ya existe un técnico con este número de documento.')
-        
-        return numero_documento
-    
-    def clean_correo(self):
-        """Valida el formato del correo electrónico"""
-        correo = self.cleaned_data.get('correo')
-        tecnico_id = self.instance.pk if self.instance else None
-        
-        if Tecnico.objects.filter(correo=correo).exclude(pk=tecnico_id).exists():
-            raise forms.ValidationError('Ya existe un técnico con este correo electrónico.')
-        
-        return correo
+        labels = {
+            'nombres': '👤 Nombres',
+            'apellidos': '👤 Apellidos',
+            'numero_documento': '🆔 Número de Documento',
+            'telefono': '📱 Teléfono',
+            'correo': '📧 Correo Electrónico',
+            'profesion': '💼 Profesión',
+            'activo': '✅ Activo',
+        }
 
 
-class TecnicoBusquedaForm(forms.Form):
-    """
-    Formulario para búsqueda de técnicos
-    """
+class TecnicoFiltroForm(forms.Form):
+    """Formulario para filtrar técnicos"""
+
+    ESTADO_CHOICES = [
+        ('', 'Todos los estados'),
+        ('habilitado', 'Habilitado'),
+        ('inhabilitado', 'Inhabilitado'),
+        ('eliminado', 'Eliminado'),
+    ]
+
     busqueda = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Buscar por nombre, documento, teléfono...',
-            'id': 'busqueda'
-        })
+            'placeholder': 'Buscar por ID, teléfono, correo...',
+        }),
+        label='🔍 Buscar'
     )
+
     estado = forms.ChoiceField(
         required=False,
-        choices=[('', 'Todos'), ('activo', 'Activos'), ('inactivo', 'Inactivos')],
+        choices=ESTADO_CHOICES,
         widget=forms.Select(attrs={
-            'class': 'form-control',
-            'id': 'estado'
-        })
+            'class': 'form-control'
+        }),
+        label='📊 Estado'
     )
 

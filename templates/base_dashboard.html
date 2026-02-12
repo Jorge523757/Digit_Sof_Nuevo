@@ -61,97 +61,161 @@
                 </a>
             </li>
 
-            <!-- Gestión de Clientes -->
-            <div class="sidebar-category">Clientes & Servicios</div>
-            <li>
-                <a href="{% url 'clientes:lista' %}">
-                    <i class="fas fa-users"></i> Gestión de Clientes
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'tecnicos:lista' %}">
-                    <i class="fas fa-user-tie"></i> Gestión de Técnicos
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'ordenes:lista' %}">
-                    <i class="fas fa-clipboard-list"></i> Órdenes de Servicio
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'equipos:lista' %}">
-                    <i class="fas fa-desktop"></i> Gestión de Equipos
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'garantias:lista' %}">
-                    <i class="fas fa-shield-alt"></i> Garantías
-                </a>
-            </li>
+            {% if user.is_staff or user.is_superuser %}
+                <!-- ADMINISTRADOR - Ve todo -->
+                <div class="sidebar-category">Clientes & Servicios</div>
+                <li>
+                    <a href="{% url 'clientes:lista' %}">
+                        <i class="fas fa-users"></i> Gestión de Clientes
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'tecnicos:lista' %}">
+                        <i class="fas fa-user-tie"></i> Gestión de Técnicos
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'ordenes:lista' %}">
+                        <i class="fas fa-clipboard-list"></i> Órdenes de Servicio
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'equipos:lista' %}">
+                        <i class="fas fa-desktop"></i> Gestión de Equipos
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'garantias:lista' %}">
+                        <i class="fas fa-shield-alt"></i> Garantías
+                    </a>
+                </li>
 
-            <!-- Inventario -->
-            <div class="sidebar-category">Inventario & Proveedores</div>
-            <li>
-                <a href="{% url 'productos:lista' %}">
-                    <i class="fas fa-box"></i> Gestión de Productos
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'proveedores:lista' %}">
-                    <i class="fas fa-truck"></i> Proveedores
-                </a>
-            </li>
+                <div class="sidebar-category">Inventario & Proveedores</div>
+                <li>
+                    <a href="{% url 'productos:lista' %}">
+                        <i class="fas fa-box"></i> Gestión de Productos
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'proveedores:lista' %}">
+                        <i class="fas fa-truck"></i> Proveedores
+                    </a>
+                </li>
 
-            <!-- Ventas -->
-            <div class="sidebar-category">Ventas & Facturación</div>
-            <li>
-                <a href="{% url 'ventas:lista' %}">
-                    <i class="fas fa-cash-register"></i> Gestión de Ventas
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'compras:lista' %}">
-                    <i class="fas fa-shopping-cart"></i> Gestión de Compras
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'facturacion:lista' %}">
-                    <i class="fas fa-file-invoice"></i> Facturación
-                </a>
-            </li>
+                <div class="sidebar-category">Ventas & Facturación</div>
+                <li>
+                    <a href="{% url 'ventas:lista' %}">
+                        <i class="fas fa-cash-register"></i> Gestión de Ventas
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'compras:lista' %}">
+                        <i class="fas fa-shopping-cart"></i> Gestión de Compras
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'facturacion:lista' %}">
+                        <i class="fas fa-file-invoice"></i> Facturación
+                    </a>
+                </li>
 
-            <!-- E-commerce -->
-            <div class="sidebar-category">E-commerce</div>
-            <li>
-                <a href="{% url 'ecommerce:productos' %}">
-                    <i class="fas fa-store"></i> Tienda Online
-                </a>
-            </li>
+                <div class="sidebar-category">E-commerce</div>
+                <li>
+                    <a href="{% url 'ecommerce:productos' %}">
+                        <i class="fas fa-store"></i> Tienda Online
+                    </a>
+                </li>
 
-            <!-- Administración -->
-            <div class="sidebar-category">Administración</div>
-            <li>
-                <a href="{% url 'usuarios:listar_usuarios' %}">
-                    <i class="fas fa-users"></i> Gestión de Usuarios
-                </a>
-            </li>
-            <!-- Comentado temporalmente - URL no configurada
-            <!-- Comentado temporalmente - URL no configurada
-            <li>
-                <a href="{% url 'usuarios:admin_gestionar_contrasenas' %}">
-                    <i class="fas fa-user-lock"></i> Gestión de Contraseñas
-                </a>
-            </li>
-            -->
-            -->
+                <div class="sidebar-category">Administración</div>
+                <li>
+                    <a href="{% url 'usuarios:listar_usuarios' %}">
+                        <i class="fas fa-users"></i> Gestión de Usuarios
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'usuarios:admin_gestionar_contrasenas' %}">
+                        <i class="fas fa-key"></i> Gestión de Contraseñas
+                    </a>
+                </li>
 
-            <!-- Otros -->
-            <div class="sidebar-category">Otros</div>
-            <li>
-                <a href="{% url 'capacitaciones:lista' %}">
-                    <i class="fas fa-graduation-cap"></i> Capacitaciones
-                </a>
-            </li>
+                <div class="sidebar-category">Otros</div>
+                <li>
+                    <a href="{% url 'capacitaciones:lista' %}">
+                        <i class="fas fa-graduation-cap"></i> Capacitaciones
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'ayuda:centro_ayuda' %}">
+                        <i class="fas fa-life-ring"></i> Ayuda y Soporte
+                    </a>
+                </li>
+
+            {% elif user.perfil.tipo_usuario == 'TECNICO' %}
+                <!-- TÉCNICO - Solo ve: Orden de Servicio Técnico, Cliente, Equipo -->
+                <div class="sidebar-category">Mis Asignaciones</div>
+                <li>
+                    <a href="{% url 'ordenes:lista' %}">
+                        <i class="fas fa-clipboard-list"></i> Orden de Servicio Técnico
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'clientes:lista' %}">
+                        <i class="fas fa-users"></i> Cliente
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'equipos:lista' %}">
+                        <i class="fas fa-desktop"></i> Equipo
+                    </a>
+                </li>
+
+                <div class="sidebar-category">Mi Cuenta</div>
+                <li>
+                    <a href="{% url 'usuarios:mi_perfil' %}">
+                        <i class="fas fa-user-circle"></i> Mi Perfil
+                    </a>
+                </li>
+
+            {% elif user.perfil.tipo_usuario == 'CLIENTE' %}
+                <!-- CLIENTE - Solo ve: Equipo, Orden de Servicio, Factura, Garantía -->
+                <div class="sidebar-category">Mis Servicios</div>
+                <li>
+                    <a href="{% url 'equipos:lista' %}">
+                        <i class="fas fa-desktop"></i> Equipo
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'ordenes:lista' %}">
+                        <i class="fas fa-clipboard-list"></i> Orden de Servicio
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'facturacion:lista' %}">
+                        <i class="fas fa-file-invoice"></i> Factura
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'garantias:lista' %}">
+                        <i class="fas fa-shield-alt"></i> Garantía
+                    </a>
+                </li>
+
+                <div class="sidebar-category">Mi Cuenta</div>
+                <li>
+                    <a href="{% url 'usuarios:mi_perfil' %}">
+                        <i class="fas fa-user-circle"></i> Mi Perfil
+                    </a>
+                </li>
+
+            {% else %}
+                <!-- Usuario sin tipo definido -->
+                <div class="sidebar-category">Acceso Limitado</div>
+                <li>
+                    <a href="{% url 'ayuda:centro_ayuda' %}">
+                        <i class="fas fa-life-ring"></i> Ayuda y Soporte
+                    </a>
+                </li>
+            {% endif %}
         </ul>
     </div>
 
@@ -168,8 +232,8 @@
                 </div>
             </div>
 
-            <!-- Navigation Menu -->
-            <nav class="navbar-menu">
+            <!-- Navigation Menu - OCULTO -->
+            <nav class="navbar-menu" style="display: none !important;">
                 <ul class="nav-list">
                     <li><a href="{% url 'core:home' %}">Inicio</a></li>
                     <li><a href="{% url 'dashboard:index' %}">Tablero</a></li>
@@ -202,15 +266,24 @@
 
             <div class="header-actions">
                 {% if user.is_authenticated %}
-                    <!-- Botón del Carrito -->
-                    <a href="{% url 'ecommerce:ver_carrito' %}" class="btn btn-success btn-sm me-2">
+                    <!-- Botón del Carrito - OCULTO -->
+                    <a href="{% url 'ecommerce:ver_carrito' %}" class="btn btn-success btn-sm me-2" style="display: none !important;">
                         <i class="fas fa-shopping-cart"></i> Carrito
                         <span class="badge bg-light text-dark ms-1" id="header-carrito-count">0</span>
                     </a>
 
-                    <!-- Botón ver tienda -->
-                    <a href="{% url 'ecommerce:productos' %}" class="btn btn-info btn-sm me-3">
+                    <!-- Botón ver tienda - OCULTO -->
+                    <a href="{% url 'ecommerce:productos' %}" class="btn btn-info btn-sm me-3" style="display: none !important;">
                         <i class="fas fa-store"></i> Tienda
+                    </a>
+
+                    <!-- Botón de Inicio -->
+                    <a href="{% url 'core:home' %}"
+                       class="btn btn-outline-primary btn-sm me-3"
+                       title="Inicio"
+                       style="min-width: 45px; height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 5px;">
+                        <i class="fas fa-home" style="font-size: 1.1rem;"></i>
+                        <span class="d-none d-md-inline">Inicio</span>
                     </a>
 
                     <!-- Botón Tema Oscuro/Claro -->
@@ -304,43 +377,6 @@
 
         <!-- Footer -->
         <footer>
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>DIGITSOFT</h3>
-                    <p>Sistema integral de gestión empresarial. Soluciones tecnológicas para optimizar tu negocio.</p>
-                    <p><i class="fas fa-map-marker-alt"></i> Calle 15 # 14-26, Duitama - Boyacá</p>
-                    <p><i class="fas fa-phone"></i> (+57) 3215434380</p>
-                </div>
-
-                <div class="footer-section">
-                    <h3>Enlaces Rápidos</h3>
-                    <ul>
-                        <li><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
-                        <li><a href="{% url 'clientes:lista' %}">Clientes</a></li>
-                        <li><a href="{% url 'productos:lista' %}">Productos</a></li>
-                        <li><a href="{% url 'ventas:lista' %}">Ventas</a></li>
-                        <li><a href="{% url 'facturacion:lista' %}">Facturación</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-section">
-                    <h3>Módulos</h3>
-                    <ul>
-                        <li><a href="{% url 'tecnicos:lista' %}">Técnicos</a></li>
-                        <li><a href="{% url 'ordenes:lista' %}">Órdenes</a></li>
-                        <li><a href="{% url 'proveedores:lista' %}">Proveedores</a></li>
-                        <li><a href="{% url 'garantias:lista' %}">Garantías</a></li>
-                        <li><a href="{% url 'equipos:lista' %}">Equipos</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-section">
-                    <h3>Información</h3>
-                    <p>Sistema basado en Django Framework</p>
-                    <p>Centro Minero Regional Boyacá</p>
-                    <p><i class="fas fa-envelope"></i> info@digitsoft.com.co</p>
-                </div>
-            </div>
 
             <div class="footer-bottom">
                 <p>&copy; 2025 DIGITSOFT. Todos los derechos reservados.</p>

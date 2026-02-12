@@ -1,48 +1,58 @@
 """
-DIGT SOFT - Formularios para Registro de Daños
+DIGIT SOFT - Formularios de Reportes de Daño
+Formularios para que los clientes reporten equipos dañados
 """
 
 from django import forms
-from .models import RegistroDano, ImagenDano
+from .models import RegistroDano
+from equipos.models import Equipo
+from clientes.models import Cliente
 
 
-class RegistroDanoForm(forms.ModelForm):
-    """Formulario básico para registrar daño"""
+class ReporteDanoForm(forms.ModelForm):
+    """Formulario para reportar un equipo dañado"""
 
     class Meta:
         model = RegistroDano
-        fields = ['descripcion_dano']
+        fields = ['equipo', 'descripcion_dano', 'tiempo_requerido_cliente']
         widgets = {
+            'equipo': forms.Select(attrs={
+                'class': 'form-control',
+                'required': True
+            }),
             'descripcion_dano': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 5,
-                'placeholder': 'Describa el daño...',
+                'placeholder': 'Describa detalladamente el problema del equipo...',
+                'required': True
             }),
-        }
-
-
-class ImagenDanoForm(forms.ModelForm):
-    """Formulario para subir imágenes"""
-
-    class Meta:
-        model = ImagenDano
-        fields = ['imagen']
-        widgets = {
-            'imagen': forms.FileInput(attrs={
+            'tiempo_requerido_cliente': forms.TextInput(attrs={
                 'class': 'form-control',
-                'accept': 'image/*',
+                'placeholder': 'Ej: Lo necesito en 3 días, urgente, etc.',
             }),
         }
+        labels = {
+            'equipo': '💻 Seleccione el equipo dañado',
+            'descripcion_dano': '📝 Descripción del daño',
+            'tiempo_requerido_cliente': '⏰ ¿Cuándo necesita el equipo?',
+        }
+        help_texts = {
+            'descripcion_dano': 'Sea lo más específico posible sobre el problema',
+            'tiempo_requerido_cliente': 'Opcional: Indique si tiene urgencia',
+        }
+
+    def __init__(self, *args, **kwargs):
+        cliente = kwargs.pop('cliente', None)
+        super().__init__(*args, **kwargs)
+
+        # Filtrar solo los equipos del cliente
+        if cliente:
+            self.fields['equipo'].queryset = Equipo.objects.filter(
+                cliente=cliente,
+                activo=True
+            )
+        else:
+            self.fields['equipo'].queryset = Equipo.objects.none()
 
 
-from django.forms import inlineformset_factory
-
-ImagenDanoFormSet = inlineformset_factory(
-    RegistroDano,
-    ImagenDano,
-    form=ImagenDanoForm,
-    extra=3,
-    max_num=5,
-    can_delete=True
-)
 

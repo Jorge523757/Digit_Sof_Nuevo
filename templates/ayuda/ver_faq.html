@@ -1,0 +1,140 @@
+{% extends 'ayuda/base_ayuda.html' %}
+{% load static %}
+
+{% block title %}{{ faq.pregunta }} - FAQs - DIGIT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .faq-detail-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .faq-card {
+        background: white;
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .faq-question {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .faq-meta {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+
+    .faq-answer {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #555;
+    }
+
+    .related-faqs {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 15px;
+        margin-top: 40px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="faq-detail-container">
+    <div class="faq-card">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'ayuda:centro_ayuda' %}">Ayuda</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'ayuda:faqs' %}">FAQs</a></li>
+                <li class="breadcrumb-item active">{{ faq.pregunta|truncatewords:8 }}</li>
+            </ol>
+        </nav>
+
+        <!-- Pregunta -->
+        <div class="faq-question">
+            <i class="fas fa-question-circle text-primary"></i>
+            {{ faq.pregunta }}
+        </div>
+
+        <!-- Meta información -->
+        <div class="faq-meta">
+            <div class="row">
+                <div class="col-md-4">
+                    {% if faq.categoria %}
+                    <i class="fas {{ faq.categoria.icono }}"></i>
+                    <strong>Categoría:</strong> {{ faq.categoria.nombre }}
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <i class="fas fa-eye"></i>
+                    <strong>Vistas:</strong> {{ faq.vistas }}
+                </div>
+                <div class="col-md-4">
+                    <i class="fas fa-calendar"></i>
+                    <strong>Actualizado:</strong> {{ faq.fecha_actualizacion|date:"d/m/Y" }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Respuesta -->
+        <div class="faq-answer">
+            {{ faq.respuesta|linebreaks }}
+        </div>
+
+        <!-- Acciones -->
+        <div class="mt-4 pt-4 border-top">
+            <a href="{% url 'ayuda:faqs' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Volver a FAQs
+            </a>
+            <a href="{% url 'ayuda:crear_ticket' %}" class="btn btn-primary">
+                <i class="fas fa-ticket-alt"></i> Crear Ticket
+            </a>
+        </div>
+    </div>
+
+    <!-- FAQs Relacionadas -->
+    {% if faqs_relacionadas %}
+    <div class="related-faqs">
+        <h4 class="mb-3">
+            <i class="fas fa-lightbulb"></i> Preguntas Relacionadas
+        </h4>
+        <div class="list-group">
+            {% for related in faqs_relacionadas %}
+            <a href="{% url 'ayuda:ver_faq' related.id %}" class="list-group-item list-group-item-action">
+                <i class="fas fa-question-circle text-primary"></i>
+                {{ related.pregunta }}
+                <small class="text-muted float-end">
+                    <i class="fas fa-eye"></i> {{ related.vistas }}
+                </small>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ¿Te fue útil? -->
+    <div class="card mt-4">
+        <div class="card-body text-center">
+            <h5 class="mb-3">¿Esta respuesta te fue útil?</h5>
+            <div class="btn-group" role="group">
+                <button class="btn btn-outline-success" onclick="alert('¡Gracias por tu feedback!')">
+                    <i class="fas fa-thumbs-up"></i> Sí
+                </button>
+                <button class="btn btn-outline-danger" onclick="alert('Gracias. ¿Quieres crear un ticket?')">
+                    <i class="fas fa-thumbs-down"></i> No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

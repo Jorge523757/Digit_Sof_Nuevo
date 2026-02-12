@@ -1,0 +1,180 @@
+{% extends 'ayuda/base_ayuda.html' %}
+{% load static %}
+
+{% block title %}Preguntas Frecuentes - DIGIT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .faqs-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .faqs-header {
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .search-box {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .faq-card {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+
+    .faq-card:hover {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .faq-question {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .faq-answer {
+        color: #666;
+        line-height: 1.6;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .faq-meta {
+        font-size: 0.85rem;
+        color: #999;
+    }
+
+    .category-badge {
+        background: #667eea;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="faqs-container">
+    <!-- Header -->
+    <div class="faqs-header">
+        <h1 class="mb-3">
+            <i class="fas fa-question-circle"></i> Preguntas Frecuentes
+        </h1>
+        <p class="text-muted mb-4">Encuentra respuestas rápidas a las preguntas más comunes</p>
+
+        <!-- Buscador -->
+        <form method="get" class="search-box">
+            <div class="input-group input-group-lg">
+                <input type="text" name="busqueda" class="form-control"
+                       placeholder="Busca tu pregunta..."
+                       value="{{ form.busqueda.value|default:'' }}">
+                <button class="btn btn-primary" type="submit">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Resultado de búsqueda -->
+    {% if form.busqueda.value %}
+    <div class="alert alert-info">
+        <i class="fas fa-search"></i>
+        Resultados para: <strong>"{{ form.busqueda.value }}"</strong>
+        ({{ total_faqs }} encontrada{{ total_faqs|pluralize }})
+    </div>
+    {% endif %}
+
+    <!-- Lista de FAQs -->
+    {% if faqs %}
+        {% for faq in faqs %}
+        <div class="faq-card" onclick="toggleFAQ({{ faq.id }})">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    <div class="faq-question">
+                        <i class="fas fa-question text-primary"></i>
+                        {{ faq.pregunta }}
+                    </div>
+                    <div class="faq-meta">
+                        {% if faq.categoria %}
+                            <span class="category-badge">
+                                <i class="fas {{ faq.categoria.icono }}"></i> {{ faq.categoria.nombre }}
+                            </span>
+                        {% endif %}
+                        <span class="ms-2">
+                            <i class="fas fa-eye"></i> {{ faq.vistas }} vista{{ faq.vistas|pluralize }}
+                        </span>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-down" id="icon-{{ faq.id }}"></i>
+            </div>
+
+            <div class="faq-answer" id="answer-{{ faq.id }}" style="display: none;">
+                {{ faq.respuesta|linebreaks }}
+
+                <div class="mt-3 pt-3 border-top">
+                    <a href="{% url 'ayuda:ver_faq' faq.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-link"></i> Ver detalles
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-search fa-4x text-muted mb-3"></i>
+                <h4>No se encontraron resultados</h4>
+                <p class="text-muted">Intenta con otras palabras clave o crea un ticket de ayuda</p>
+                <a href="{% url 'ayuda:crear_ticket' %}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle"></i> Crear Ticket
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Ayuda adicional -->
+    <div class="card mt-4">
+        <div class="card-body text-center">
+            <h5>¿No encontraste lo que buscabas?</h5>
+            <p class="text-muted mb-3">Nuestro equipo de soporte está listo para ayudarte</p>
+            <a href="{% url 'ayuda:crear_ticket' %}" class="btn btn-primary">
+                <i class="fas fa-life-ring"></i> Contactar Soporte
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleFAQ(id) {
+    const answer = document.getElementById('answer-' + id);
+    const icon = document.getElementById('icon-' + id);
+
+    if (answer.style.display === 'none') {
+        answer.style.display = 'block';
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+    } else {
+        answer.style.display = 'none';
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+    }
+}
+</script>
+{% endblock %}
+

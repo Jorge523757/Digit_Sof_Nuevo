@@ -1,17 +1,45 @@
-{% extends 'base.html' %}
+{% extends 'base_auth.html' %}
 {% load static %}
 
-{% block title %}Recuperar Contraseña - Paso 1{% endblock %}
+{% block title %}Recuperar Contraseña - DIGIT SOFT{% endblock %}
 
 {% block extra_css %}
 <style>
+    /* FORZAR centrado completo vertical y horizontal */
+    html, body {
+        height: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: hidden;
+    }
+
+    body {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 100vh !important;
+    }
+
+    /* Resetear contenedores Bootstrap */
+    body > * {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
     .recovery-container {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        width: 100%;
+        height: 100vh;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 20px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
     }
     .recovery-card {
         background: white;
@@ -20,7 +48,20 @@
         max-width: 500px;
         width: 100%;
         padding: 40px;
+        animation: fadeInUp 0.5s ease-out;
     }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .recovery-icon {
         width: 80px;
         height: 80px;
@@ -32,31 +73,45 @@
         margin: 0 auto 20px;
         font-size: 40px;
         color: white;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
     }
     .recovery-title {
         text-align: center;
         color: #1e3c72;
+        font-weight: 700;
+        font-size: 2rem;
         margin-bottom: 10px;
     }
     .recovery-subtitle {
         text-align: center;
         color: #666;
         margin-bottom: 30px;
+        font-size: 1rem;
     }
     .form-label {
         font-weight: 600;
         color: #1e3c72;
         margin-bottom: 8px;
+        display: block;
+    }
+    .form-label i {
+        margin-right: 8px;
+        color: #667eea;
     }
     .form-control {
+        width: 100%;
         border: 2px solid #e0e0e0;
         border-radius: 10px;
         padding: 12px 15px;
         font-size: 16px;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
     }
     .form-control:focus {
         border-color: #667eea;
         box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        background: white;
+        outline: none;
     }
     .btn-recovery {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -68,6 +123,8 @@
         font-size: 16px;
         width: 100%;
         margin-top: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
     }
     .btn-recovery:hover {
         transform: translateY(-2px);
@@ -84,34 +141,55 @@
         text-align: center;
         margin-top: 20px;
     }
+    .back-link a {
+        color: #667eea;
+        font-weight: 500;
+    }
+    .back-link a:hover {
+        color: #764ba2;
+    }
 </style>
 {% endblock %}
 
-{% block content %}
+{% block body_content %}
 <div class="recovery-container">
     <div class="recovery-card">
         <div class="recovery-icon">
             <i class="fas fa-lock"></i>
         </div>
 
-        <h2 class="recovery-title">¿Olvidaste tu contraseña?</h2>
+        <h2 class="recovery-title">DIGIT SOFT</h2>
+        <h3 class="recovery-subtitle" style="font-weight: 600; color: #1e3c72;">¿Olvidaste tu contraseña?</h3>
         <p class="recovery-subtitle">Te enviaremos un código de verificación a tu email</p>
 
-        <form method="post">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message|safe }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" action="{% url 'usuarios:solicitar_recuperacion' %}">
             {% csrf_token %}
 
             <div class="mb-3">
-                <label class="form-label">
+                <label class="form-label" for="email">
                     <i class="fas fa-envelope me-2"></i>
-                    Email registrado
+                    Correo Electrónico
                 </label>
-                <input type="email"
-                       name="email"
-                       class="form-control"
-                       placeholder="tu@email.com"
-                       required
-                       autofocus>
-                <small class="text-muted">Ingresa el email con el que te registraste</small>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-control"
+                    placeholder="tu-email@ejemplo.com"
+                    required
+                    autofocus
+                    value="{{ request.POST.email|default:'' }}"
+                >
+                <small class="text-muted">Ingresa el correo asociado a tu cuenta</small>
             </div>
 
             <div class="info-box">

@@ -3,6 +3,8 @@ from django.contrib.auth import views as auth_views
 from . import views
 from . import views_recuperacion
 from . import views_notificaciones
+from . import views_perfil
+from . import views_admin_password
 
 app_name = 'usuarios'
 
@@ -22,9 +24,16 @@ urlpatterns = [
     path('recuperar-password/', views.recuperar_password, name='recuperar_password'),
     path('reset-password/<uuid:token>/', views.reset_password, name='reset_password'),
 
-    # Perfil de usuario
+    # Perfil de usuario - NUEVO
+    path('mi-perfil/', views_perfil.mi_perfil, name='mi_perfil'),
+    path('cambiar-contrasena/', views_perfil.cambiar_contrasena, name='cambiar_contrasena'),
+
+    # Gestión de contraseñas por ADMIN - NUEVO
+    path('admin/gestionar-contrasenas/', views_admin_password.admin_gestionar_contrasenas, name='admin_gestionar_contrasenas'),
+    path('admin/cambiar-contrasena/<int:user_id>/', views_admin_password.admin_cambiar_contrasena, name='admin_cambiar_contrasena'),
+
+    # Perfil de usuario (antiguo - mantener compatibilidad)
     path('perfil/', views.perfil_view, name='perfil'),
-    path('cambiar-contrasena/', views.cambiar_contrasena, name='cambiar_contrasena'),
 
     # Gestión de usuarios (requiere permisos de admin)
     path('gestionar/', views.listar_usuarios, name='listar_usuarios'),

@@ -12,7 +12,32 @@ from .models import OrdenServicio, RepuestoOrden, SeguimientoOrden
 
 def ordenes_lista(request):
     """Lista de órdenes con búsqueda y filtros avanzados"""
-    ordenes = OrdenServicio.objects.select_related('cliente', 'tecnico_asignado').all().order_by('-fecha_recepcion')
+
+    # FILTRO DE PRIVACIDAD POR ROL
+    if request.user.is_staff or request.user.is_superuser:
+        # Staff/Admin ven todas las órdenes
+        ordenes = OrdenServicio.objects.select_related('cliente', 'tecnico_asignado').all().order_by('-fecha_recepcion')
+    else:
+        # Clientes solo ven SUS órdenes
+        try:
+            from clientes.models import Cliente
+            cliente = Cliente.objects.filter(correo=request.user.email).first()
+
+            if cliente:
+                ordenes = OrdenServicio.objects.filter(cliente=cliente).select_related('cliente', 'tecnico_asignado').order_by('-fecha_recepcion')
+            else:
+                # Si no es cliente, verificar si es técnico
+                from tecnicos.models import Tecnico
+                tecnico = Tecnico.objects.filter(correo=request.user.email).first()
+
+                if tecnico:
+                    # Técnico ve solo órdenes asignadas a él
+                    ordenes = OrdenServicio.objects.filter(tecnico_asignado=tecnico).select_related('cliente', 'tecnico_asignado').order_by('-fecha_recepcion')
+                else:
+                    # Usuario sin rol asignado no ve nada
+                    ordenes = OrdenServicio.objects.none()
+        except Exception as e:
+            ordenes = OrdenServicio.objects.none()
 
     # Búsqueda simple
     busqueda = request.GET.get('busqueda', '')
@@ -77,13 +102,23 @@ def ordenes_lista(request):
     paginator = Paginator(ordenes, 20)
     page_obj = paginator.get_page(request.GET.get('page'))
 
-    # Estadísticas generales
-    total_ordenes = OrdenServicio.objects.count()
-    en_proceso = OrdenServicio.objects.filter(
-        estado__in=['RECIBIDA', 'EN_DIAGNOSTICO', 'EN_REPARACION']
-    ).count()
-    listas_entrega = OrdenServicio.objects.filter(estado='LISTA_ENTREGA').count()
-    entregadas = OrdenServicio.objects.filter(estado='ENTREGADA').count()
+    # Estadísticas según el rol del usuario
+    if request.user.is_staff or request.user.is_superuser:
+        # Admin ve estadísticas globales
+        total_ordenes = OrdenServicio.objects.count()
+        en_proceso = OrdenServicio.objects.filter(
+            estado__in=['RECIBIDA', 'EN_DIAGNOSTICO', 'EN_REPARACION']
+        ).count()
+        listas_entrega = OrdenServicio.objects.filter(estado='LISTA_ENTREGA').count()
+        entregadas = OrdenServicio.objects.filter(estado='ENTREGADA').count()
+    else:
+        # Cliente/Técnico ven solo sus estadísticas
+        total_ordenes = ordenes.count()
+        en_proceso = ordenes.filter(
+            estado__in=['RECIBIDA', 'EN_DIAGNOSTICO', 'EN_REPARACION']
+        ).count()
+        listas_entrega = ordenes.filter(estado='LISTA_ENTREGA').count()
+        entregadas = ordenes.filter(estado='ENTREGADA').count()
 
     # Obtener listas para filtros
     from clientes.models import Cliente
@@ -115,7 +150,6 @@ def ordenes_lista(request):
 
 def orden_crear(request):
     """Crear nueva orden de servicio"""
-    from .forms import OrdenServicioForm
     from clientes.models import Cliente
     from tecnicos.models import Tecnico
     from .notifications import ServicioNotificaciones
@@ -213,7 +247,6 @@ def orden_detalle(request, pk):
 
 def orden_editar(request, pk):
     """Editar orden existente"""
-    from .forms import OrdenServicioForm
     from clientes.models import Cliente
     from tecnicos.models import Tecnico
     from .notifications import ServicioNotificaciones

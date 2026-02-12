@@ -5,6 +5,7 @@ CRUD Completo: Crear, Leer, Actualizar, Eliminar
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from datetime import date, timedelta
@@ -12,10 +13,27 @@ from .models import Garantia, SeguimientoGarantia
 from .forms import GarantiaForm, BuscarGarantiaForm
 
 
+@login_required
 def garantias_lista(request):
-    """RF2: Lista de garantías con búsqueda y filtros"""
+    """RF2: Lista de garantías con búsqueda y filtros - FILTRADA POR ROL"""
     form = BuscarGarantiaForm(request.GET or None)
-    garantias = Garantia.objects.select_related('producto', 'cliente').all()
+
+    # FILTRO DE PRIVACIDAD POR ROL
+    if request.user.is_staff or request.user.is_superuser:
+        # Admin ve todas las garantías
+        garantias = Garantia.objects.select_related('producto', 'cliente').all()
+    else:
+        # Cliente solo ve SUS garantías
+        try:
+            from clientes.models import Cliente
+            cliente = Cliente.objects.filter(correo=request.user.email).first()
+
+            if cliente:
+                garantias = Garantia.objects.filter(cliente=cliente).select_related('producto', 'cliente')
+            else:
+                garantias = Garantia.objects.none()
+        except Exception as e:
+            garantias = Garantia.objects.none()
 
     # Aplicar filtros
     if form.is_valid():
@@ -53,11 +71,19 @@ def garantias_lista(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    # Estadísticas
-    total_garantias = Garantia.objects.count()
-    activas = Garantia.objects.filter(estado='ACTIVA', fecha_vencimiento__gte=date.today()).count()
-    vencidas = Garantia.objects.filter(fecha_vencimiento__lt=date.today()).count()
-    en_revision = Garantia.objects.filter(estado='EN_REVISION').count()
+    # Estadísticas según el rol
+    if request.user.is_staff or request.user.is_superuser:
+        # Admin ve estadísticas globales
+        total_garantias = Garantia.objects.count()
+        activas = Garantia.objects.filter(estado='ACTIVA', fecha_vencimiento__gte=date.today()).count()
+        vencidas = Garantia.objects.filter(fecha_vencimiento__lt=date.today()).count()
+        en_revision = Garantia.objects.filter(estado='EN_REVISION').count()
+    else:
+        # Cliente ve solo sus estadísticas
+        total_garantias = garantias.count()
+        activas = garantias.filter(estado='ACTIVA', fecha_vencimiento__gte=date.today()).count()
+        vencidas = garantias.filter(fecha_vencimiento__lt=date.today()).count()
+        en_revision = garantias.filter(estado='EN_REVISION').count()
 
     context = {
         'page_obj': page_obj,
@@ -71,6 +97,7 @@ def garantias_lista(request):
     return render(request, 'garantias/lista.html', context)
 
 
+@login_required
 def garantia_crear(request):
     """RF1: Registrar nueva garantía"""
     if request.method == 'POST':
@@ -100,6 +127,7 @@ def garantia_crear(request):
     return render(request, 'garantias/form.html', context)
 
 
+@login_required
 def garantia_editar(request, pk):
     """Editar garantía existente"""
     garantia = get_object_or_404(Garantia, pk=pk)
@@ -134,9 +162,24 @@ def garantia_editar(request, pk):
     return render(request, 'garantias/form.html', context)
 
 
+@login_required
 def garantia_detalle(request, pk):
-    """Detalle completo de una garantía"""
+    """Detalle completo de una garantía con control de acceso"""
     garantia = get_object_or_404(Garantia, pk=pk)
+
+    # Verificar permisos
+    if not request.user.is_staff and not request.user.is_superuser:
+        try:
+            from clientes.models import Cliente
+            cliente = Cliente.objects.filter(correo=request.user.email).first()
+
+            if not cliente or garantia.cliente != cliente:
+                messages.error(request, 'No tienes permiso para ver esta garantía.')
+                return redirect('garantias:lista')
+        except:
+            messages.error(request, 'No tienes permiso para ver esta garantía.')
+            return redirect('garantias:lista')
+
     seguimientos = garantia.seguimientos.all()
 
     context = {
@@ -146,6 +189,7 @@ def garantia_detalle(request, pk):
     return render(request, 'garantias/detalle.html', context)
 
 
+@login_required
 def garantia_eliminar(request, pk):
     """RF3: Eliminar garantía"""
     garantia = get_object_or_404(Garantia, pk=pk)
@@ -168,6 +212,7 @@ def garantia_eliminar(request, pk):
     return render(request, 'garantias/eliminar.html', context)
 
 
+@login_required
 def garantia_buscar(request):
     """RF2: Buscar garantía por múltiples criterios"""
     garantias = []
@@ -198,6 +243,7 @@ def garantia_buscar(request):
     return render(request, 'garantias/buscar.html', context)
 
 
+@login_required
 def garantias_por_vencer(request):
     """Lista de garantías próximas a vencer (30 días)"""
     fecha_limite = date.today() + timedelta(days=30)
@@ -214,6 +260,7 @@ def garantias_por_vencer(request):
     return render(request, 'garantias/por_vencer.html', context)
 
 
+@login_required
 def garantias_vencidas(request):
     """Lista de garantías vencidas"""
     garantias = Garantia.objects.filter(

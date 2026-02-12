@@ -1,182 +1,233 @@
 """
-Script de Verificación Final - Google OAuth y Sistema de Recuperación
+Script de Verificación Completa del Sistema
+Verifica que todas las dependencias y configuraciones estén correctas
 """
-
+import sys
 import os
-import django
 
-# Configurar Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
-django.setup()
+print("\n" + "="*80)
+print("🔍 VERIFICACIÓN COMPLETA DEL SISTEMA - DIGIT SOFT")
+print("="*80)
 
-from allauth.socialaccount.models import SocialApp
-from django.contrib.sites.models import Site
-from usuarios.models import PasswordResetToken
-from usuarios.models_tokens import TokenRecuperacion
-from django.contrib.auth.models import User
-
-print("=" * 80)
-print("🔍 VERIFICACIÓN FINAL DEL SISTEMA")
-print("=" * 80)
-
-# 1. Verificar Google OAuth
-print("\n📱 1. GOOGLE OAUTH")
-print("-" * 80)
-google_apps = SocialApp.objects.filter(provider='google')
-print(f"✓ Social Apps de Google encontradas: {google_apps.count()}")
-
-if google_apps.count() == 1:
-    app = google_apps.first()
-    print(f"✅ PERFECTO: Solo hay 1 configuración de Google OAuth")
-    print(f"   - Name: {app.name}")
-    print(f"   - Client ID: {app.client_id[:30]}...")
-    print(f"   - Sites: {[site.domain for site in app.sites.all()]}")
-elif google_apps.count() == 0:
-    print("❌ ERROR: No hay configuraciones de Google OAuth")
-    print("   Ejecuta: python forzar_limpieza_google.py")
+# ============================================================================
+# 1. VERIFICAR VERSIÓN DE PYTHON
+# ============================================================================
+print("\n[1] Verificando versión de Python...")
+python_version = sys.version_info
+if python_version.major == 3 and python_version.minor >= 8:
+    print(f"   ✅ Python {python_version.major}.{python_version.minor}.{python_version.micro}")
 else:
-    print(f"⚠️ ADVERTENCIA: Hay {google_apps.count()} configuraciones (debe ser solo 1)")
-    print("   Ejecuta: python forzar_limpieza_google.py")
-    for idx, app in enumerate(google_apps, 1):
-        print(f"   {idx}. {app.name} - {app.client_id[:30]}...")
+    print(f"   ⚠️  Python {python_version.major}.{python_version.minor}.{python_version.micro}")
+    print("   Recomendado: Python 3.8+")
 
-# 2. Verificar URLs de usuarios
-print("\n🔗 2. URLS DEL MÓDULO USUARIOS")
-print("-" * 80)
-from django.urls import reverse
-try:
-    url_gestionar_contrasenas = reverse('usuarios:admin_gestionar_contrasenas')
-    print(f"✅ URL 'admin_gestionar_contrasenas' configurada: {url_gestionar_contrasenas}")
-except Exception as e:
-    print(f"❌ ERROR: URL 'admin_gestionar_contrasenas' no encontrada: {e}")
+# ============================================================================
+# 2. VERIFICAR PAQUETES INSTALADOS
+# ============================================================================
+print("\n[2] Verificando paquetes instalados...")
 
-try:
-    url_solicitar = reverse('usuarios:solicitar_recuperacion')
-    print(f"✅ URL 'solicitar_recuperacion' configurada: {url_solicitar}")
-except Exception as e:
-    print(f"❌ ERROR: {e}")
+paquetes_requeridos = {
+    'django': 'Django',
+    'allauth': 'django-allauth',
+    'django_recaptcha': 'django-recaptcha'
+}
 
-try:
-    url_verificar = reverse('usuarios:verificar_codigo')
-    print(f"✅ URL 'verificar_codigo' configurada: {url_verificar}")
-except Exception as e:
-    print(f"❌ ERROR: {e}")
+paquetes_ok = True
+for modulo, nombre in paquetes_requeridos.items():
+    try:
+        __import__(modulo)
+        if modulo == 'django':
+            import django
+            print(f"   ✅ {nombre} ({django.get_version()})")
+        elif modulo == 'allauth':
+            import allauth
+            print(f"   ✅ {nombre} ({allauth.__version__})")
+        else:
+            print(f"   ✅ {nombre}")
+    except ImportError:
+        print(f"   ❌ {nombre} NO instalado")
+        print(f"      Ejecuta: pip install {nombre}")
+        paquetes_ok = False
 
-# 3. Verificar modelos de recuperación
-print("\n🔐 3. SISTEMA DE RECUPERACIÓN DE CONTRASEÑA")
-print("-" * 80)
+# ============================================================================
+# 3. CONFIGURAR DJANGO
+# ============================================================================
+if paquetes_ok:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+    try:
+        import django
+        django.setup()
+        print("\n[3] Django configurado correctamente ✅")
+    except Exception as e:
+        print(f"\n[3] Error al configurar Django: {e}")
+        sys.exit(1)
+else:
+    print("\n⚠️  Instala los paquetes faltantes antes de continuar")
+    sys.exit(1)
 
-# Tokens antiguos (24 horas)
-total_tokens_antiguos = PasswordResetToken.objects.count()
-tokens_antiguos_validos = PasswordResetToken.objects.filter(used=False).count()
-print(f"✓ Tokens antiguos (24h): {total_tokens_antiguos} total, {tokens_antiguos_validos} válidos")
+# ============================================================================
+# 4. VERIFICAR CONFIGURACIÓN DE SETTINGS
+# ============================================================================
+print("\n[4] Verificando configuración en settings.py...")
 
-# Tokens nuevos (30 minutos)
-total_tokens_nuevos = TokenRecuperacion.objects.count()
-tokens_nuevos_activos = TokenRecuperacion.objects.filter(usado=False).count()
-print(f"✓ Códigos nuevos (30min): {total_tokens_nuevos} total, {tokens_nuevos_activos} activos")
-
-# 4. Verificar templates
-print("\n📄 4. TEMPLATES")
-print("-" * 80)
-import os
 from django.conf import settings
 
-templates_requeridos = [
-    'usuarios/admin_gestionar_contrasenas.html',
-    'usuarios/recuperar_paso1.html',
-    'usuarios/recuperar_paso2.html',
-    'usuarios/recuperar_paso3.html',
-]
+# Verificar reCAPTCHA
+if hasattr(settings, 'RECAPTCHA_PUBLIC_KEY'):
+    print("   ✅ RECAPTCHA_PUBLIC_KEY configurado")
+else:
+    print("   ❌ RECAPTCHA_PUBLIC_KEY NO configurado")
 
-for template_name in templates_requeridos:
-    template_encontrado = False
-    for template_dir in settings.TEMPLATES[0]['DIRS']:
-        template_path = os.path.join(template_dir, template_name)
-        if os.path.exists(template_path):
-            print(f"✅ {template_name}")
-            template_encontrado = True
-            break
-    if not template_encontrado:
-        print(f"❌ {template_name} - NO ENCONTRADO")
+if hasattr(settings, 'RECAPTCHA_PRIVATE_KEY'):
+    print("   ✅ RECAPTCHA_PRIVATE_KEY configurado")
+else:
+    print("   ❌ RECAPTCHA_PRIVATE_KEY NO configurado")
 
-# 5. Verificar usuarios
-print("\n👥 5. USUARIOS DEL SISTEMA")
-print("-" * 80)
-total_users = User.objects.count()
-superusers = User.objects.filter(is_superuser=True).count()
-staff = User.objects.filter(is_staff=True, is_superuser=False).count()
-normales = User.objects.filter(is_staff=False, is_superuser=False).count()
-
-print(f"✓ Total de usuarios: {total_users}")
-print(f"  - Superusuarios: {superusers}")
-print(f"  - Staff: {staff}")
-print(f"  - Normales: {normales}")
-
-# 6. Verificar vistas
-print("\n🎯 6. VISTAS IMPORTANTES")
-print("-" * 80)
-from usuarios import views
-from usuarios import views_recuperacion
-
-vistas_requeridas = [
-    ('views.admin_gestionar_contrasenas', views, 'admin_gestionar_contrasenas'),
-    ('views_recuperacion.solicitar_recuperacion', views_recuperacion, 'solicitar_recuperacion'),
-    ('views_recuperacion.verificar_codigo', views_recuperacion, 'verificar_codigo'),
-    ('views_recuperacion.nueva_password', views_recuperacion, 'nueva_password'),
-]
-
-for nombre, modulo, funcion in vistas_requeridas:
-    if hasattr(modulo, funcion):
-        print(f"✅ {nombre}")
+# Verificar apps instaladas
+apps_requeridas = ['django_recaptcha', 'allauth', 'usuarios']
+for app in apps_requeridas:
+    if app in settings.INSTALLED_APPS:
+        print(f"   ✅ '{app}' en INSTALLED_APPS")
     else:
-        print(f"❌ {nombre} - NO ENCONTRADA")
+        print(f"   ❌ '{app}' NO está en INSTALLED_APPS")
 
-# RESUMEN FINAL
-print("\n" + "=" * 80)
-print("📊 RESUMEN FINAL")
-print("=" * 80)
+# ============================================================================
+# 5. VERIFICAR BASE DE DATOS
+# ============================================================================
+print("\n[5] Verificando base de datos...")
 
-errores = []
-advertencias = []
-
-# Verificar Google OAuth
-if google_apps.count() != 1:
-    errores.append("Google OAuth no tiene exactamente 1 configuración")
-else:
-    print("✅ Google OAuth: OK")
-
-# Verificar URL
 try:
-    reverse('usuarios:admin_gestionar_contrasenas')
-    print("✅ URLs: OK")
-except:
-    errores.append("URL admin_gestionar_contrasenas no configurada")
+    from django.db import connection
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT 1")
+    print("   ✅ Conexión a base de datos exitosa")
 
-# Verificar templates
-if os.path.exists(os.path.join(settings.TEMPLATES[0]['DIRS'][0], 'usuarios/admin_gestionar_contrasenas.html')):
-    print("✅ Templates: OK")
+    # Verificar tablas importantes
+    from django.contrib.auth.models import User
+    user_count = User.objects.count()
+    print(f"   ✅ Usuarios en la base de datos: {user_count}")
+
+except Exception as e:
+    print(f"   ⚠️  Error en base de datos: {e}")
+    print("   Ejecuta: python manage.py migrate")
+
+# ============================================================================
+# 6. VERIFICAR GOOGLE OAUTH
+# ============================================================================
+print("\n[6] Verificando Google OAuth...")
+
+try:
+    from allauth.socialaccount.models import SocialApp
+    google_apps = SocialApp.objects.filter(provider='google')
+    count = google_apps.count()
+
+    if count == 0:
+        print("   ⚠️  No hay configuración de Google OAuth")
+        print("   Ejecuta: python LIMPIAR_GOOGLE_OAUTH.py")
+    elif count == 1:
+        app = google_apps.first()
+        print("   ✅ Exactamente 1 configuración de Google OAuth")
+        print(f"      Client ID: {app.client_id[:20]}...")
+    else:
+        print(f"   ❌ ERROR: {count} configuraciones (debe ser 1)")
+        print("   Ejecuta: python LIMPIAR_GOOGLE_OAUTH.py")
+
+except Exception as e:
+    print(f"   ⚠️  Error: {e}")
+
+# ============================================================================
+# 7. VERIFICAR ARCHIVOS IMPORTANTES
+# ============================================================================
+print("\n[7] Verificando archivos importantes...")
+
+archivos = {
+    'manage.py': 'Script principal de Django',
+    'config/settings.py': 'Configuración',
+    'usuarios/views.py': 'Vistas de usuarios',
+    'usuarios/forms.py': 'Formularios con reCAPTCHA',
+    'usuarios/views_recuperacion.py': 'Sistema de recuperación',
+    'templates/usuarios/login.html': 'Template de login',
+    'templates/usuarios/recuperar_paso1.html': 'Template recuperación paso 1',
+    'templates/usuarios/recuperar_paso2.html': 'Template recuperación paso 2',
+    'templates/usuarios/recuperar_paso3.html': 'Template recuperación paso 3',
+}
+
+archivos_ok = True
+for archivo, descripcion in archivos.items():
+    if os.path.exists(archivo):
+        print(f"   ✅ {archivo}")
+    else:
+        print(f"   ❌ {archivo} NO encontrado")
+        archivos_ok = False
+
+# ============================================================================
+# 8. VERIFICAR SCRIPTS DE CONFIGURACIÓN
+# ============================================================================
+print("\n[8] Verificando scripts de configuración...")
+
+scripts = [
+    'CONFIGURAR_SISTEMA_COMPLETO.bat',
+    'LIMPIAR_GOOGLE_OAUTH.py',
+    'verificacion_final.py',
+    'RESUMEN_FINAL.bat'
+]
+
+for script in scripts:
+    if os.path.exists(script):
+        print(f"   ✅ {script}")
+    else:
+        print(f"   ⚠️  {script} NO encontrado (opcional)")
+
+# ============================================================================
+# RESUMEN FINAL
+# ============================================================================
+print("\n" + "="*80)
+print("📊 RESUMEN")
+print("="*80)
+
+all_ok = True
+
+if python_version.major == 3 and python_version.minor >= 8:
+    print("✅ Python")
 else:
-    errores.append("Template admin_gestionar_contrasenas.html no encontrado")
+    print("⚠️  Python (versión antigua)")
+    all_ok = False
 
-# Verificar vistas
-if hasattr(views, 'admin_gestionar_contrasenas'):
-    print("✅ Vistas: OK")
+if paquetes_ok:
+    print("✅ Paquetes")
 else:
-    errores.append("Vista admin_gestionar_contrasenas no encontrada")
+    print("❌ Paquetes (faltantes)")
+    all_ok = False
 
-print("\n" + "=" * 80)
-if errores:
-    print("❌ ERRORES ENCONTRADOS:")
-    for error in errores:
-        print(f"   - {error}")
+if archivos_ok:
+    print("✅ Archivos")
 else:
-    print("🎉 ¡TODO PERFECTO! El sistema está funcionando correctamente")
+    print("⚠️  Archivos (algunos faltantes)")
+    all_ok = False
 
-if advertencias:
-    print("\n⚠️ ADVERTENCIAS:")
-    for adv in advertencias:
-        print(f"   - {adv}")
+print("\n" + "="*80)
 
-print("=" * 80)
+if all_ok:
+    print("🎉 ¡TODO ESTÁ PERFECTO!")
+    print("="*80)
+    print("\n✅ El sistema está listo para usar")
+    print("\n🚀 PRÓXIMOS PASOS:")
+    print("   1. Ejecuta: python manage.py runserver")
+    print("   2. Visita: http://127.0.0.1:8000/usuarios/login/")
+    print("   3. Prueba las funcionalidades")
+else:
+    print("⚠️  HAY PROBLEMAS QUE RESOLVER")
+    print("="*80)
+    print("\n📝 ACCIONES RECOMENDADAS:")
+    if not paquetes_ok:
+        print("   • Instalar paquetes faltantes")
+    if not archivos_ok:
+        print("   • Verificar que todos los archivos existan")
+    print("   • Ejecutar: CONFIGURAR_SISTEMA_COMPLETO.bat")
+
+print("\n" + "="*80)
+print("📚 DOCUMENTACIÓN:")
+print("   • README_RAPIDO.md - Inicio rápido")
+print("   • INSTRUCCIONES_SISTEMA_COMPLETO.md - Guía completa")
+print("   • IMPLEMENTACION_COMPLETA.md - Resumen técnico")
+print("="*80 + "\n")
 

@@ -9,11 +9,10 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from .models import Cliente
 from .forms import ClienteForm
-from usuarios.decorators import staff_required
+from core.decorators import admin_required, admin_o_tecnico_required
 
 
-@login_required
-@staff_required
+@admin_o_tecnico_required
 def lista_clientes(request):
     """RF2: BUSCAR CLIENTES - Lista todos los clientes con búsqueda dinámica y filtros"""
     # Obtener parámetros de búsqueda
@@ -63,9 +62,8 @@ def lista_clientes(request):
     }
     return render(request, 'clientes/lista.html', context)
 
-@staff_required
 
-@login_required
+@admin_required
 def crear_cliente(request):
     """RF1: REGISTRAR CLIENTE - Crear un nuevo cliente"""
     if request.method == 'POST':
@@ -86,8 +84,7 @@ def crear_cliente(request):
     return render(request, 'clientes/form.html', context)
 
 
-@login_required
-@staff_required
+@admin_required
 def editar_cliente(request, pk):
     """RF3: MODIFICAR DATOS DEL CLIENTE - Editar cliente existente"""
     cliente = get_object_or_404(Cliente, pk=pk)
@@ -111,8 +108,7 @@ def editar_cliente(request, pk):
     return render(request, 'clientes/form.html', context)
 
 
-@login_required
-@staff_required
+@admin_required
 def eliminar_cliente(request, pk):
     """RF4: ELIMINAR CLIENTE - Eliminar cliente de la base de datos"""
     cliente = get_object_or_404(Cliente, pk=pk)
@@ -129,8 +125,7 @@ def eliminar_cliente(request, pk):
     return render(request, 'clientes/eliminar.html', context)
 
 
-@login_required
-@staff_required
+@admin_o_tecnico_required
 def detalle_cliente(request, pk):
     """Ver detalles completos de un cliente"""
     cliente = get_object_or_404(Cliente, pk=pk)
@@ -148,8 +143,7 @@ index = lista_clientes
 # REPORTES PDF Y EXCEL
 # ==============================================
 
-@login_required
-@staff_required
+@admin_required
 def cliente_reporte_pdf(request):
     """Generar reporte de clientes en PDF"""
     from utils.reportes import generar_pdf
@@ -188,8 +182,7 @@ def cliente_reporte_pdf(request):
     return generar_pdf('reportes/clientes_pdf.html', context, filename)
 
 
-@login_required
-@staff_required
+@admin_required
 def cliente_reporte_excel(request):
     """Generar reporte de clientes en Excel"""
     from utils.reportes import generar_excel_avanzado

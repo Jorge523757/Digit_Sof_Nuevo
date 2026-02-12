@@ -4,9 +4,24 @@ from .models import RegistroDano, ImagenDano, DocumentoFactura, NotaDano
 
 @admin.register(RegistroDano)
 class RegistroDanoAdmin(admin.ModelAdmin):
-    list_display = ['numero_factura', 'fecha_reporte', 'usuario']
-    list_filter = ['fecha_reporte']
-    search_fields = ['numero_factura', 'descripcion_dano']
+    list_display = ['numero_reporte', 'cliente', 'fecha_reporte', 'estado', 'usuario']
+    list_filter = ['fecha_reporte', 'estado', 'notificado_admin']
+    search_fields = ['numero_reporte', 'descripcion_dano', 'cliente__nombre']
+    readonly_fields = ['numero_reporte', 'fecha_reporte', 'fecha_actualizacion']
+    fieldsets = (
+        ('Información del Reporte', {
+            'fields': ('numero_reporte', 'fecha_reporte', 'cliente', 'usuario', 'equipo')
+        }),
+        ('Detalles del Daño', {
+            'fields': ('descripcion_dano', 'tiempo_requerido_cliente', 'observaciones')
+        }),
+        ('Estado', {
+            'fields': ('estado', 'notificado_admin', 'fecha_notificacion_admin')
+        }),
+        ('Orden de Servicio', {
+            'fields': ('orden',)
+        }),
+    )
 
 
 @admin.register(ImagenDano)

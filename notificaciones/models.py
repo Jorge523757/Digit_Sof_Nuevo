@@ -6,7 +6,6 @@ Gestión automatizada de comunicaciones con técnicos y clientes
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-from datetime import timedelta
 
 
 class CanalNotificacion(models.Model):
@@ -232,3 +231,123 @@ class MonitoreoOrden(models.Model):
 
         return False
 
+
+class NotificacionEmail(models.Model):
+    """Notificaciones por correo electrónico"""
+    TIPO_NOTIFICACION_CHOICES = [
+        ('REPORTE_CLIENTE', 'Envío de reporte de cliente'),
+        ('ASIGNACION_TECNICO', 'Envío de equipo'),
+        ('ORDEN_SERVICIO_CLIENTE', 'Orden de Servicio'),
+        ('DIAGNOSTICO_COMPLETADO', 'Diagnóstico Completado'),
+        ('EQUIPO_LISTO', 'Equipo Listo para Entrega'),
+    ]
+
+    ESTADO_CHOICES = [
+        ('PENDIENTE', 'Pendiente'),
+        ('ENVIADO', 'Enviado'),
+        ('ERROR', 'Error'),
+    ]
+
+    destinatario = models.EmailField(verbose_name="Correo destinatario")
+    asunto = models.CharField(max_length=200, verbose_name="Asunto")
+    contenido_texto = models.TextField(verbose_name="Contenido texto plano")
+    contenido_html = models.TextField(blank=True, verbose_name="Contenido HTML")
+    tipo_notificacion = models.CharField(
+        max_length=30,
+        choices=TIPO_NOTIFICACION_CHOICES,
+        verbose_name="Tipo"
+    )
+    orden_servicio = models.ForeignKey(
+        'ordenes.OrdenServicio',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='emails_enviados',
+        verbose_name="Orden de servicio"
+    )
+    enviado = models.BooleanField(default=False, verbose_name="Enviado")
+    estado = models.CharField(
+        max_length=20,
+        choices=ESTADO_CHOICES,
+        default='PENDIENTE',
+        verbose_name="Estado"
+    )
+    fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+    fecha_envio = models.DateTimeField(null=True, blank=True, verbose_name="Fecha de envío")
+    error_mensaje = models.TextField(blank=True, verbose_name="Mensaje de error")
+
+    class Meta:
+        verbose_name = "Notificación por Email"
+        verbose_name_plural = "Notificaciones por Email"
+        ordering = ['-fecha_creacion']
+
+    def __str__(self):
+        return f"{self.get_tipo_notificacion_display()} - {self.destinatario}"
+
+
+class NotificacionWeb(models.Model):
+    """Notificaciones en la plataforma web"""
+    TIPO_CHOICES = [
+        ('INFO', 'Información'),
+        ('SUCCESS', 'Éxito'),
+        ('WARNING', 'Advertencia'),
+        ('DANGER', 'Peligro'),
+        ('PRIMARY', 'Primario'),
+    ]
+
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='notificaciones_web',
+        verbose_name="Usuario"
+    )
+    titulo = models.CharField(max_length=200, verbose_name="Título")
+    mensaje = models.TextField(verbose_name="Mensaje")
+    tipo = models.CharField(
+        max_length=10,
+        choices=TIPO_CHOICES,
+        default='INFO',
+        verbose_name="Tipo"
+    )
+    icono = models.CharField(
+        max_length=50,
+        default='fa-bell',
+        verbose_name="Icono",
+        help_text="Clase de Font Awesome"
+    )
+    url = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name="URL de acción",
+        help_text="URL a la que redirigir al hacer clic"
+    )
+    orden_servicio = models.ForeignKey(
+        'ordenes.OrdenServicio',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='notificaciones_web',
+        verbose_name="Orden de servicio"
+    )
+    leida = models.BooleanField(default=False, verbose_name="Leída")
+    fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+    fecha_lectura = models.DateTimeField(null=True, blank=True, verbose_name="Fecha de lectura")
+
+    class Meta:
+        verbose_name = "Notificación Web"
+        verbose_name_plural = "Notificaciones Web"
+        ordering = ['-fecha_creacion']
+        indexes = [
+            models.Index(fields=['usuario', 'leida']),
+            models.Index(fields=['fecha_creacion']),
+        ]
+
+    def __str__(self):
+        return f"{self.titulo} - {self.usuario.username}"
+
+    def marcar_leida(self):
+        """Marca la notificación como leída"""
+        if not self.leida:
+            self.leida = True
+            self.fecha_lectura = timezone.now()
+            self.save()

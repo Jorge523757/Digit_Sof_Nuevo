@@ -35,6 +35,16 @@ class Tecnico(models.Model):
 
     # Estado
     activo = models.BooleanField(default=True, verbose_name="Activo")
+    eliminado = models.BooleanField(default=False, verbose_name="Eliminado")
+    fecha_eliminacion = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Fecha de Eliminación"
+    )
+    motivo_eliminacion = models.TextField(
+        blank=True,
+        verbose_name="Motivo de Eliminación"
+    )
 
     # Metadatos
     fecha_registro = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Registro")
@@ -53,4 +63,31 @@ class Tecnico(models.Model):
     def nombre_completo(self):
         """Retorna el nombre completo del técnico"""
         return f"{self.nombres} {self.apellidos}"
+
+    def eliminar_logicamente(self, motivo=""):
+        """Elimina el técnico de forma lógica"""
+        from django.utils import timezone
+        self.eliminado = True
+        self.activo = False
+        self.fecha_eliminacion = timezone.now()
+        self.motivo_eliminacion = motivo
+        self.save()
+
+    def restaurar(self):
+        """Restaura un técnico eliminado"""
+        self.eliminado = False
+        self.activo = True
+        self.fecha_eliminacion = None
+        self.motivo_eliminacion = ""
+        self.save()
+
+    @property
+    def estado_display(self):
+        """Retorna el estado del técnico para mostrar"""
+        if self.eliminado:
+            return "Eliminado"
+        elif not self.activo:
+            return "Inhabilitado"
+        else:
+            return "Habilitado"
 

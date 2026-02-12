@@ -1,0 +1,192 @@
+{% extends 'ayuda/base_ayuda.html' %}
+{% load static %}
+
+{% block title %}Mis Tickets - DIGIT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tickets-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .page-header {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .filter-bar {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .ticket-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        transition: all 0.3s;
+    }
+
+    .ticket-card:hover {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+
+    .ticket-badge {
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .badge-abierto { background: #fff3cd; color: #856404; }
+    .badge-en_proceso { background: #cce5ff; color: #004085; }
+    .badge-respondido { background: #d1ecf1; color: #0c5460; }
+    .badge-resuelto { background: #d4edda; color: #155724; }
+    .badge-cerrado { background: #e2e3e5; color: #383d41; }
+
+    .priority-badge {
+        padding: 3px 10px;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .priority-baja { background: #e0e0e0; color: #666; }
+    .priority-media { background: #fff3cd; color: #856404; }
+    .priority-alta { background: #ffe5b4; color: #ff8c00; }
+    .priority-urgente { background: #f8d7da; color: #721c24; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tickets-container">
+    <div class="page-header">
+        <h1><i class="fas fa-ticket-alt"></i> Mis Tickets de Ayuda</h1>
+        <p class="text-muted mb-0">Gestiona y da seguimiento a tus solicitudes de ayuda</p>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filter-bar">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h5 class="mb-0">
+                    <i class="fas fa-filter"></i> Filtrar por estado:
+                </h5>
+            </div>
+            <div class="col-md-6">
+                <div class="btn-group" role="group">
+                    <a href="{% url 'ayuda:mis_tickets' %}"
+                       class="btn btn-sm {% if not estado_filtro %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        Todos
+                    </a>
+                    <a href="?estado=abierto"
+                       class="btn btn-sm {% if estado_filtro == 'abierto' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                        Abiertos
+                    </a>
+                    <a href="?estado=en_proceso"
+                       class="btn btn-sm {% if estado_filtro == 'en_proceso' %}btn-info{% else %}btn-outline-info{% endif %}">
+                        En Proceso
+                    </a>
+                    <a href="?estado=resuelto"
+                       class="btn btn-sm {% if estado_filtro == 'resuelto' %}btn-success{% else %}btn-outline-success{% endif %}">
+                        Resueltos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Tickets -->
+    {% if tickets %}
+        {% for ticket in tickets %}
+        <div class="ticket-card">
+            <div class="row align-items-center">
+                <div class="col-md-1">
+                    <h4 class="text-muted mb-0">#{{ ticket.id }}</h4>
+                </div>
+                <div class="col-md-5">
+                    <h5 class="mb-1">{{ ticket.asunto }}</h5>
+                    <small class="text-muted">
+                        {% if ticket.categoria %}
+                            <i class="fas {{ ticket.categoria.icono }}"></i> {{ ticket.categoria.nombre }}
+                        {% else %}
+                            Sin categoría
+                        {% endif %}
+                    </small>
+                </div>
+                <div class="col-md-2 text-center">
+                    <span class="ticket-badge badge-{{ ticket.estado }}">
+                        {{ ticket.get_estado_display }}
+                    </span>
+                    <br>
+                    <span class="priority-badge priority-{{ ticket.prioridad }} mt-1">
+                        {{ ticket.get_prioridad_display }}
+                    </span>
+                </div>
+                <div class="col-md-2 text-center">
+                    <small class="text-muted d-block">Creado:</small>
+                    <strong>{{ ticket.fecha_creacion|date:"d/m/Y" }}</strong>
+                    <br>
+                    <small class="text-muted">{{ ticket.fecha_creacion|date:"H:i" }}</small>
+                </div>
+                <div class="col-md-2 text-end">
+                    <a href="{% url 'ayuda:ver_ticket' ticket.id %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye"></i> Ver Detalles
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Paginación -->
+        {% if tickets.has_other_pages %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if tickets.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ tickets.previous_page_number }}{% if estado_filtro %}&estado={{ estado_filtro }}{% endif %}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">{{ tickets.number }} de {{ tickets.paginator.num_pages }}</span>
+                </li>
+
+                {% if tickets.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ tickets.next_page_number }}{% if estado_filtro %}&estado={{ estado_filtro }}{% endif %}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    {% else %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                <h4>No tienes tickets aún</h4>
+                <p class="text-muted">¿Necesitas ayuda? Crea tu primer ticket</p>
+                <a href="{% url 'ayuda:crear_ticket' %}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle"></i> Crear Ticket
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+

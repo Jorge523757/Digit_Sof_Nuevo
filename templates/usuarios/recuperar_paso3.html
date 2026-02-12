@@ -1,0 +1,338 @@
+{% extends 'base_auth.html' %}
+{% load static %}
+
+{% block title %}Nueva Contraseña - DIGIT SOFT{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* FORZAR centrado completo vertical y horizontal */
+    html, body {
+        height: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: hidden;
+    }
+
+    body {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 100vh !important;
+    }
+
+    body > * {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .recovery-container {
+        width: 100%;
+        height: 100vh;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+    .recovery-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        max-width: 500px;
+        width: 100%;
+        padding: 40px;
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .recovery-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 40px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(40, 167, 69, 0.4);
+    }
+    }
+    .recovery-title {
+        text-align: center;
+        color: #1e3c72;
+        margin-bottom: 10px;
+    }
+    .recovery-subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 14px;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #1e3c72;
+        margin-bottom: 8px;
+        display: block;
+    }
+    .form-control {
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 12px 15px;
+        font-size: 16px;
+    }
+    .form-control:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+    .btn-recovery {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 16px;
+        width: 100%;
+        margin-top: 20px;
+    }
+    .btn-recovery:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    }
+    .password-requirements {
+        background-color: #e7f3ff;
+        border-left: 4px solid #2196F3;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
+        font-size: 14px;
+    }
+    .requirement {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .requirement:last-child {
+        margin-bottom: 0;
+    }
+    .requirement i {
+        margin-right: 10px;
+        color: #2196F3;
+    }
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        position: relative;
+    }
+    .progress-steps::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #e0e0e0;
+        z-index: 0;
+    }
+    .step {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        flex: 1;
+    }
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e0e0e0;
+        color: #999;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    .step.active .step-circle {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        box-shadow: 0 3px 10px rgba(40, 167, 69, 0.4);
+    }
+    .step.completed .step-circle {
+        background: #28a745;
+        color: white;
+    }
+    .step-label {
+        font-size: 12px;
+        color: #999;
+    }
+    .step.active .step-label {
+        color: #28a745;
+        font-weight: 600;
+    }
+    .input-icon {
+        position: relative;
+    }
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #95a5a6;
+        cursor: pointer;
+        font-size: 18px;
+    }
+    .toggle-password:hover {
+        color: #1e3c72;
+    }
+</style>
+{% endblock %}
+
+{% block body_content %}
+<div class="recovery-container">
+    <div class="recovery-card">
+        <!-- Indicador de pasos -->
+        <div class="progress-steps">
+            <div class="step completed">
+                <div class="step-circle">✓</div>
+                <div class="step-label">Email</div>
+            </div>
+            <div class="step completed">
+                <div class="step-circle">✓</div>
+                <div class="step-label">Código</div>
+            </div>
+            <div class="step active">
+                <div class="step-circle">3</div>
+                <div class="step-label">Contraseña</div>
+            </div>
+        </div>
+
+        <div class="recovery-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+
+        <h2 class="recovery-title">DIGIT SOFT</h2>
+        <h3 class="recovery-subtitle" style="font-weight: 600; color: #1e3c72;">Crea tu nueva contraseña</h3>
+        <p class="recovery-subtitle">Elige una contraseña segura que no hayas usado antes</p>
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="fas fa-lock me-2"></i>
+                    {{ form.password1.label }}
+                </label>
+                <div class="input-icon">
+                    {{ form.password1 }}
+                    <i class="fas fa-eye toggle-password" id="togglePassword1"></i>
+                </div>
+                {% if form.password1.errors %}
+                    <small class="text-danger">{{ form.password1.errors.0 }}</small>
+                {% else %}
+                    <small class="text-muted">{{ form.password1.help_text }}</small>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="fas fa-lock me-2"></i>
+                    {{ form.password2.label }}
+                </label>
+                <div class="input-icon">
+                    {{ form.password2 }}
+                    <i class="fas fa-eye toggle-password" id="togglePassword2"></i>
+                </div>
+                {% if form.password2.errors %}
+                    <small class="text-danger">{{ form.password2.errors.0 }}</small>
+                {% endif %}
+            </div>
+
+            <div class="password-requirements">
+                <p style="margin: 0 0 10px 0; font-weight: 600;">
+                    <i class="fas fa-info-circle me-2"></i>Tu contraseña debe cumplir:
+                </p>
+                <div class="requirement">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Mínimo 8 caracteres</span>
+                </div>
+                <div class="requirement">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Al menos una letra</span>
+                </div>
+                <div class="requirement">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Al menos un número</span>
+                </div>
+                <div class="requirement">
+                    <i class="fas fa-check-circle"></i>
+                    <span>No puede ser completamente numérica</span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-recovery">
+                <i class="fas fa-key me-2"></i>
+                Cambiar Contraseña
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Toggle mostrar/ocultar contraseña para password1
+    const togglePassword1 = document.getElementById('togglePassword1');
+    const passwordInput1 = document.querySelector('input[name="password1"]');
+
+    if (togglePassword1 && passwordInput1) {
+        togglePassword1.addEventListener('click', function() {
+            const type = passwordInput1.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput1.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    }
+
+    // Toggle mostrar/ocultar contraseña para password2
+    const togglePassword2 = document.getElementById('togglePassword2');
+    const passwordInput2 = document.querySelector('input[name="password2"]');
+
+    if (togglePassword2 && passwordInput2) {
+        togglePassword2.addEventListener('click', function() {
+            const type = passwordInput2.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput2.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    }
+</script>
+{% endblock %}
+
