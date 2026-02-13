@@ -202,16 +202,29 @@ class RegistroClienteForm(UserCreationForm):
             perfil.documento = self.cleaned_data['documento']
             perfil.save()
 
-            # Crear el registro en la tabla de clientes
-            cliente = Cliente.objects.create(
-                nombres=self.cleaned_data['first_name'],
-                apellidos=self.cleaned_data['last_name'],
+            # Crear o obtener el registro en la tabla de clientes
+            # Usar get_or_create para evitar duplicados
+            cliente, created = Cliente.objects.get_or_create(
                 numero_documento=self.cleaned_data['documento'],
-                telefono=self.cleaned_data['telefono'],
-                correo=self.cleaned_data['email'],
-                direccion=self.cleaned_data['direccion'],
-                activo=True
+                defaults={
+                    'nombres': self.cleaned_data['first_name'],
+                    'apellidos': self.cleaned_data['last_name'],
+                    'telefono': self.cleaned_data['telefono'],
+                    'correo': self.cleaned_data['email'],
+                    'direccion': self.cleaned_data['direccion'],
+                    'activo': True
+                }
             )
+
+            # Si ya existía, actualizar sus datos
+            if not created:
+                cliente.nombres = self.cleaned_data['first_name']
+                cliente.apellidos = self.cleaned_data['last_name']
+                cliente.telefono = self.cleaned_data['telefono']
+                cliente.correo = self.cleaned_data['email']
+                cliente.direccion = self.cleaned_data['direccion']
+                cliente.activo = True
+                cliente.save()
 
             # Vincular el cliente con el perfil
             perfil.cliente = cliente

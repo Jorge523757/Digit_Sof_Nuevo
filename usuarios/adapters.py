@@ -107,19 +107,67 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
 
     def save_user(self, request, sociallogin, form=None):
         """
-        Guarda el usuario y crea automáticamente su perfil
+        Guarda el usuario y crea automáticamente su perfil y registro de cliente
         """
         user = super().save_user(request, sociallogin, form)
 
         # Crear el perfil de usuario automáticamente si no existe
         if not hasattr(user, 'perfil'):
-            PerfilUsuario.objects.create(
+            from clientes.models import Cliente
+            
+            # Crear registro de cliente con datos de Google
+            extra_data = sociallogin.account.extra_data if hasattr(sociallogin, 'account') else {}
+            
+            # Crear cliente primero (sin documento por ahora)
+            # Usar email como identificador único temporal
+            try:
+                cliente, created = Cliente.objects.get_or_create(
+                    correo=user.email.lower(),
+                    defaults={
+                        'nombres': user.first_name or 'Usuario',
+                        'apellidos': user.last_name or 'Google',
+                        'numero_documento': f'GOOGLE-{user.id}',  # Documento temporal
+                        'telefono': '0000000000',  # Teléfono temporal
+                        'direccion': 'Dirección pendiente de completar',
+                        'activo': True,
+                        'observaciones': 'Registrado con Google OAuth'
+                    }
+                )
+                
+                if not created:
+                    # Actualizar información si ya existía
+                    cliente.nombres = user.first_name or cliente.nombres
+                    cliente.apellidos = user.last_name or cliente.apellidos
+                    cliente.activo = True
+                    cliente.save()
+                
+            except Exception as e:
+                print(f"⚠️ Error al crear cliente: {e}")
+                # Si falla, crear con un documento único basado en el user ID
+                cliente = Cliente.objects.create(
+                    nombres=user.first_name or 'Usuario',
+                    apellidos=user.last_name or 'Google',
+                    numero_documento=f'GOOGLE-{user.id}-{user.email[:10]}',
+                    telefono='0000000000',
+                    correo=user.email.lower(),
+                    direccion='Dirección pendiente de completar',
+                    activo=True,
+                    observaciones='Registrado con Google OAuth'
+                )
+            
+            # Crear perfil vinculado al cliente
+            perfil = PerfilUsuario.objects.create(
                 user=user,
-                tipo_usuario='CLIENTE',  # Por defecto, los usuarios de Google son clientes
+                tipo_usuario='CLIENTE',
                 activo=True,
-                bloqueado=False
+                bloqueado=False,
+                cliente=cliente,
+                telefono='0000000000',
+                direccion='Dirección pendiente de completar',
+                documento=cliente.numero_documento
             )
-            print(f"✅ Perfil creado automáticamente para: {user.username}")
+            
+            print(f"✅ Perfil y cliente creados automáticamente para: {user.username}")
 
         return user
 

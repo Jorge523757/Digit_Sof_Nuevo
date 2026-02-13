@@ -1,4 +1,4 @@
-"""
+r"""
 DIGT SOFT - Módulo de Usuarios
 Views - Vistas de Autenticación, Registro, Perfil y Notificaciones
 """
@@ -30,12 +30,42 @@ def registro_cliente(request):
     if request.method == 'POST':
         form = RegistroClienteForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            messages.success(
-                request,
-                '¡Registro exitoso! Tu cuenta ha sido creada. Ahora puedes iniciar sesión.'
-            )
-            return redirect('usuarios:login')
+            try:
+                user = form.save()
+                messages.success(
+                    request,
+                    '¡Registro exitoso! Tu cuenta ha sido creada. Ahora puedes iniciar sesión.'
+                )
+                return redirect('usuarios:login')
+            except Exception as e:
+                # Capturar errores de base de datos
+                error_msg = str(e)
+                if 'UNIQUE constraint failed' in error_msg:
+                    if 'numero_documento' in error_msg:
+                        messages.error(
+                            request,
+                            'Este número de documento ya está registrado. Si ya tienes una cuenta, inicia sesión.'
+                        )
+                    elif 'email' in error_msg or 'correo' in error_msg:
+                        messages.error(
+                            request,
+                            'Este correo electrónico ya está registrado. Por favor, usa otro o inicia sesión.'
+                        )
+                    elif 'username' in error_msg:
+                        messages.error(
+                            request,
+                            'Este nombre de usuario ya está en uso. Por favor, elige otro.'
+                        )
+                    else:
+                        messages.error(
+                            request,
+                            'Ya existe un registro con esta información. Por favor, verifica tus datos.'
+                        )
+                else:
+                    messages.error(
+                        request,
+                        f'Ocurrió un error al crear tu cuenta: {error_msg}. Por favor, inténtalo de nuevo.'
+                    )
         else:
             messages.error(
                 request,
