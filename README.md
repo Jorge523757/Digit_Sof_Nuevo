@@ -1,545 +1,349 @@
-# 🏢 DIGIT SOFT - Sistema de Gestión Empresarial
+# 🚀 DIGIT SOFT - Sistema de Gestión
 
-Sistema completo de gestión para servicios técnicos, inventario, ventas y facturación.
+## 📋 Descripción
 
-## 📋 Tabla de Contenidos
-
-- [Características](#características)
-- [Requisitos](#requisitos)
-- [Instalación](#instalación)
-- [Configuración](#configuración)
-- [Uso](#uso)
-- [Módulos](#módulos)
-- [Credenciales](#credenciales)
-- [Estructura del Proyecto](#estructura-del-proyecto)
+Sistema completo de gestión de servicios técnicos con módulos integrados para:
+- Clientes
+- Técnicos  
+- Órdenes de servicio
+- Reportes de daños
+- Inventario
+- Compras
+- Reportes y análisis
 
 ---
 
-## ✨ Características
+## ⚡ INICIO RÁPIDO (CONFIGURACIÓN AUTOMÁTICA)
 
-### Gestión de Clientes y Técnicos
-- ✅ Registro completo de clientes
-- ✅ Gestión de técnicos
-- ✅ Reportes en PDF y Excel
-- ✅ Búsqueda avanzada
+### Requisitos Previos
 
-### Órdenes de Servicio
-- ✅ Gestión completa de órdenes
-- ✅ Asignación de técnicos
-- ✅ Seguimiento de estados
-- ✅ Notificaciones por correo
+- Python 3.8 o superior
+- pip instalado
 
-### Inventario
-- ✅ Gestión de equipos
-- ✅ Control de productos
-- ✅ Proveedores
-- ✅ Garantías
+### Pasos de Instalación
 
-### Ventas y Facturación
-- ✅ Sistema de ventas
-- ✅ Gestión de compras
-- ✅ Facturación electrónica
-- ✅ E-commerce integrado
+1. **Clonar el repositorio**
+   ```bash
+   git clone https://github.com/Jorge523757/Digit_Sof_Nuevo.git
+   cd Digit_Sof_Nuevo
+   git checkout jorge-dev
+   ```
 
-### Seguridad
-- ✅ Autenticación de usuarios
-- ✅ Control de acceso por roles (Admin, Cliente, Técnico)
-- ✅ Recuperación de contraseña por email
-- ✅ Gestión de contraseñas (solo admin)
-- ✅ Privacidad de datos por usuario
+2. **Ejecutar configuración automática**
 
----
+   **En Windows:**
+   ```bash
+   SETUP_AUTOMATICO.bat
+   ```
 
-## 💻 Requisitos
+   **En Linux/Mac:**
+   ```bash
+   python setup_proyecto.py
+   ```
 
-- Python 3.9 o superior
-- Django 6.0.2
-- MySQL (opcional, usa SQLite por defecto)
-- Windows / Linux / macOS
+   Esto instalará automáticamente:
+   - ✅ Todas las dependencias
+   - ✅ Migraciones de base de datos
+   - ✅ Superusuario (admin/admin123)
+   - ✅ Vistas SQL
+   - ✅ Archivos estáticos
 
----
+3. **Iniciar el servidor**
+   ```bash
+   python manage.py runserver
+   ```
 
-## 🚀 Instalación
-
-### 1. Clonar el Repositorio
-
-```bash
-git clone https://github.com/tu-usuario/digit-soft.git
-cd digit-soft
-```
-
-### 2. Crear Entorno Virtual
-
-**Windows:**
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-
-**Linux/Mac:**
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Instalar Dependencias
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configurar Base de Datos
-
-**Opción 1: SQLite (Por defecto)**
-```bash
-python manage.py migrate
-```
-
-**Opción 2: MySQL**
-```bash
-# Editar config/settings.py - Sección DATABASES
-python manage.py migrate
-```
-
-### 5. Crear Superusuario
-
-**Opción 1: Script automático**
-```bash
-python crear_superusuario.py
-```
-
-**Opción 2: Manual**
-```bash
-python manage.py createsuperuser
-```
-
-**Opción 3: Windows (Doble click)**
-```
-CREAR_SUPERUSUARIO.bat
-```
-
-### 6. Iniciar Servidor
-
-```bash
-python manage.py runserver
-```
-
-### 7. Acceder al Sistema
-
-```
-http://127.0.0.1:8000/
-```
+4. **Acceder al sistema**
+   ```
+   http://127.0.0.1:8000
+   ```
 
 ---
 
-## ⚙️ Configuración
-
-### Variables de Entorno
-
-Crea un archivo `.env` en la raíz del proyecto (opcional):
-
-```env
-DEBUG=True
-SECRET_KEY=tu-clave-secreta
-DATABASE_NAME=digit_soft
-DATABASE_USER=root
-DATABASE_PASSWORD=tu_password
-DATABASE_HOST=localhost
-DATABASE_PORT=3306
-
-# Email
-EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
-EMAIL_HOST_USER=tu_email@gmail.com
-EMAIL_HOST_PASSWORD=tu_password_app
-```
-
-### Configurar Email (Gmail)
-
-1. Ir a: https://myaccount.google.com/apppasswords
-2. Crear "Contraseña de aplicación"
-3. Ejecutar:
-```bash
-python CONFIGURAR_EMAIL_GMAIL.bat
-```
-
-O editar manualmente `config/settings.py`
-
----
-
-## 🎯 Uso
-
-### Credenciales por Defecto
+## 🔑 CREDENCIALES PREDETERMINADAS
 
 **Superusuario:**
 - Usuario: `admin`
 - Contraseña: `admin123`
 - Email: `admin@digitsoft.com`
 
-**⚠️ IMPORTANTE:** Cambiar la contraseña después del primer login
+---
 
-### Accesos
+## 🎯 CARACTERÍSTICAS PRINCIPALES
 
-**Sistema Principal:**
-```
-http://127.0.0.1:8000/usuarios/login/
-```
+### Módulo de Órdenes de Servicio
+- ✅ Gestión completa de órdenes
+- ✅ Seguimiento de estados
+- ✅ Asignación de técnicos
+- ✅ Cálculo automático de costos
+- ✅ Sistema de notificaciones
+- ✅ **Reportes en Excel y PDF**
+- ✅ **Vistas SQL personalizadas**
+- ✅ **Dashboard ejecutivo**
 
-**Panel Admin Django:**
-```
-http://127.0.0.1:8000/admin/
-```
+### Sistema de Reportes
+- ✅ Generación de reportes Excel profesionales
+- ✅ Generación de reportes PDF
+- ✅ Vista previa AJAX en tiempo real
+- ✅ Filtros avanzados (fecha, estado, cliente, técnico)
 
-**Dashboard:**
-```
-http://127.0.0.1:8000/dashboard/
-```
+### Vistas SQL Avanzadas (8 vistas)
+- ✅ Vista completa de órdenes con datos relacionados
+- ✅ Estadísticas por estado
+- ✅ Rendimiento de técnicos
+- ✅ Historial de clientes
+- ✅ Órdenes críticas
+- ✅ Análisis de equipos
+- ✅ Dashboard ejecutivo
+- ✅ Timeline de órdenes
+
+### Otros Módulos
+- ✅ Gestión de clientes
+- ✅ Gestión de técnicos
+- ✅ Reportes de daños
+- ✅ Inventario
+- ✅ Sistema de compras
+- ✅ Autenticación con Google OAuth
+- ✅ Sistema de permisos
 
 ---
 
-## 📦 Módulos
-
-### Para Administradores
-
-1. **Gestión de Usuarios**
-   - Crear/Editar/Eliminar usuarios
-   - Asignar roles
-   - Gestionar permisos
-
-2. **Gestión de Contraseñas**
-   - Cambiar contraseñas de usuarios
-   - Ver usuarios con/sin cuenta
-   - Búsqueda y filtros
-
-3. **Clientes**
-   - Registro de clientes
-   - Historial completo
-   - Reportes
-
-4. **Técnicos**
-   - Gestión de técnicos
-   - Asignación de órdenes
-   - Disponibilidad
-
-5. **Órdenes de Servicio**
-   - Crear órdenes
-   - Asignar técnicos
-   - Seguimiento
-
-6. **Equipos**
-   - Registro de equipos
-   - Historial de servicio
-   - Garantías
-
-7. **Productos**
-   - Inventario
-   - Stock
-   - Precios
-
-8. **Proveedores**
-   - Gestión de proveedores
-   - Compras
-   - Historial
-
-9. **Ventas**
-   - Punto de venta
-   - Facturación
-   - Reportes
-
-10. **Facturación**
-    - Generación de facturas
-    - Impresión
-    - Exportación
-
-11. **E-commerce**
-    - Tienda online
-    - Carrito de compras
-    - Checkout
-
-### Para Técnicos
-
-1. **Órdenes Asignadas**
-   - Ver órdenes propias
-   - Actualizar estado
-   - Registrar trabajo
-
-2. **Clientes**
-   - Ver clientes de sus órdenes
-   - Información de contacto
-
-3. **Equipos**
-   - Ver equipos de sus órdenes
-   - Historial
-
-### Para Clientes
-
-1. **Mis Equipos**
-   - Ver equipos registrados
-   - Reportar daños
-
-2. **Mis Órdenes**
-   - Ver estado de órdenes
-   - Historial
-
-3. **Mis Facturas**
-   - Ver facturas
-   - Descargar
-
-4. **Mis Garantías**
-   - Ver garantías activas
-   - Fechas de vencimiento
-
----
-
-## 🔐 Seguridad
-
-### Roles y Permisos
-
-**Administrador:**
-- Acceso completo al sistema
-- Gestión de usuarios y contraseñas
-- Todos los módulos
-
-**Técnico:**
-- Órdenes asignadas
-- Clientes de sus órdenes
-- Equipos de sus órdenes
-
-**Cliente:**
-- Solo sus datos
-- Sus equipos
-- Sus órdenes
-- Sus facturas
-- Sus garantías
-
-### Características de Seguridad
-
-- ✅ Autenticación obligatoria
-- ✅ Control de acceso por rol
-- ✅ Filtros de privacidad en todas las vistas
-- ✅ Protección CSRF
-- ✅ Prevención XSS
-- ✅ Sidebar dinámico según permisos
-- ✅ Recuperación de contraseña segura
-
----
-
-## 📁 Estructura del Proyecto
+## 📂 ESTRUCTURA DEL PROYECTO
 
 ```
 Digit_Sof_Nuevo/
-├── config/                 # Configuración del proyecto
-│   ├── settings.py        # Configuraciones generales
-│   ├── urls.py            # URLs principales
-│   └── wsgi.py            # WSGI para producción
-├── core/                  # Módulo principal
-│   └── decorators.py     # Decoradores de seguridad
-├── usuarios/              # Gestión de usuarios
-├── clientes/             # Gestión de clientes
-├── tecnicos/             # Gestión de técnicos
-├── ordenes/              # Órdenes de servicio
-├── equipos/              # Gestión de equipos
-├── productos/            # Inventario de productos
-├── proveedores/          # Gestión de proveedores
-├── ventas/               # Sistema de ventas
-├── compras/              # Gestión de compras
-├── facturacion/          # Facturación
-├── garantias/            # Gestión de garantías
-├── ecommerce/            # Tienda online
-├── reportes_dano/        # Reportes de daños
-├── capacitaciones/       # Módulo de capacitación
-├── ayuda/                # Centro de ayuda
-├── templates/            # Plantillas HTML
-├── static/               # Archivos estáticos
-├── media/                # Archivos subidos
-├── manage.py             # Django manager
-├── requirements.txt      # Dependencias Python
-├── crear_superusuario.py # Script crear admin
-├── CREAR_SUPERUSUARIO.bat # Ejecutable Windows
-└── README.md             # Esta documentación
+├── config/                 # Configuración Django
+├── core/                   # Módulo principal
+├── clientes/              # Gestión de clientes
+├── tecnicos/              # Gestión de técnicos
+├── ordenes/               # Órdenes de servicio
+│   ├── reportes.py        # Generador de reportes
+│   ├── views_reportes.py  # Vistas de reportes
+│   └── views_vistas.py    # Vistas SQL
+├── usuarios/              # Autenticación
+├── inventario/            # Gestión de inventario
+├── compras/               # Sistema de compras
+├── reportes_dano/         # Reportes de daños
+├── templates/             # Plantillas HTML
+├── static/                # Archivos estáticos
+├── media/                 # Archivos multimedia
+├── requirements.txt       # Dependencias
+├── setup_proyecto.py      # Configuración automática
+├── SETUP_AUTOMATICO.bat   # Script Windows
+└── README.md             # Este archivo
 ```
 
 ---
 
-## 🛠️ Scripts Útiles
+## 🛠️ INSTALACIÓN MANUAL (OPCIONAL)
 
-### Windows (.bat)
+Si prefieres configurar manualmente:
 
-- `CREAR_SUPERUSUARIO.bat` - Crear administrador
-- `CONFIGURAR_EMAIL_GMAIL.bat` - Configurar email
-- `CREAR_BD_MYSQL.bat` - Crear base de datos MySQL
-
-### Python (.py)
-
-- `crear_superusuario.py` - Crear/actualizar admin
-- `configurar_email_gmail.py` - Setup de email
-- `verificar_seguridad.py` - Verificar protecciones
-
----
-
-## 📊 Comandos Útiles
-
-### Migraciones
-
-```bash
-# Crear migraciones
-python manage.py makemigrations
-
-# Aplicar migraciones
-python manage.py migrate
-
-# Ver migraciones
-python manage.py showmigrations
-```
-
-### Base de Datos
-
-```bash
-# Shell de Django
-python manage.py shell
-
-# SQL de migración
-python manage.py sqlmigrate app_name migration_name
-
-# Limpiar base de datos
-python manage.py flush
-```
-
-### Servidor
-
-```bash
-# Desarrollo
-python manage.py runserver
-
-# Puerto específico
-python manage.py runserver 8080
-
-# Acceso externo
-python manage.py runserver 0.0.0.0:8000
-```
-
-### Archivos Estáticos
-
-```bash
-# Recolectar archivos estáticos
-python manage.py collectstatic
-
-# Limpiar archivos estáticos
-python manage.py collectstatic --clear
-```
-
----
-
-## 🐛 Solución de Problemas
-
-### Error: ModuleNotFoundError
-
+### 1. Instalar dependencias
 ```bash
 pip install -r requirements.txt
 ```
 
-### Error: Base de datos bloqueada
-
+### 2. Aplicar migraciones
 ```bash
-# Cerrar todas las conexiones
-# Reiniciar el servidor
+python manage.py migrate
 ```
 
-### Error: Puerto en uso
-
+### 3. Crear superusuario
 ```bash
-# Windows
-netstat -ano | findstr :8000
-taskkill /PID <numero_pid> /F
-
-# Linux/Mac
-lsof -ti:8000 | xargs kill -9
+python manage.py createsuperuser
 ```
 
-### Olvidé la contraseña del admin
-
+### 4. Crear vistas SQL (opcional)
 ```bash
-python crear_superusuario.py
-# Restablece a: admin123
+python gestionar_vistas_ordenes.py crear
 ```
 
-### Email no se envía
+### 5. Recolectar archivos estáticos
+```bash
+python manage.py collectstatic
+```
 
-1. Verificar configuración en `settings.py`
-2. Verificar contraseña de aplicación
-3. Revisar logs del servidor
-
----
-
-## 📝 Documentación Adicional
-
-En el proyecto encontrarás archivos `.md` con documentación específica:
-
-- `SEGURIDAD_SISTEMA_COMPLETO.md` - Seguridad implementada
-- `SUPERUSUARIO_CREADO.md` - Info del superusuario
-- `PRIVACIDAD_COMPLETA_IMPLEMENTADA.md` - Privacidad de datos
-- `MODULO_GESTION_CONTRASENAS_ADMIN.md` - Gestión de contraseñas
+### 6. Iniciar servidor
+```bash
+python manage.py runserver
+```
 
 ---
 
-## 🤝 Contribuir
+## 📊 ACCESO A LAS FUNCIONALIDADES
 
-1. Fork el proyecto
-2. Crea tu rama (`git checkout -b feature/nueva-caracteristica`)
-3. Commit tus cambios (`git commit -am 'Agregar nueva característica'`)
-4. Push a la rama (`git push origin feature/nueva-caracteristica`)
-5. Crea un Pull Request
+### Reportes de Órdenes
+```
+http://127.0.0.1:8000/ordenes/reportes/
+```
 
----
+### Dashboard Ejecutivo
+```
+http://127.0.0.1:8000/ordenes/vistas/dashboard-ejecutivo/
+```
 
-## 📄 Licencia
+### Órdenes Críticas
+```
+http://127.0.0.1:8000/ordenes/vistas/criticas/
+```
 
-Este proyecto es privado y propietario.
-
----
-
-## 👥 Autor
-
-**DIGIT SOFT**  
-Sistema de Gestión Empresarial  
-© 2026 - Todos los derechos reservados
-
----
-
-## 📞 Soporte
-
-Para soporte, contactar a:
-- Email: soporte@digitsoft.com
-- Sistema: `/ayuda/` (Centro de Ayuda)
+### Panel de Administración
+```
+http://127.0.0.1:8000/admin/
+```
 
 ---
 
-## ✅ Checklist de Instalación
+## 🔧 COMANDOS ÚTILES
 
-- [ ] Python instalado
-- [ ] Repositorio clonado
-- [ ] Entorno virtual creado
-- [ ] Dependencias instaladas
-- [ ] Base de datos migrada
-- [ ] Superusuario creado
-- [ ] Email configurado (opcional)
-- [ ] Servidor iniciado
-- [ ] Login verificado
-- [ ] Contraseña cambiada
+### Crear datos de prueba
+```bash
+python crear_datos_prueba.py
+```
+
+### Reparar registros duplicados
+```bash
+python reparar_registros_duplicados.py
+```
+
+### Verificar sistema
+```bash
+python manage.py check
+```
+
+### Crear migraciones
+```bash
+python manage.py makemigrations
+```
 
 ---
 
-## 🎉 ¡Listo para Usar!
+## 📦 DEPENDENCIAS PRINCIPALES
 
-El sistema está completamente configurado y listo para usar.
+- Django 6.0.2
+- django-allauth (Google OAuth)
+- Pillow (Imágenes)
+- openpyxl (Reportes Excel)
+- reportlab (Reportes PDF)
+- django-crispy-forms (Formularios)
 
-**Siguiente paso:** `python manage.py runserver`
+Ver `requirements.txt` para la lista completa.
 
 ---
 
-**Última Actualización:** 11/02/2026  
-**Versión:** 1.0.0  
-**Estado:** ✅ Producción Ready
+## 🌐 NAVEGADORES SOPORTADOS
+
+- ✅ Chrome (Recomendado)
+- ✅ Firefox
+- ✅ Edge
+- ✅ Safari
+
+---
+
+## 📱 RESPONSIVE
+
+El sistema es completamente responsive y funciona en:
+- ✅ Desktop
+- ✅ Tablet
+- ✅ Móvil
+
+---
+
+## 🎨 CARACTERÍSTICAS DE DISEÑO
+
+- Interfaz moderna y profesional
+- Modo oscuro disponible
+- Animaciones suaves
+- Diseño responsive
+- Accesibilidad mejorada
+
+---
+
+## 🔐 SEGURIDAD
+
+- ✅ Autenticación de usuarios
+- ✅ Sistema de permisos
+- ✅ Protección CSRF
+- ✅ Validación de formularios
+- ✅ Hash de contraseñas
+
+---
+
+## 📝 NOTAS IMPORTANTES
+
+1. **Base de datos:** El proyecto usa SQLite por defecto (db.sqlite3)
+2. **Archivos estáticos:** Se sirven desde /static/
+3. **Archivos media:** Se suben a /media/
+4. **Debug:** Está activado en desarrollo (DEBUG=True)
+
+---
+
+## 🆘 SOLUCIÓN DE PROBLEMAS
+
+### Error: "No module named 'X'"
+```bash
+pip install -r requirements.txt
+```
+
+### Error: "No such table"
+```bash
+python manage.py migrate
+```
+
+### Error: Puerto 8000 ocupado
+```bash
+python manage.py runserver 8080
+```
+
+### Restablecer base de datos
+```bash
+# Eliminar db.sqlite3
+python manage.py migrate
+python setup_proyecto.py
+```
+
+---
+
+## 📧 CONTACTO
+
+**Desarrollador:** Jorge Guarín  
+**Proyecto:** DIGIT SOFT  
+**Fecha:** Febrero 2026
+
+---
+
+## 📄 LICENCIA
+
+Este proyecto es privado y de uso exclusivo para DIGIT SOFT.
+
+---
+
+## ✨ ACTUALIZACIONES RECIENTES
+
+### Versión Actual (jorge-dev)
+
+**Últimas características agregadas:**
+- ✅ Sistema completo de reportes Excel/PDF
+- ✅ 8 vistas SQL personalizadas con filtros
+- ✅ Dashboard ejecutivo con métricas en tiempo real
+- ✅ Vista de órdenes críticas
+- ✅ API JSON para integraciones
+- ✅ Corrección de errores de registro
+- ✅ Google OAuth funcionando
+- ✅ Configuración automática del proyecto
+
+---
+
+## 🎯 PRÓXIMOS PASOS DESPUÉS DE INSTALAR
+
+1. ✅ Acceder al sistema con admin/admin123
+2. ✅ Explorar el módulo de órdenes
+3. ✅ Generar tu primer reporte
+4. ✅ Revisar el dashboard ejecutivo
+5. ✅ Personalizar según tus necesidades
+
+---
+
+**¡Gracias por usar DIGIT SOFT! 🚀**
 
