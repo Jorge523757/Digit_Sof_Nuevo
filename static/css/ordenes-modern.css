@@ -91,6 +91,28 @@
     color: #1e3c72;
 }
 
+/* Botón Reportes */
+.btn-reportes-modern {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.05rem;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-reportes-modern:hover {
+    transform: translateY(-3px) scale(1.05);
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 12px 35px rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
 /* Tarjetas de Estadísticas */
 .stat-card-modern {
     background: #fff;

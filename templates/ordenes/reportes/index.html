@@ -1,0 +1,306 @@
+{% extends "base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Reportes de Órdenes{% endblock %}
+
+{% block extra_css %}
+<style>
+    .reportes-container {
+        padding: 20px;
+    }
+
+    .filtros-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .btn-generar {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-generar:hover {
+        transform: translateY(-2px);
+        color: white;
+        box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-excel {
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+    }
+
+    .btn-pdf {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    }
+
+    .vista-previa {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-top: 20px;
+        display: none;
+    }
+
+    .tabla-preview {
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .tabla-preview th {
+        background: #1e3c72;
+        color: white;
+        padding: 12px;
+        font-weight: 600;
+        text-align: left;
+    }
+
+    .tabla-preview td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #ecf0f1;
+    }
+
+    .tabla-preview tr:hover {
+        background: #f8f9fa;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="reportes-container">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1><i class="fas fa-chart-bar"></i> Reportes de Órdenes de Servicio</h1>
+            <p class="text-muted">Genera reportes personalizados en Excel o PDF</p>
+        </div>
+        <div>
+            <a href="{% url 'ordenes:lista' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Volver a Órdenes
+            </a>
+        </div>
+    </div>
+
+    <!-- Formulario de Filtros -->
+    <div class="filtros-card">
+        <h3 class="mb-4"><i class="fas fa-filter"></i> Filtros</h3>
+
+        <form id="formFiltros" method="GET">
+            <div class="row">
+                <!-- Rango de Fechas -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label"><i class="fas fa-calendar"></i> Fecha Desde</label>
+                    <input type="date" name="fecha_desde" class="form-control" value="{{ request.GET.fecha_desde }}">
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label"><i class="fas fa-calendar"></i> Fecha Hasta</label>
+                    <input type="date" name="fecha_hasta" class="form-control" value="{{ request.GET.fecha_hasta }}">
+                </div>
+
+                <!-- Estado -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label"><i class="fas fa-tasks"></i> Estado</label>
+                    <select name="estado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        {% for codigo, nombre in estados %}
+                        <option value="{{ codigo }}" {% if request.GET.estado == codigo %}selected{% endif %}>
+                            {{ nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Prioridad -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label"><i class="fas fa-exclamation-triangle"></i> Prioridad</label>
+                    <select name="prioridad" class="form-select">
+                        <option value="">Todas las prioridades</option>
+                        {% for codigo, nombre in prioridades %}
+                        <option value="{{ codigo }}" {% if request.GET.prioridad == codigo %}selected{% endif %}>
+                            {{ nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Cliente -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label"><i class="fas fa-user"></i> Cliente</label>
+                    <select name="cliente_id" class="form-select">
+                        <option value="">Todos los clientes</option>
+                        {% for cliente in clientes %}
+                        <option value="{{ cliente.id }}" {% if request.GET.cliente_id == cliente.id|stringformat:"s" %}selected{% endif %}>
+                            {{ cliente.nombres }} {{ cliente.apellidos }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Técnico -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label"><i class="fas fa-user-cog"></i> Técnico</label>
+                    <select name="tecnico_id" class="form-select">
+                        <option value="">Todos los técnicos</option>
+                        {% for tecnico in tecnicos %}
+                        <option value="{{ tecnico.id }}" {% if request.GET.tecnico_id == tecnico.id|stringformat:"s" %}selected{% endif %}>
+                            {{ tecnico.nombres }} {{ tecnico.apellidos }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Tipo de Equipo -->
+                <div class="col-md-12 mb-3">
+                    <label class="form-label"><i class="fas fa-laptop"></i> Tipo de Equipo</label>
+                    <input type="text" name="tipo_equipo" class="form-control"
+                           placeholder="Ej: Laptop, PC, Impresora..."
+                           value="{{ request.GET.tipo_equipo }}">
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="row mt-4">
+                <div class="col-md-12 text-center">
+                    <button type="button" class="btn btn-generar me-2" onclick="vistaPrevia()">
+                        <i class="fas fa-eye"></i> Vista Previa
+                    </button>
+
+                    <button type="button" class="btn btn-generar btn-excel me-2" onclick="generarExcel()">
+                        <i class="fas fa-file-excel"></i> Generar Excel
+                    </button>
+
+                    <button type="button" class="btn btn-generar btn-pdf" onclick="generarPDF()">
+                        <i class="fas fa-file-pdf"></i> Generar PDF
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Vista Previa -->
+    <div class="vista-previa" id="vistaPrevia">
+        <h3 class="mb-4"><i class="fas fa-table"></i> Vista Previa</h3>
+        <div id="contenidoVista"></div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function generarExcel() {
+    const form = document.getElementById('formFiltros');
+    const queryString = new URLSearchParams(new FormData(form)).toString();
+    window.location.href = `/ordenes/reportes/excel/?${queryString}`;
+}
+
+function generarPDF() {
+    const form = document.getElementById('formFiltros');
+    const queryString = new URLSearchParams(new FormData(form)).toString();
+    window.location.href = `/ordenes/reportes/pdf/?${queryString}`;
+}
+
+function vistaPrevia() {
+    const form = document.getElementById('formFiltros');
+    const queryString = new URLSearchParams(new FormData(form)).toString();
+
+    // Mostrar loading
+    const vistaDiv = document.getElementById('vistaPrevia');
+    const contenidoDiv = document.getElementById('contenidoVista');
+
+    vistaDiv.style.display = 'block';
+    contenidoDiv.innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-3">Generando vista previa...</p>
+        </div>
+    `;
+
+    // Hacer petición AJAX
+    fetch(`/ordenes/reportes/vista-previa/?${queryString}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                let html = `
+                    <div class="alert alert-info">
+                        <strong>Total de órdenes encontradas:</strong> ${data.total}
+                        <br><strong>Mostrando:</strong> ${data.mostrando} (límite de vista previa)
+                    </div>
+                `;
+
+                if (data.ordenes.length > 0) {
+                    html += `
+                        <div class="table-responsive">
+                            <table class="tabla-preview table">
+                                <thead>
+                                    <tr>
+                                        <th>N° Orden</th>
+                                        <th>Fecha</th>
+                                        <th>Cliente</th>
+                                        <th>Técnico</th>
+                                        <th>Equipo</th>
+                                        <th>Estado</th>
+                                        <th>Prioridad</th>
+                                        <th>Costo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                    data.ordenes.forEach(orden => {
+                        html += `
+                            <tr>
+                                <td>${orden.numero_orden}</td>
+                                <td>${orden.fecha}</td>
+                                <td>${orden.cliente}</td>
+                                <td>${orden.tecnico}</td>
+                                <td>${orden.equipo}</td>
+                                <td>${orden.estado}</td>
+                                <td>${orden.prioridad}</td>
+                                <td>$${orden.costo.toLocaleString('es-CO', {minimumFractionDigits: 0})}</td>
+                            </tr>
+                        `;
+                    });
+
+                    html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                } else {
+                    html += '<div class="alert alert-warning">No se encontraron órdenes con los filtros seleccionados.</div>';
+                }
+
+                contenidoDiv.innerHTML = html;
+            } else {
+                contenidoDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <strong>Error:</strong> ${data.error}
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            contenidoDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>Error:</strong> No se pudo cargar la vista previa.
+                </div>
+            `;
+            console.error('Error:', error);
+        });
+}
+</script>
+{% endblock %}
+
