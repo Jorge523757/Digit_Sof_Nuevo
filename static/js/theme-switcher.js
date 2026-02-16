@@ -186,6 +186,9 @@ document.addEventListener('DOMContentLoaded', function() {
 (function() {
     const theme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
 })();
 
 // Exportar para uso global

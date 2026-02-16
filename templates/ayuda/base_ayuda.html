@@ -15,6 +15,21 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Theme Switcher CSS -->
+    <link rel="stylesheet" href="{% static 'css/theme-switcher.css' %}">
+
+    <!-- Dark Mode Global CSS -->
+    <link rel="stylesheet" href="{% static 'css/dark-mode-global.css' %}">
+
+    <!-- Text Visibility Fix CSS -->
+    <link rel="stylesheet" href="{% static 'css/text-visibility-fix.css' %}">
+
+    <!-- Accessibility CSS -->
+    <link rel="stylesheet" href="{% static 'css/accessibility.css' %}">
+
+    <!-- Floating Widgets CSS -->
+    <link rel="stylesheet" href="{% static 'css/floating-widgets.css' %}">
+
     <style>
         * {
             margin: 0;
@@ -128,6 +143,36 @@
                 font-size: 1.2rem;
             }
         }
+
+        /* ========== MODO OSCURO ESPECÍFICO PARA AYUDA ========== */
+        body.dark-mode {
+            background-color: #1a1d20;
+            color: #e9ecef;
+        }
+
+        body.dark-mode .help-navbar {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+        }
+
+        body.dark-mode .simple-footer {
+            background: #1a202c;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .main-content {
+            background-color: #1a1d20;
+        }
+
+        /* Botón de tema en navbar */
+        .help-navbar .btn-outline-light {
+            border-color: rgba(255,255,255,0.5);
+            color: white;
+        }
+
+        .help-navbar .btn-outline-light:hover {
+            background-color: rgba(255,255,255,0.2);
+            border-color: white;
+        }
     </style>
 
     {% block extra_css %}{% endblock %}
@@ -189,8 +234,101 @@
         </div>
     </footer>
 
+    <!-- Widget Flotante de Accesibilidad -->
+    <div id="accessibilityWidget" class="accessibility-widget">
+        <button id="accessibilityToggle" class="accessibility-toggle" aria-label="Abrir opciones de accesibilidad">
+            <i class="fas fa-universal-access"></i>
+        </button>
+        <div id="accessibilityMenu" class="accessibility-menu">
+            <div class="accessibility-header">
+                <h5>Accesibilidad</h5>
+                <button id="closeAccessibility" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="accessibility-options">
+                <button class="accessibility-option" onclick="increaseFontSize()">
+                    <i class="fas fa-search-plus"></i>
+                    <span>Aumentar texto</span>
+                </button>
+                <button class="accessibility-option" onclick="decreaseFontSize()">
+                    <i class="fas fa-search-minus"></i>
+                    <span>Reducir texto</span>
+                </button>
+                <button class="accessibility-option" onclick="toggleHighContrast()">
+                    <i class="fas fa-adjust"></i>
+                    <span>Alto contraste</span>
+                </button>
+                <button class="accessibility-option" onclick="resetAccessibility()">
+                    <i class="fas fa-undo"></i>
+                    <span>Restablecer</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Theme Switcher JS -->
+    <script>
+        // Cargar tema guardado
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                updateThemeIcon(true);
+            } else {
+                document.body.classList.remove('dark-mode');
+                updateThemeIcon(false);
+            }
+        }
+
+        // Actualizar icono del botón
+        function updateThemeIcon(isDark) {
+            const themeIcon = document.getElementById('themeIconHeader');
+            const themeToggleBtn = document.getElementById('themeToggleHeader');
+
+            if (themeIcon) {
+                if (isDark) {
+                    themeIcon.className = 'fas fa-sun';
+                    if (themeToggleBtn) {
+                        themeToggleBtn.title = 'Cambiar a modo claro';
+                    }
+                } else {
+                    themeIcon.className = 'fas fa-moon';
+                    if (themeToggleBtn) {
+                        themeToggleBtn.title = 'Cambiar a modo oscuro';
+                    }
+                }
+            }
+        }
+
+        // Toggle tema
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggleBtn = document.getElementById('themeToggleHeader');
+
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', function() {
+                    const isDark = document.body.classList.toggle('dark-mode');
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    updateThemeIcon(isDark);
+
+                    // Añadir animación de transición
+                    document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+                    setTimeout(() => {
+                        document.body.style.transition = '';
+                    }, 300);
+                });
+            }
+
+            // Cargar tema al inicio
+            loadTheme();
+        });
+    </script>
+
+    <!-- Accessibility JS -->
+    <script src="{% static 'js/accessibility.js' %}"></script>
 
     <script>
         // Auto-cerrar mensajes después de 5 segundos

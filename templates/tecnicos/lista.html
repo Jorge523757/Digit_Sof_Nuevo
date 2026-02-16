@@ -6,6 +6,183 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/tecnicos.css' %}">
 <link rel="stylesheet" href="{% static 'css/theme-switcher.css' %}">
+
+<style>
+    /* ========== CORRECCIONES ULTRA-ESPECÍFICAS PARA TABLA DE TÉCNICOS ========== */
+
+    /* MODO CLARO - TODOS los elementos visibles */
+    .tecnicos-container,
+    .tecnicos-container * {
+        color: #212529 !important;
+    }
+
+    .tecnicos-container {
+        background-color: #f8f9fa !important;
+    }
+
+    .stat-card {
+        background-color: #ffffff !important;
+    }
+
+    .table-card,
+    .tecnicos-table {
+        background-color: #ffffff !important;
+    }
+
+    /* Headers de tabla */
+    .tecnicos-table thead th,
+    .table thead th {
+        background-color: #4a5568 !important;
+        color: #ffffff !important;
+    }
+
+    /* Filas y celdas de tabla */
+    .tecnicos-table tbody tr,
+    .table tbody tr {
+        background-color: #ffffff !important;
+    }
+
+    .tecnicos-table tbody td,
+    .table tbody td,
+    .tecnicos-table tbody td *,
+    .table tbody td *,
+    .nombre-cell,
+    .nombre-cell *,
+    .nombre-avatar,
+    .nombre-avatar span,
+    .nombre-cell strong {
+        color: #212529 !important;
+    }
+
+    /* Badges - siempre con texto blanco */
+    .badge,
+    .badge *,
+    .badge-profesion,
+    .badge-activo,
+    .badge-inactivo {
+        color: #ffffff !important;
+    }
+
+    .badge-activo {
+        background-color: #28a745 !important;
+    }
+
+    .badge-inactivo {
+        background-color: #dc3545 !important;
+    }
+
+    .badge-profesion {
+        background-color: #6c757d !important;
+    }
+
+    /* Botones de acción */
+    .btn-action {
+        color: #ffffff !important;
+    }
+
+    /* Forms */
+    .form-control,
+    .form-select {
+        background-color: #ffffff !important;
+        color: #212529 !important;
+    }
+
+    /* MODO OSCURO - TODOS los elementos visibles */
+    body.dark-mode .tecnicos-container,
+    body.dark-mode .tecnicos-container * {
+        color: #e9ecef !important;
+    }
+
+    body.dark-mode .tecnicos-container {
+        background-color: #1a1d20 !important;
+    }
+
+    body.dark-mode .stat-card {
+        background-color: #2b3035 !important;
+    }
+
+    body.dark-mode .stat-card h3 {
+        color: #ffffff !important;
+    }
+
+    body.dark-mode .table-card,
+    body.dark-mode .tecnicos-table {
+        background-color: #2b3035 !important;
+    }
+
+    /* Headers de tabla oscuro */
+    body.dark-mode .tecnicos-table thead th,
+    body.dark-mode .table thead th {
+        background-color: #343a40 !important;
+        color: #ffffff !important;
+    }
+
+    /* Filas y celdas oscuras */
+    body.dark-mode .tecnicos-table tbody tr,
+    body.dark-mode .table tbody tr {
+        background-color: #2b3035 !important;
+    }
+
+    body.dark-mode .tecnicos-table tbody tr:hover,
+    body.dark-mode .table tbody tr:hover {
+        background-color: #343a40 !important;
+    }
+
+    body.dark-mode .tecnicos-table tbody td,
+    body.dark-mode .table tbody td,
+    body.dark-mode .tecnicos-table tbody td *,
+    body.dark-mode .table tbody td *,
+    body.dark-mode .nombre-cell,
+    body.dark-mode .nombre-cell *,
+    body.dark-mode .nombre-avatar,
+    body.dark-mode .nombre-avatar span,
+    body.dark-mode .nombre-cell strong {
+        color: #e9ecef !important;
+    }
+
+    /* Nombres en blanco puro */
+    body.dark-mode .nombre-cell strong {
+        color: #ffffff !important;
+    }
+
+    /* Badges oscuros */
+    body.dark-mode .badge,
+    body.dark-mode .badge *,
+    body.dark-mode .badge-profesion,
+    body.dark-mode .badge-activo,
+    body.dark-mode .badge-inactivo {
+        color: #ffffff !important;
+    }
+
+    body.dark-mode .badge-activo {
+        background-color: #51cf66 !important;
+    }
+
+    body.dark-mode .badge-inactivo {
+        background-color: #ff6b6b !important;
+    }
+
+    body.dark-mode .badge-profesion {
+        background-color: #6c757d !important;
+    }
+
+    /* Botones de acción oscuros */
+    body.dark-mode .btn-action {
+        color: #ffffff !important;
+    }
+
+    /* Forms oscuros */
+    body.dark-mode .form-control,
+    body.dark-mode .form-select {
+        background-color: #343a40 !important;
+        color: #ffffff !important;
+        border-color: #495057 !important;
+    }
+
+    body.dark-mode .form-control::placeholder {
+        color: #adb5bd !important;
+    }
+</style>
 {% endblock %}
 
 {% block content %}

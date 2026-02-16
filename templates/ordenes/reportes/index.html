@@ -71,6 +71,93 @@
     .tabla-preview tr:hover {
         background: #f8f9fa;
     }
+
+    /* ========== MODO OSCURO ========== */
+    body.dark-mode .filtros-card {
+        background-color: #2b3035;
+        color: #e9ecef;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+    }
+
+    body.dark-mode .filtros-card h3 {
+        color: #ffffff;
+    }
+
+    body.dark-mode .filtros-card .form-label {
+        color: #e9ecef;
+    }
+
+    /* CRÍTICO: Inputs con texto muy visible */
+    body.dark-mode .filtros-card input,
+    body.dark-mode .filtros-card select {
+        background-color: #343a40 !important;
+        color: #ffffff !important; /* Blanco puro para máxima visibilidad */
+        border-color: #495057 !important;
+    }
+
+    body.dark-mode .filtros-card input::placeholder {
+        color: #adb5bd !important;
+        opacity: 1 !important;
+    }
+
+    body.dark-mode .filtros-card input:focus,
+    body.dark-mode .filtros-card select:focus {
+        background-color: #343a40 !important;
+        color: #ffffff !important;
+        border-color: #4dabf7 !important;
+        box-shadow: 0 0 0 0.25rem rgba(77, 171, 247, 0.25) !important;
+    }
+
+    /* Select options también visibles */
+    body.dark-mode .filtros-card select option {
+        background-color: #343a40;
+        color: #ffffff;
+    }
+
+    body.dark-mode .vista-previa {
+        background-color: #2b3035;
+        color: #e9ecef;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+    }
+
+    body.dark-mode .tabla-preview {
+        background-color: #2b3035;
+        color: #e9ecef;
+    }
+
+    body.dark-mode .tabla-preview th {
+        background-color: #343a40;
+        color: #ffffff;
+    }
+
+    body.dark-mode .tabla-preview td {
+        color: #e9ecef;
+        border-bottom-color: #495057;
+    }
+
+    body.dark-mode .tabla-preview tr:hover {
+        background-color: #343a40;
+    }
+
+    body.dark-mode .reportes-container h1 {
+        color: #ffffff !important;
+    }
+
+    body.dark-mode .reportes-container .text-muted {
+        color: #adb5bd !important;
+    }
+
+    /* Asegurar que el header sea visible */
+    body.dark-mode .reportes-container .d-flex h1,
+    body.dark-mode .reportes-container h1,
+    body.dark-mode h1 {
+        color: #ffffff !important;
+    }
+
+    body.dark-mode .reportes-container .d-flex .text-muted,
+    body.dark-mode .reportes-container p {
+        color: #adb5bd !important;
+    }
 </style>
 {% endblock %}
 
