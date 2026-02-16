@@ -77,7 +77,7 @@ Modo CARD:
 
 ### 1. Productos (Morado)
 ```css
-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+ background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
 ```
 
 ### 2. Clientes (Rosa)

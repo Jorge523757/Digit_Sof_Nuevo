@@ -134,7 +134,7 @@ subject='Codigo de Recuperacion - DIGIT SOFT'  # Sin tildes ni emojis
 if settings.DEBUG and token:
     messages.success(
         request,
-        f'<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">'
+        f'<div style=" background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;">'
         f'<div style="font-size: 48px;">{token.codigo}</div>'
         f'</div>'
     )

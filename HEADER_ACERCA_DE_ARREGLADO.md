@@ -71,7 +71,7 @@
     left: 50%;
     width: 0;
     height: 2px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     transition: all 0.3s ease;
     transform: translateX(-50%);
 }

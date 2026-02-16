@@ -4,8 +4,8 @@
 
 /* ===== UTILIDADES GENERALES ===== */
 
-.text-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.text-gradient {;
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -27,7 +27,7 @@
 /* ===== BOTONES MEJORADOS ===== */
 
 .btn-gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     border: none;
     color: white;
     transition: all 0.3s ease;
@@ -68,7 +68,7 @@
 }
 
 .card-header-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     color: white;
     padding: 1.5rem;
 }
@@ -76,7 +76,7 @@
 /* ===== BADGES Y LABELS ===== */
 
 .badge-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 20px;
@@ -98,7 +98,7 @@
 }
 
 .section-bg-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     color: white;
 }
 
@@ -151,7 +151,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     color: white;
     font-size: 2rem;
     margin: 0 auto 1.5rem;
@@ -268,7 +268,7 @@
 }
 
 .table-modern thead {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     color: white;
 }
 
@@ -296,7 +296,7 @@
 }
 
 .alert-primary-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     color: white;
 }
 
@@ -309,7 +309,7 @@
 }
 
 .nav-pills-modern .nav-link.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
 }
 
 /* ===== LOADERS Y SPINNERS ===== */
@@ -339,7 +339,7 @@
 /* ===== TOOLTIPS PERSONALIZADOS ===== */
 
 .tooltip-modern {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 8px;

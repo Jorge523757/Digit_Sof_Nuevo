@@ -129,7 +129,7 @@ nav {
 
 /* Botón de menú lateral */
 .sidebar-toggle-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -241,7 +241,7 @@ nav ul li a:hover::after {
 
 .sidebar-header {
     padding: 25px 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -345,7 +345,7 @@ nav ul li a:hover::after {
     top: 0;
     height: 100%;
     width: 4px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     transform: scaleY(0);
     transition: transform 0.3s ease;
 }
@@ -373,7 +373,7 @@ nav ul li a:hover::after {
 }
 
 .sidebar-menu li a:hover .menu-icon {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     transform: scale(1.1) rotate(5deg);
 }
 
@@ -425,7 +425,7 @@ nav ul li a:hover::after {
 .user-avatar {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -498,7 +498,7 @@ nav ul li a:hover::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     z-index: 0;
 }
 
@@ -626,7 +626,7 @@ nav ul li a:hover::after {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     color: white;
     padding: 15px 35px;
     border-radius: 50px;

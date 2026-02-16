@@ -156,7 +156,7 @@ const DigitSoftCart = {
             
             .cart-header {
                 padding: 1.5rem;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                 background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
                 color: white;
                 display: flex;
                 justify-content: space-between;
@@ -209,7 +209,7 @@ const DigitSoftCart = {
             }
             
             .btn-checkout {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                 background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
                 color: white;
             }
             

@@ -228,7 +228,7 @@
 
 .carrito-header {
     padding: 25px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     color: white;
     display: flex;
     justify-content: space-between;
@@ -454,7 +454,7 @@
 }
 
 .filter-btn.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
     color: white;
     border-color: #667eea;
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);

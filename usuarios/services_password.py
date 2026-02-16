@@ -103,7 +103,7 @@ DIGIT SOFT - Sistema de Gestión
     <style>
         body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f4f4f4; }}
         .container {{ max-width: 600px; margin: 20px auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
-        .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 20px; text-align: center; }}
+        .header {{ background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important; color: white; padding: 40px 20px; text-align: center; }}
         .content {{ padding: 40px 30px; }}
         .codigo-box {{ background: #f8f9fa; border: 2px dashed #667eea; border-radius: 10px; padding: 30px; text-align: center; margin: 30px 0; }}
         .codigo {{ font-size: 48px; font-weight: bold; color: #667eea; letter-spacing: 8px; font-family: 'Courier New', monospace; }}

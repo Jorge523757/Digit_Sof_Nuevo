@@ -207,7 +207,7 @@ Si quieres notificaciones automáticas por email, puedes integrar el sistema de 
 Edita `templates/ayuda/base_ayuda.html`:
 ```css
 .help-navbar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00b4d8 100%) !important;
 }
 ```
 
