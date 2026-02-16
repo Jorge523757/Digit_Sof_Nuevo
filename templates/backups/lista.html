@@ -9,11 +9,11 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2><i class="fas fa-database"></i> Copias de Seguridad</h2>
-            <p class="text-muted mb-0">Gestión de backups de la base de datos</p>
+            <p class="text-muted mb-0">Gestión de Copias de Seguridad de la base de datos</p>
         </div>
         <div>
             <a href="{% url 'backups:crear' %}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Crear Backup
+                <i class="fas fa-plus"></i> Crear Copias de Seguridad
             </a>
             <a href="{% url 'backups:configuracion' %}" class="btn btn-outline-secondary">
                 <i class="fas fa-cog"></i> Configuración
@@ -27,7 +27,7 @@
             <div class="card bg-primary text-white">
                 <div class="card-body">
                     <h5 class="card-title">
-                        <i class="fas fa-database"></i> Total Backups
+                        <i class="fas fa-database"></i> Total Copias de Seguridad
                     </h5>
                     <h2 class="mb-0">{{ total_backups }}</h2>
                 </div>
@@ -47,7 +47,7 @@
             <div class="card {% if config.activo %}bg-info{% else %}bg-secondary{% endif %} text-white">
                 <div class="card-body">
                     <h5 class="card-title">
-                        <i class="fas fa-sync"></i> Auto Backup
+                        <i class="fas fa-sync"></i> Auto Copias de Seguridad
                     </h5>
                     <h2 class="mb-0">{% if config.activo %}Activo{% else %}Inactivo{% endif %}</h2>
                 </div>
@@ -68,7 +68,7 @@
     <!-- Lista de Backups -->
     <div class="card">
         <div class="card-header">
-            <h5 class="mb-0"><i class="fas fa-list"></i> Listado de Backups</h5>
+            <h5 class="mb-0"><i class="fas fa-list"></i> Listado de Copias de Seguridad</h5>
         </div>
         <div class="card-body">
             {% if backups %}
@@ -183,10 +183,10 @@
             {% else %}
                 <div class="alert alert-info text-center">
                     <i class="fas fa-info-circle fa-3x mb-3"></i>
-                    <h5>No hay backups disponibles</h5>
-                    <p>Cree su primer backup para proteger sus datos</p>
+                    <h5>No hay Copias de Seguridad disponibles</h5>
+                    <p>Cree su primer copia de Seguridad para proteger sus datos</p>
                     <a href="{% url 'backups:crear' %}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Crear Primer Backup
+                        <i class="fas fa-plus"></i> Crear Primer Copia de Seguridad
                     </a>
                 </div>
             {% endif %}
