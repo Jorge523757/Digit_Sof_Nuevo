@@ -242,26 +242,6 @@ body {
     color: var(--text-primary);
 }
 
-/* Indicador de tema en cada módulo */
-.module-theme-indicator {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    padding: 8px 15px;
-    border-radius: 20px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-}
-
-.module-theme-indicator i {
-    font-size: 1rem;
-}
-
 /* Mejora de formularios en modo oscuro */
 [data-theme="dark"] .form-control::placeholder {
     color: var(--text-secondary);
@@ -311,11 +291,5 @@ body {
         font-size: 1.2rem;
     }
 
-    .module-theme-indicator {
-        top: 10px;
-        right: 10px;
-        padding: 6px 12px;
-        font-size: 0.75rem;
-    }
 }
 

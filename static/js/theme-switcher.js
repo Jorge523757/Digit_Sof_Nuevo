@@ -37,13 +37,6 @@ class ThemeSwitcher {
         const moduleName = this.getCurrentModuleName();
         if (!moduleName) return;
 
-        const indicator = document.createElement('div');
-        indicator.className = 'module-theme-indicator';
-        indicator.innerHTML = `
-            <i class="fas fa-palette"></i>
-            <span>${moduleName}</span>
-            <i class="fas fa-${this.theme === 'dark' ? 'moon' : 'sun'}"></i>
-        `;
 
         const container = document.querySelector('.container-fluid, .container');
         if (container) {
