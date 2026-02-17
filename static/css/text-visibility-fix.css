@@ -255,23 +255,24 @@ body.dark-mode .alert-danger {
 
 /* Gestión de Usuarios */
 body.dark-mode .users-table-container .user-name {
-    color: #ffffff !important;
+    color: #090808 !important;
     font-weight: 600 !important;
 }
 
+
 body.dark-mode .users-table-container .user-email {
-    color: #adb5bd !important;
+    color: #090808 !important;
 }
 
 body.dark-mode .users-table-container .user-meta span {
-    color: #adb5bd !important;
+    color: #090808 !important;
 }
 
 /* Gestión de Técnicos */
 body.dark-mode .tecnicos-container .user-name,
 body.dark-mode .tecnicos-container .tecnico-name,
 body.dark-mode .tecnicos-container td {
-    color: #e9ecef !important;
+    color: #ffffff !important;
 }
 
 /* Reportes */

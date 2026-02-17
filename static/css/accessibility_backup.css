@@ -596,9 +596,9 @@ body.dark-mode a:not(.accessibility-btn):not(.reset-btn):hover {
 }
 
 body.dark-mode button:not(.accessibility-btn):not(.reset-btn) {
-    background: #424242 !important;
+    background: #515151 !important;
     color: #fff !important;
-    border-color: #555 !important;
+    border-color: #454444 !important;
 }
 
 body.dark-mode input,

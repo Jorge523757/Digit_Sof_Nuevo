@@ -105,13 +105,13 @@
 
     body.dark-mode .form-section h3,
     body.dark-mode .form-section h3 i {
-        color: #ffffff !important;
+        color: #050505 !important;
     }
 
     /* Labels MUY VISIBLES en oscuro */
     body.dark-mode .form-group label,
     body.dark-mode .form-check-label {
-        color: #ffffff !important;
+        color: #070707 !important;
         font-weight: 500 !important;
     }
 
@@ -160,6 +160,15 @@
         border-color: #ff6b6b !important;
     }
 
+    body.dark-mode .error-message,
+    body.dark-mode .form-error {
+        color: #ff8787 !important;
+    }
+
+    /* Transiciones suaves */
+    * {
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
     body.dark-mode .error-message {
         color: #ff8787 !important;
     }

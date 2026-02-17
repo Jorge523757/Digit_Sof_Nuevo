@@ -234,38 +234,137 @@
         </div>
     </footer>
 
-    <!-- Widget Flotante de Accesibilidad -->
-    <div id="accessibilityWidget" class="accessibility-widget">
-        <button id="accessibilityToggle" class="accessibility-toggle" aria-label="Abrir opciones de accesibilidad">
-            <i class="fas fa-universal-access"></i>
-        </button>
-        <div id="accessibilityMenu" class="accessibility-menu">
-            <div class="accessibility-header">
-                <h5>Accesibilidad</h5>
-                <button id="closeAccessibility" class="close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="accessibility-options">
-                <button class="accessibility-option" onclick="increaseFontSize()">
-                    <i class="fas fa-search-plus"></i>
-                    <span>Aumentar texto</span>
-                </button>
-                <button class="accessibility-option" onclick="decreaseFontSize()">
-                    <i class="fas fa-search-minus"></i>
-                    <span>Reducir texto</span>
-                </button>
-                <button class="accessibility-option" onclick="toggleHighContrast()">
-                    <i class="fas fa-adjust"></i>
-                    <span>Alto contraste</span>
-                </button>
-                <button class="accessibility-option" onclick="resetAccessibility()">
-                    <i class="fas fa-undo"></i>
-                    <span>Restablecer</span>
-                </button>
-            </div>
+    <!-- =============================================
+     WIDGET FLOTANTE DE ACCESIBILIDAD
+     Compatible con accessibility.js (AccessibilityWidget class)
+     IDs requeridos por el JS:
+       - accessibilityToggle  → botón flotante
+       - accessibilityPanel   → panel completo
+       - accessibilityClose   → botón X del panel
+       - fontLarge, fontSmall
+       - highContrast, darkMode, grayscale
+       - highlightLinks, screenReader, increasedSpacing
+       - resetAccessibility
+============================================== -->
+
+<!-- Botón flotante -->
+<div class="accessibility-widget">
+    <button id="accessibilityToggle"
+            class="accessibility-toggle"
+            aria-label="Abrir panel de accesibilidad"
+            aria-expanded="false"
+            aria-controls="accessibilityPanel">
+        <i class="fas fa-universal-access"></i>
+    </button>
+
+    <!-- Panel (oculto por defecto con clase hidden) -->
+    <div id="accessibilityPanel" class="accessibility-panel hidden" role="toolbar" aria-label="Herramientas de accesibilidad">
+
+        <!-- Cabecera -->
+        <div class="accessibility-header">
+            <h3><i class="fas fa-universal-access" style="margin-right:8px;"></i>Accesibilidad</h3>
+            <button id="accessibilityClose"
+                    class="accessibility-close"
+                    aria-label="Cerrar panel de accesibilidad">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-    </div>
+
+        <!-- Contenido con scroll -->
+        <div class="accessibility-content">
+
+            <!-- TAMAÑO DE TEXTO -->
+            <button id="fontLarge"
+                    class="accessibility-btn"
+                    aria-label="Aumentar tamaño de texto"
+                    aria-pressed="false"
+                    title="Aumentar texto">
+                <i class="fas fa-search-plus"></i>
+                <span>Aumentar texto</span>
+            </button>
+
+            <button id="fontSmall"
+                    class="accessibility-btn"
+                    aria-label="Disminuir tamaño de texto"
+                    aria-pressed="false"
+                    title="Reducir texto">
+                <i class="fas fa-search-minus"></i>
+                <span>Reducir texto</span>
+            </button>
+
+            <div class="accessibility-separator"></div>
+
+            <!-- COLOR / CONTRASTE -->
+            <button id="highContrast"
+                    class="accessibility-btn"
+                    aria-label="Activar alto contraste"
+                    aria-pressed="false"
+                    title="Alto contraste">
+                <i class="fas fa-adjust"></i>
+                <span>Alto contraste</span>
+            </button>
+
+            <button id="darkMode"
+                    class="accessibility-btn"
+                    aria-label="Activar modo oscuro"
+                    aria-pressed="false"
+                    title="Modo oscuro">
+                <i class="fas fa-moon"></i>
+                <span>Modo oscuro</span>
+            </button>
+
+            <button id="grayscale"
+                    class="accessibility-btn"
+                    aria-label="Activar escala de grises"
+                    aria-pressed="false"
+                    title="Escala de grises">
+                <i class="fas fa-circle-half-stroke"></i>
+                <span>Escala de grises</span>
+            </button>
+
+            <div class="accessibility-separator"></div>
+
+            <!-- OTRAS OPCIONES -->
+            <button id="highlightLinks"
+                    class="accessibility-btn"
+                    aria-label="Resaltar enlaces"
+                    aria-pressed="false"
+                    title="Resaltar enlaces">
+                <i class="fas fa-link"></i>
+                <span>Resaltar enlaces</span>
+            </button>
+
+            <button id="increasedSpacing"
+                    class="accessibility-btn"
+                    aria-label="Aumentar espaciado"
+                    aria-pressed="false"
+                    title="Mayor espaciado">
+                <i class="fas fa-text-height"></i>
+                <span>Mayor espaciado</span>
+            </button>
+
+            <button id="screenReader"
+                    class="accessibility-btn"
+                    aria-label="Activar lector de pantalla"
+                    aria-pressed="false"
+                    title="Lector de pantalla">
+                <i class="fas fa-volume-up"></i>
+                <span>Lector de pantalla</span>
+            </button>
+
+            <div class="accessibility-separator"></div>
+
+            <!-- RESET -->
+            <button id="resetAccessibility"
+                    class="reset-btn"
+                    aria-label="Restablecer configuración de accesibilidad">
+                <i class="fas fa-undo"></i>
+                <span>Restablecer todo</span>
+            </button>
+
+        </div><!-- /accessibility-content -->
+    </div><!-- /accessibilityPanel -->
+</div><!-- /accessibility-widget -->
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
