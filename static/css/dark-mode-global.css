@@ -585,7 +585,7 @@ body.dark-mode span:not(.badge):not(.btn) {
 }
 
 body.dark-mode div:not(.card):not(.modal):not(.alert):not(.btn) {
-    color: inherit;
+    color: #0b0101;
 }
 
 body.dark-mode strong,
@@ -594,7 +594,7 @@ body.dark-mode b {
 }
 
 body.dark-mode .text-muted {
-    color: #adb5bd !important;
+    color: #090808 !important;
 }
 
 body.dark-mode .text-primary {

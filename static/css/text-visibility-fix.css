@@ -100,7 +100,7 @@ body.dark-mode .text-muted {
 /* Labels y form labels */
 body.dark-mode label,
 body.dark-mode .form-label {
-    color: #e9ecef !important;
+    color: #0b0101 !important;
 }
 
 /* Párrafos y spans */
