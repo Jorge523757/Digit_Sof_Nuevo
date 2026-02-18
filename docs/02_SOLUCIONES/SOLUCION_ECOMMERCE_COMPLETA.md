@@ -834,13 +834,14 @@ python manage.py migrate
 ```
 
 ### PASO 2: Configurar URLs
+
 ```python
 # En el archivo principal urls.py
 from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('ecommerce/', include('ecommerce_urls')),
+    path('ecommerce/', include('......utils.06_OTROS.ecommerce_urls')),
     # ... otras urls
 ]
 ```

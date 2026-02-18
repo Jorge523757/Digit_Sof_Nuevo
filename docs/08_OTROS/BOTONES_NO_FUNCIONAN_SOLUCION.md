@@ -175,7 +175,7 @@ Luego abre: http://127.0.0.1:8000/tienda/
 # config/urls.py
 urlpatterns = [
     ...
-    path('tienda/', include('ecommerce_urls')),
+    path('tienda/', include('......utils.06_OTROS.ecommerce_urls')),
     ...
 ]
 ```

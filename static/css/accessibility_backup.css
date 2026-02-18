@@ -19,7 +19,6 @@
         font-size: 0.9rem;
         padding: 12px 20px;
     }
-}
 
 @media (max-width: 480px) {
     .accessibility-panel {

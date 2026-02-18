@@ -11,7 +11,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
 
     # E-commerce
-    path('tienda/', include('ecommerce_urls')),  # URLs del e-commerce
+    path('tienda/', include('utils.06_OTROS.ecommerce_urls')),  # URLs del e-commerce
 
     # Módulos
     path('usuarios/', include('usuarios.urls')),
