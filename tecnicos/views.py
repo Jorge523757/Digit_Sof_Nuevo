@@ -201,30 +201,26 @@ def deshabilitar_tecnico(request, tecnico_id):
 @login_required
 @user_passes_test(es_staff, login_url='dashboard:index')
 def eliminar_tecnico(request, tecnico_id):
-    """Vista para eliminar un técnico (soft delete)"""
-
-    if request.method != 'POST':
-        messages.error(request, 'Método no permitido.')
-        return redirect('tecnicos:lista')
+    """Vista para eliminar un técnico"""
 
     tecnico = get_object_or_404(Tecnico, id=tecnico_id)
 
-    if tecnico.eliminado:
-        messages.warning(request, 'Este técnico ya está eliminado.')
+    if request.method == 'POST':
+        # Eliminar el técnico
+        nombre = tecnico.nombre_completo
+        tecnico.delete()
+
+        messages.success(
+            request,
+            f'🗑️ Técnico {nombre} eliminado exitosamente.'
+        )
         return redirect('tecnicos:lista')
 
-    # Obtener motivo de eliminación
-    motivo = request.POST.get('motivo', 'Sin motivo especificado')
-
-    # Eliminar lógicamente
-    tecnico.eliminar_logicamente(motivo)
-
-    messages.success(
-        request,
-        f'🗑️ Técnico {tecnico.nombre_completo} eliminado exitosamente.'
-    )
-
-    return redirect('tecnicos:lista')
+    # GET: Mostrar página de confirmación
+    context = {
+        'tecnico': tecnico,
+    }
+    return render(request, 'tecnicos/eliminar.html', context)
 
 
 @login_required
@@ -251,107 +247,6 @@ def restaurar_tecnico(request, tecnico_id):
     )
 
     return redirect('tecnicos:detalle', tecnico_id=tecnico.id)
-    page_number = request.GET.get('page')
-    tecnicos_paginados = paginator.get_page(page_number)
-
-    context = {
-        'tecnicos': tecnicos_paginados,
-        'form_busqueda': form_busqueda,
-        'total_tecnicos': tecnicos.count(),
-        'tecnicos_activos': Tecnico.objects.filter(activo=True).count(),
-        'tecnicos_inactivos': Tecnico.objects.filter(activo=False).count(),
-    }
-
-    return render(request, 'tecnicos/lista.html', context)
-
-
-@login_required
-@user_passes_test(es_staff, login_url='dashboard:index')
-def crear_tecnico(request):
-    """
-    Vista para crear un nuevo técnico
-    Solo accesible para staff/admin
-    """
-    if request.method == 'POST':
-        form = TecnicoForm(request.POST)
-        if form.is_valid():
-            tecnico = form.save()
-            messages.success(request, f'Técnico {tecnico.nombre_completo} registrado exitosamente.')
-            return redirect('tecnicos:lista')
-    else:
-        form = TecnicoForm()
-
-    context = {
-        'form': form,
-        'accion': 'Registrar'
-    }
-
-    return render(request, 'tecnicos/form.html', context)
-
-
-@login_required
-@user_passes_test(es_staff, login_url='dashboard:index')
-def editar_tecnico(request, pk):
-    """
-    Vista para editar un técnico existente
-    Solo accesible para staff/admin
-    """
-    tecnico = get_object_or_404(Tecnico, pk=pk)
-
-    if request.method == 'POST':
-        form = TecnicoForm(request.POST, instance=tecnico)
-        if form.is_valid():
-            tecnico = form.save()
-            messages.success(request, f'Técnico {tecnico.nombre_completo} actualizado exitosamente.')
-            return redirect('tecnicos:lista')
-    else:
-        form = TecnicoForm(instance=tecnico)
-
-    context = {
-        'form': form,
-        'tecnico': tecnico,
-        'accion': 'Cambiar'
-    }
-
-    return render(request, 'tecnicos/form.html', context)
-
-
-@login_required
-@user_passes_test(es_staff, login_url='dashboard:index')
-def detalle_tecnico(request, pk):
-    """
-    Vista para ver el detalle de un técnico
-    Solo accesible para staff/admin
-    """
-    tecnico = get_object_or_404(Tecnico, pk=pk)
-
-    context = {
-        'tecnico': tecnico
-    }
-
-    return render(request, 'tecnicos/detalle.html', context)
-
-
-@login_required
-@user_passes_test(es_staff, login_url='dashboard:index')
-def eliminar_tecnico(request, pk):
-    """
-    Vista para eliminar un técnico
-    Solo accesible para staff/admin
-    """
-    tecnico = get_object_or_404(Tecnico, pk=pk)
-
-    if request.method == 'POST':
-        nombre = tecnico.nombre_completo
-        tecnico.delete()
-        messages.success(request, f'Técnico {nombre} eliminado exitosamente.')
-        return redirect('tecnicos:lista')
-
-    context = {
-        'tecnico': tecnico
-    }
-
-    return render(request, 'tecnicos/eliminar.html', context)
 
 
 @login_required

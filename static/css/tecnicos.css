@@ -329,19 +329,20 @@
 }
 
 /* Variables para tema oscuro */
-[data-theme="dark"] {
-    --tecnicos-bg: #1a1a2e;
-    --tecnicos-card-bg: #16213e;
-    --tecnicos-text: #eaeaea;
-    --tecnicos-text-muted: #a0a0a0;
-    --tecnicos-border: #2d3748;
-    --tecnicos-shadow: rgba(0, 0, 0, 0.3);
-    --tecnicos-hover: #1f2937;
-    --tecnicos-primary: #667eea;
-    --tecnicos-success: #2ecc71;
-    --tecnicos-danger: #e74c3c;
-    --tecnicos-warning: #f39c12;
-    --tecnicos-info: #3498db;
+[data-theme="dark"],
+body.dark-mode {
+    --tecnicos-bg: #1a1d20;
+    --tecnicos-card-bg: #2b3035;
+    --tecnicos-text: #e9ecef;
+    --tecnicos-text-muted: #adb5bd;
+    --tecnicos-border: #495057;
+    --tecnicos-shadow: rgba(0, 0, 0, 0.5);
+    --tecnicos-hover: #343a40;
+    --tecnicos-primary: #4dabf7;
+    --tecnicos-success: #51cf66;
+    --tecnicos-danger: #ff6b6b;
+    --tecnicos-warning: #ffd43b;
+    --tecnicos-info: #22b8cf;
 }
 
 /* ============================================

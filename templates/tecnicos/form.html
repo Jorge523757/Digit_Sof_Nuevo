@@ -6,6 +6,183 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/tecnicos.css' %}">
 <link rel="stylesheet" href="{% static 'css/theme-switcher.css' %}">
+
+<style>
+    /* ========== CORRECCIONES ESPECÍFICAS PARA FORMULARIO DE TÉCNICOS ========== */
+
+    /* MODO CLARO - Valores por defecto */
+    .tecnicos-container {
+        background-color: #f8f9fa !important;
+    }
+
+    .tecnicos-header h1,
+    .tecnicos-header h1 i {
+        color: #212529 !important;
+    }
+
+    .tecnicos-header .text-muted {
+        color: #6c757d !important;
+    }
+
+    .form-container {
+        background-color: #ffffff !important;
+        border-radius: 10px;
+        padding: 30px;
+    }
+
+    .form-section h3,
+    .form-section h3 i {
+        color: #212529 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Labels MUY VISIBLES */
+    .form-group label,
+    .form-check-label {
+        color: #212529 !important;
+        font-weight: 500 !important;
+        font-size: 14px !important;
+    }
+
+    /* Asterisco rojo */
+    .required {
+        color: #dc3545 !important;
+        font-weight: bold !important;
+    }
+
+    /* Inputs y selects */
+    .tecnicos-container .form-control,
+    .tecnicos-container .form-select,
+    .tecnicos-container input[type="text"],
+    .tecnicos-container input[type="email"],
+    .tecnicos-container input[type="tel"],
+    .tecnicos-container input[type="number"],
+    .tecnicos-container textarea,
+    .tecnicos-container select {
+        background-color: #ffffff !important;
+        color: #212529 !important;
+        border: 1px solid #ced4da !important;
+        font-size: 14px !important;
+    }
+
+    /* Placeholders VISIBLES */
+    .tecnicos-container .form-control::placeholder,
+    .tecnicos-container input::placeholder,
+    .tecnicos-container textarea::placeholder {
+        color: #6c757d !important;
+        opacity: 1 !important;
+        font-weight: normal !important;
+    }
+
+    /* Checkbox */
+    .tecnicos-container input[type="checkbox"] {
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    /* Botones */
+    .form-actions .btn {
+        font-weight: 600 !important;
+    }
+
+    /* MODO OSCURO */
+    body.dark-mode .tecnicos-container {
+        background-color: #1a1d20 !important;
+    }
+
+    body.dark-mode .tecnicos-header h1,
+    body.dark-mode .tecnicos-header h1 i {
+        color: #ffffff !important;
+    }
+
+    body.dark-mode .tecnicos-header .text-muted {
+        color: #adb5bd !important;
+    }
+
+    body.dark-mode .form-container {
+        background-color: #2b3035 !important;
+    }
+
+    body.dark-mode .form-section h3,
+    body.dark-mode .form-section h3 i {
+        color: #050505 !important;
+    }
+
+    /* Labels MUY VISIBLES en oscuro */
+    body.dark-mode .form-group label,
+    body.dark-mode .form-check-label {
+        color: #070707 !important;
+        font-weight: 500 !important;
+    }
+
+    body.dark-mode .required {
+        color: #ff6b6b !important;
+    }
+
+    /* Inputs oscuros con texto BLANCO */
+    body.dark-mode .tecnicos-container .form-control,
+    body.dark-mode .tecnicos-container .form-select,
+    body.dark-mode .tecnicos-container input[type="text"],
+    body.dark-mode .tecnicos-container input[type="email"],
+    body.dark-mode .tecnicos-container input[type="tel"],
+    body.dark-mode .tecnicos-container input[type="number"],
+    body.dark-mode .tecnicos-container textarea,
+    body.dark-mode .tecnicos-container select {
+        background-color: #343a40 !important;
+        color: #ffffff !important;
+        border: 1px solid #495057 !important;
+    }
+
+    /* Placeholders visibles en oscuro */
+    body.dark-mode .tecnicos-container .form-control::placeholder,
+    body.dark-mode .tecnicos-container input::placeholder,
+    body.dark-mode .tecnicos-container textarea::placeholder {
+        color: #adb5bd !important;
+        opacity: 1 !important;
+    }
+
+    /* Focus states */
+    body.dark-mode .tecnicos-container .form-control:focus,
+    body.dark-mode .tecnicos-container .form-select:focus,
+    body.dark-mode .tecnicos-container input:focus,
+    body.dark-mode .tecnicos-container textarea:focus,
+    body.dark-mode .tecnicos-container select:focus {
+        background-color: #343a40 !important;
+        color: #ffffff !important;
+        border-color: #4dabf7 !important;
+        box-shadow: 0 0 0 0.25rem rgba(77, 171, 247, 0.25) !important;
+    }
+
+    /* Alertas y errores */
+    body.dark-mode .alert-danger {
+        background-color: rgba(255, 107, 107, 0.15) !important;
+        color: #ff8787 !important;
+        border-color: #ff6b6b !important;
+    }
+
+    body.dark-mode .error-message,
+    body.dark-mode .form-error {
+        color: #ff8787 !important;
+    }
+
+    /* Transiciones suaves */
+    * {
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+    body.dark-mode .error-message {
+        color: #ff8787 !important;
+    }
+
+    /* Iconos */
+    body.dark-mode .tecnicos-container i {
+        color: inherit !important;
+    }
+
+    /* Contador de caracteres */
+    body.dark-mode .tecnicos-container small {
+        color: #adb5bd !important;
+    }
+</style>
 {% endblock %}
 
 {% block content %}

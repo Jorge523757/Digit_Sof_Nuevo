@@ -3,6 +3,228 @@
 
 {% block title %}Configuración de Backups - DIGIT SOFT{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Estilos para modo claro (por defecto) */
+    .container-fluid {
+        background-color: #f8f9fa;
+    }
+
+    .card {
+        background-color: #ffffff;
+        color: #212529;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .card-header {
+        background-color: #0d6efd;
+        color: #ffffff;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .card-header h5,
+    .card-header h6 {
+        color: #ffffff;
+    }
+
+    .card-body {
+        background-color: #ffffff;
+        color: #212529;
+    }
+
+    .form-control,
+    .form-select {
+        background-color: #ffffff;
+        color: #212529;
+        border-color: #ced4da;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        background-color: #ffffff;
+        color: #212529;
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .form-label {
+        color: #212529;
+    }
+
+    .form-text,
+    small.text-muted {
+        color: #6c757d !important;
+    }
+
+    .alert-info {
+        background-color: #cfe2ff;
+        border-color: #b6d4fe;
+        color: #084298;
+    }
+
+    .alert-secondary {
+        background-color: #e2e3e5;
+        border-color: #d3d6d8;
+        color: #41464b;
+    }
+
+    .alert-warning {
+        background-color: #fff3cd;
+        border-color: #ffecb5;
+        color: #664d03;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: #ffffff;
+    }
+
+    .btn-primary {
+        background-color: #0d6efd;
+        color: #ffffff;
+    }
+
+    /* Estilos para modo oscuro */
+    body.dark-mode .container-fluid {
+        background-color: #1a1d20;
+    }
+
+    body.dark-mode .card {
+        background-color: #2b3035;
+        color: #e9ecef;
+        border-color: #495057;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.5);
+    }
+
+    body.dark-mode .card-header {
+        background-color: #1e3a5f;
+        color: #ffffff;
+        border-bottom-color: #495057;
+    }
+
+    body.dark-mode .card-header h5,
+    body.dark-mode .card-header h6 {
+        color: #ffffff;
+    }
+
+    body.dark-mode .card-body {
+        background-color: #2b3035;
+        color: #e9ecef;
+    }
+
+    body.dark-mode .form-control,
+    body.dark-mode .form-select {
+        background-color: #343a40;
+        color: #e9ecef;
+        border-color: #495057;
+    }
+
+    body.dark-mode .form-control:focus,
+    body.dark-mode .form-select:focus {
+        background-color: #343a40;
+        color: #e9ecef;
+        border-color: #4dabf7;
+        box-shadow: 0 0 0 0.25rem rgba(77, 171, 247, 0.25);
+    }
+
+    body.dark-mode .form-control::placeholder {
+        color: #adb5bd;
+    }
+
+    body.dark-mode .form-label {
+        color: #e9ecef;
+    }
+
+    body.dark-mode .form-text,
+    body.dark-mode small.text-muted {
+        color: #adb5bd !important;
+    }
+
+    body.dark-mode .form-check-label {
+        color: #e9ecef;
+    }
+
+    body.dark-mode .form-check-input {
+        background-color: #495057;
+        border-color: #6c757d;
+    }
+
+    body.dark-mode .form-check-input:checked {
+        background-color: #4dabf7;
+        border-color: #4dabf7;
+    }
+
+    body.dark-mode .alert-info {
+        background-color: rgba(34, 184, 207, 0.15);
+        border-color: #22b8cf;
+        color: #7fdbeb;
+    }
+
+    body.dark-mode .alert-secondary {
+        background-color: rgba(108, 117, 125, 0.15);
+        border-color: #6c757d;
+        color: #ced4da;
+    }
+
+    body.dark-mode .alert-warning {
+        background-color: rgba(255, 212, 59, 0.15);
+        border-color: #ffd43b;
+        color: #ffe066;
+    }
+
+    body.dark-mode .text-success {
+        color: #51cf66 !important;
+    }
+
+    body.dark-mode .text-danger {
+        color: #ff6b6b !important;
+    }
+
+    body.dark-mode .btn-secondary {
+        background-color: #495057;
+        border-color: #495057;
+        color: #ffffff;
+    }
+
+    body.dark-mode .btn-secondary:hover {
+        background-color: #5c636a;
+        border-color: #565e64;
+    }
+
+    body.dark-mode .btn-primary {
+        background-color: #4dabf7;
+        border-color: #4dabf7;
+        color: #ffffff;
+    }
+
+    body.dark-mode .btn-primary:hover {
+        background-color: #339af0;
+        border-color: #228be6;
+    }
+
+    body.dark-mode ul li,
+    body.dark-mode ol li {
+        color: #e9ecef;
+    }
+
+    body.dark-mode strong {
+        color: #ffffff;
+    }
+
+    /* Transiciones suaves */
+    .card,
+    .card-header,
+    .card-body,
+    .form-control,
+    .form-select,
+    .alert,
+    .btn {
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
     <div class="row justify-content-center">
@@ -214,8 +436,8 @@
                     <h6 class="mt-3">Recomendaciones de seguridad:</h6>
                     <ul>
                         <li>Mantener al menos 7-10 backups para tener historial suficiente</li>
-                        <li>Crear backups diarios para sistemas en producción</li>
-                        <li>Descargar backups importantes y guardarlos fuera del servidor</li>
+                        <li>Crear Copias de Seguridad diarios para sistemas en producción</li>
+                        <li>Descargar Copias de Seguridad importantes y guardarlos fuera del servidor</li>
                         <li>Probar la restauración periódicamente</li>
                     </ul>
                 </div>

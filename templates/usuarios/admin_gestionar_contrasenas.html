@@ -3,6 +3,268 @@
 
 {% block title %}Gestión de Contraseñas - DIGIT SOFT{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* ========== MODO CLARO (Por defecto) ========== */
+    .container-fluid h2 {
+        color: #212529;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .card {
+        background-color: #ffffff;
+        color: #212529;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        color: #212529;
+    }
+
+    .card-header h5 {
+        color: #212529;
+    }
+
+    .table {
+        background-color: #ffffff;
+        color: #212529;
+    }
+
+    .table thead th {
+        background-color: #f8f9fa;
+        color: #212529;
+        font-weight: 600;
+    }
+
+    .table tbody td {
+        color: #212529;
+    }
+
+    .table tbody td strong {
+        color: #212529;
+        font-weight: 600;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .form-label {
+        color: #212529;
+        font-weight: 500;
+    }
+
+    .form-control,
+    .form-select {
+        background-color: #ffffff;
+        color: #212529;
+        border-color: #ced4da;
+    }
+
+    .form-control::placeholder {
+        color: #6c757d;
+    }
+
+    .alert-warning {
+        background-color: #fff3cd;
+        color: #856404;
+        border-color: #ffc107;
+    }
+
+    .alert-warning h6 {
+        color: #856404;
+    }
+
+    /* ========== MODO OSCURO ========== */
+    body.dark-mode .container-fluid h2 {
+        color: #ffffff !important;
+    }
+
+    body.dark-mode .text-muted {
+        color: #adb5bd !important;
+    }
+
+    body.dark-mode .card {
+        background-color: #2b3035 !important;
+        color: #e9ecef !important;
+        border-color: #495057 !important;
+    }
+
+    body.dark-mode .card-header {
+        background-color: #1e3a5f !important;
+        color: #ffffff !important;
+        border-bottom-color: #495057 !important;
+    }
+
+    body.dark-mode .card-header h5 {
+        color: #ffffff !important;
+    }
+
+    body.dark-mode .card-body {
+        background-color: #2b3035 !important;
+        color: #e9ecef !important;
+    }
+
+    body.dark-mode .table {
+        background-color: #2b3035 !important;
+        color: #e9ecef !important;
+    }
+
+    body.dark-mode .table thead th {
+        background-color: #343a40 !important;
+        color: #ffffff !important;
+        border-color: #495057 !important;
+    }
+
+    body.dark-mode .table tbody tr {
+        background-color: #2b3035 !important;
+        color: #e9ecef !important;
+        border-color: #495057 !important;
+    }
+
+    body.dark-mode .table tbody tr:hover {
+        background-color: #343a40 !important;
+    }
+
+    body.dark-mode .table tbody td {
+        color: #e9ecef !important;
+        border-color: #495057 !important;
+    }
+
+    body.dark-mode .table tbody td strong {
+        color: #ffffff !important;
+    }
+
+    body.dark-mode .table tbody td small {
+        color: #adb5bd !important;
+    }
+
+    body.dark-mode .table tbody td i {
+        color: #adb5bd !important;
+    }
+
+    body.dark-mode .form-label {
+        color: #e9ecef !important;
+    }
+
+    body.dark-mode .form-control,
+    body.dark-mode .form-select {
+        background-color: #343a40 !important;
+        color: #ffffff !important;
+        border-color: #495057 !important;
+    }
+
+    body.dark-mode .form-control::placeholder {
+        color: #adb5bd !important;
+    }
+
+    body.dark-mode .form-control:focus,
+    body.dark-mode .form-select:focus {
+        background-color: #343a40 !important;
+        color: #ffffff !important;
+        border-color: #4dabf7 !important;
+        box-shadow: 0 0 0 0.25rem rgba(77, 171, 247, 0.25) !important;
+    }
+
+    body.dark-mode .alert-warning {
+        background-color: rgba(255, 212, 59, 0.15) !important;
+        color: #ffe066 !important;
+        border-color: #ffd43b !important;
+    }
+
+    body.dark-mode .alert-warning h6 {
+        color: #ffe066 !important;
+    }
+
+    body.dark-mode .alert-warning ul {
+        color: #ffe066 !important;
+    }
+
+    /* Badges siempre visibles en ambos modos */
+    .badge {
+        font-weight: 600;
+    }
+
+    body.dark-mode .badge.bg-success {
+        background-color: #51cf66 !important;
+        color: #ffffff !important;
+    }
+
+    body.dark-mode .badge.bg-warning {
+        background-color: #ffd43b !important;
+        color: #212529 !important;
+    }
+
+    body.dark-mode .badge.bg-secondary {
+        background-color: #6c757d !important;
+        color: #ffffff !important;
+    }
+
+    body.dark-mode .badge.bg-primary {
+        background-color: #4dabf7 !important;
+        color: #ffffff !important;
+    }
+
+    /* Botones */
+    body.dark-mode .btn-warning {
+        background-color: #ffd43b !important;
+        border-color: #ffd43b !important;
+        color: #212529 !important;
+    }
+
+    body.dark-mode .btn-warning:hover {
+        background-color: #ffc107 !important;
+        border-color: #ffc107 !important;
+    }
+
+    body.dark-mode .btn-secondary:disabled {
+        background-color: #6c757d !important;
+        border-color: #6c757d !important;
+        color: #ffffff !important;
+        opacity: 0.65;
+    }
+
+    body.dark-mode .btn-primary {
+        background-color: #4dabf7 !important;
+        border-color: #4dabf7 !important;
+        color: #ffffff !important;
+    }
+
+    /* Stats cards */
+    body.dark-mode .card.border-primary {
+        border-color: #4dabf7 !important;
+    }
+
+    body.dark-mode .card.border-success {
+        border-color: #51cf66 !important;
+    }
+
+    body.dark-mode .card.border-warning {
+        border-color: #ffd43b !important;
+    }
+
+    body.dark-mode .text-primary {
+        color: #4dabf7 !important;
+    }
+
+    body.dark-mode .text-success {
+        color: #51cf66 !important;
+    }
+
+    body.dark-mode .text-warning {
+        color: #ffd43b !important;
+    }
+
+    /* Icon wrapper */
+    body.dark-mode .icon-wrapper {
+        background-color: #dc3545 !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
     <!-- Título -->

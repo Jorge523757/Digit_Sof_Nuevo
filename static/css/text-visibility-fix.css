@@ -1,0 +1,305 @@
+/* ========================================
+   CORRECCIONES CRÍTICAS DE TEXTO
+   Asegura que TODOS los textos sean visibles
+   en modo claro Y oscuro
+   ======================================== */
+
+/* ========== MODO CLARO - VALORES POR DEFECTO ========== */
+/* Asegurar que en modo claro todo sea legible */
+body:not(.dark-mode) input,
+body:not(.dark-mode) select,
+body:not(.dark-mode) textarea {
+    background-color: #ffffff;
+    color: #212529; /* Negro legible */
+}
+
+body:not(.dark-mode) .user-name,
+body:not(.dark-mode) .nombre,
+body:not(.dark-mode) .name {
+    color: #212529 !important; /* Negro en modo claro */
+}
+
+body:not(.dark-mode) .user-email,
+body:not(.dark-mode) .email {
+    color: #6c757d !important; /* Gris oscuro legible */
+}
+
+body:not(.dark-mode) label,
+body:not(.dark-mode) .form-label {
+    color: #212529 !important;
+}
+
+/* ========== MODO OSCURO - CORRECCIONES CRÍTICAS ========== */
+
+/* INPUTS Y SELECTS - Texto blanco puro */
+body.dark-mode input[type="text"],
+body.dark-mode input[type="email"],
+body.dark-mode input[type="password"],
+body.dark-mode input[type="number"],
+body.dark-mode input[type="date"],
+body.dark-mode input[type="time"],
+body.dark-mode input[type="search"],
+body.dark-mode input[type="tel"],
+body.dark-mode input[type="url"],
+body.dark-mode textarea,
+body.dark-mode select,
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background-color: #343a40 !important;
+    color: #ffffff !important; /* BLANCO PURO - máxima visibilidad */
+    border-color: #495057 !important;
+}
+
+/* Placeholders visibles */
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: #adb5bd !important;
+    opacity: 1 !important;
+}
+
+/* Focus states */
+body.dark-mode input:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus,
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+    background-color: #343a40 !important;
+    color: #ffffff !important;
+    border-color: #4dabf7 !important;
+    box-shadow: 0 0 0 0.25rem rgba(77, 171, 247, 0.25) !important;
+}
+
+/* Select options */
+body.dark-mode select option {
+    background-color: #343a40;
+    color: #ffffff;
+}
+
+/* NOMBRES Y TEXTOS PRINCIPALES - Blanco puro */
+body.dark-mode .user-name,
+body.dark-mode .nombre,
+body.dark-mode .name,
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+    color: #ffffff !important; /* BLANCO PURO */
+}
+
+/* EMAILS Y TEXTOS SECUNDARIOS - Gris claro visible */
+body.dark-mode .user-email,
+body.dark-mode .email,
+body.dark-mode .user-meta,
+body.dark-mode .user-meta span,
+body.dark-mode .text-muted {
+    color: #050505 !important; /* GRIS CLARO visible */
+}
+
+/* Labels y form labels */
+body.dark-mode label,
+body.dark-mode .form-label {
+    color: #e9ecef !important;
+}
+
+/* Párrafos y spans */
+body.dark-mode p {
+    color: #e9ecef !important;
+}
+
+body.dark-mode span:not(.badge):not(.btn) {
+    color: inherit;
+}
+
+/* TABLAS - Asegurar texto visible */
+body.dark-mode table,
+body.dark-mode .table {
+    color: #e9ecef !important;
+}
+
+body.dark-mode table th,
+body.dark-mode .table th {
+    color: #ffffff !important;
+}
+
+body.dark-mode table td,
+body.dark-mode .table td {
+    color: #e9ecef !important;
+}
+
+/* Todo el contenido dentro de tablas */
+body.dark-mode table td *:not(.btn):not(.badge),
+body.dark-mode .table td *:not(.btn):not(.badge) {
+    color: inherit !important;
+}
+
+/* CARDS Y CONTENEDORES */
+body.dark-mode .card {
+    background-color: #2b3035 !important;
+    color: #e9ecef !important;
+}
+
+body.dark-mode .card-title {
+    color: #ffffff !important;
+}
+
+body.dark-mode .card-text {
+    color: #e9ecef !important;
+}
+
+/* USER CARDS específicamente */
+body.dark-mode .user-card {
+    background-color: #343a40 !important;
+    color: #e9ecef !important;
+}
+
+body.dark-mode .user-card .user-name {
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+body.dark-mode .user-card .user-email {
+    color: #adb5bd !important;
+}
+
+/* BADGES - Asegurar contraste */
+body.dark-mode .badge {
+    color: #ffffff !important;
+}
+
+body.dark-mode .badge-danger,
+body.dark-mode .badge.bg-danger {
+    background-color: #ff6b6b !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .badge-success,
+body.dark-mode .badge.bg-success {
+    background-color: #51cf66 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .badge-warning,
+body.dark-mode .badge.bg-warning {
+    background-color: #ffd43b !important;
+    color: #212529 !important;
+}
+
+body.dark-mode .badge-info,
+body.dark-mode .badge.bg-info {
+    background-color: #22b8cf !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .badge-primary,
+body.dark-mode .badge.bg-primary {
+    background-color: #4dabf7 !important;
+    color: #ffffff !important;
+}
+
+/* LINKS */
+body.dark-mode a:not(.btn):not(.dropdown-item) {
+    color: #4dabf7 !important;
+}
+
+body.dark-mode a:not(.btn):not(.dropdown-item):hover {
+    color: #74c0fc !important;
+}
+
+/* DROPDOWN MENUS */
+body.dark-mode .dropdown-menu {
+    background-color: #2b3035 !important;
+    border-color: #495057 !important;
+}
+
+body.dark-mode .dropdown-item {
+    color: #e9ecef !important;
+}
+
+body.dark-mode .dropdown-item:hover {
+    background-color: #343a40 !important;
+    color: #ffffff !important;
+}
+
+/* ALERTAS */
+body.dark-mode .alert {
+    color: #ffffff !important;
+}
+
+body.dark-mode .alert-info {
+    background-color: rgba(34, 184, 207, 0.15) !important;
+    color: #7fdbeb !important;
+    border-color: #22b8cf !important;
+}
+
+body.dark-mode .alert-success {
+    background-color: rgba(81, 207, 102, 0.15) !important;
+    color: #96f2b4 !important;
+    border-color: #51cf66 !important;
+}
+
+body.dark-mode .alert-warning {
+    background-color: rgba(255, 212, 59, 0.15) !important;
+    color: #ffe066 !important;
+    border-color: #ffd43b !important;
+}
+
+body.dark-mode .alert-danger {
+    background-color: rgba(255, 107, 107, 0.15) !important;
+    color: #ff8787 !important;
+    border-color: #ff6b6b !important;
+}
+
+/* ========== ESPECÍFICO PARA MÓDULOS ========== */
+
+/* Gestión de Usuarios */
+body.dark-mode .users-table-container .user-name {
+    color: #090808 !important;
+    font-weight: 600 !important;
+}
+
+
+body.dark-mode .users-table-container .user-email {
+    color: #090808 !important;
+}
+
+body.dark-mode .users-table-container .user-meta span {
+    color: #090808 !important;
+}
+
+/* Gestión de Técnicos */
+body.dark-mode .tecnicos-container .user-name,
+body.dark-mode .tecnicos-container .tecnico-name,
+body.dark-mode .tecnicos-container td {
+    color: #ffffff !important;
+}
+
+/* Reportes */
+body.dark-mode .reportes-container input,
+body.dark-mode .reportes-container select {
+    color: #ffffff !important;
+}
+
+body.dark-mode .reportes-container label {
+    color: #e9ecef !important;
+}
+
+/* Centro de Ayuda */
+body.dark-mode .help-hero h1,
+body.dark-mode .help-hero p {
+    color: #ffffff !important;
+}
+
+body.dark-mode .categoria-card h5,
+body.dark-mode .categoria-card .card-title {
+    color: #ffffff !important;
+}
+
+body.dark-mode .categoria-card p,
+body.dark-mode .categoria-card .card-text {
+    color: #adb5bd !important;
+}
+
+/* ========== FIN CORRECCIONES CRÍTICAS ========== */
+

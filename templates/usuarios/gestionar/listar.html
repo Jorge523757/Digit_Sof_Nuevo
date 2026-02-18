@@ -99,11 +99,11 @@
     .user-name {
         font-size: 18px;
         font-weight: 600;
-        color: #333;
+        color: #212529; /* Negro en modo claro */
         margin-bottom: 5px;
     }
     .user-email {
-        color: #666;
+        color: #6c757d; /* Gris en modo claro */
         font-size: 14px;
     }
     .user-meta {
@@ -113,7 +113,7 @@
     }
     .user-meta span {
         font-size: 12px;
-        color: #999;
+        color: #6c757d; /* Gris en modo claro */
     }
     .action-buttons {
         display: flex;
@@ -124,6 +124,84 @@
         padding: 6px 12px;
         font-size: 12px;
         border-radius: 6px;
+    }
+
+    /* ========== MODO OSCURO ========== */
+    body.dark-mode .page-header {
+        background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+    }
+
+    body.dark-mode .stat-card {
+        background-color: #2b3035;
+        color: #e9ecef;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    body.dark-mode .stat-card h3 {
+        color: #ffffff;
+    }
+
+    body.dark-mode .stat-card p {
+        color: #adb5bd;
+    }
+
+    body.dark-mode .search-filters {
+        background-color: #2b3035;
+        color: #e9ecef;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    body.dark-mode .search-box input {
+        background-color: #343a40;
+        color: #e9ecef;
+        border-color: #495057;
+    }
+
+    body.dark-mode .search-box input::placeholder {
+        color: #adb5bd;
+    }
+
+    body.dark-mode .search-box i {
+        color: #adb5bd;
+    }
+
+    body.dark-mode .form-select {
+        background-color: #343a40;
+        color: #e9ecef;
+        border-color: #495057;
+    }
+
+    body.dark-mode .users-table-container {
+        background-color: #2b3035;
+        color: #e9ecef;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    body.dark-mode .user-card {
+        background-color: #343a40;
+        border-color: #495057;
+    }
+
+    /* IMPORTANTE: Texto de nombres muy visible */
+    body.dark-mode .user-name {
+        color: #ffffff !important; /* Blanco puro en modo oscuro */
+    }
+
+    body.dark-mode .user-email {
+        color: #adb5bd !important; /* Gris claro en modo oscuro */
+    }
+
+    body.dark-mode .user-meta span {
+        color: #adb5bd !important; /* Gris claro en modo oscuro */
+    }
+
+    /* Asegurar visibilidad de badges */
+    body.dark-mode .badge {
+        color: #ffffff !important;
+    }
+
+    body.dark-mode .user-card .badge-danger {
+        background-color: #ff6b6b !important;
     }
 </style>
 {% endblock %}
