@@ -94,7 +94,7 @@ body.dark-mode .email,
 body.dark-mode .user-meta,
 body.dark-mode .user-meta span,
 body.dark-mode .text-muted {
-    color: #adb5bd !important; /* GRIS CLARO visible */
+    color: #050505 !important; /* GRIS CLARO visible */
 }
 
 /* Labels y form labels */

@@ -590,7 +590,7 @@ body.dark-mode div:not(.card):not(.modal):not(.alert):not(.btn) {
 
 body.dark-mode strong,
 body.dark-mode b {
-    color: #ffffff !important;
+    color: #050505 !important;
 }
 
 body.dark-mode .text-muted {
