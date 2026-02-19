@@ -5,12 +5,14 @@ Configuración Principal
 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
+import environ
 
+# Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Cargar variables de entorno desde .env
-load_dotenv(BASE_DIR / '.env')
+env = environ.Env()
+environ.Env.read_env(BASE_DIR / '.env')
 
 SECRET_KEY = 'django-insecure-digt-soft-2024-cambiar-en-produccion'
 DEBUG = True
@@ -18,12 +20,12 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '0.0.0.0',
-    '192.168.1.56',       # IP Ethernet
-    '192.168.1.*',        # Red Ethernet completa
-    '192.168.137.1',      # IP del adaptador de área local
-    '192.168.137.221',    # IP WiFi
-    '192.168.137.*',      # Toda la red WiFi
-    '*',                  # Permite todas las conexiones (solo desarrollo)
+    '192.168.1.56',
+    '192.168.1.*',
+    '192.168.137.1',
+    '192.168.137.221',
+    '192.168.137.*',
+    '*',
 ]
 
 INSTALLED_APPS = [
@@ -33,7 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',  # Requerido por allauth
+    'django.contrib.sites',
 
     # Django Allauth (Login con Google)
     'allauth',
@@ -42,7 +44,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
 
     # Apps del proyecto
-    'main',  # App principal con modelos Cart y CartItem
+    'main',
     'core',
     'usuarios',
     'dashboard',
@@ -57,11 +59,11 @@ INSTALLED_APPS = [
     'facturacion',
     'equipos',
     'capacitaciones',
-    'reportes_dano',  # Sistema de reporte de daños
-    'notificaciones',  # Sistema de notificaciones
-    'ayuda',  # Sistema de ayuda y soporte
-    'backups',  # Sistema de copias de seguridad
-    'utils',  # Utilidades y filtros personalizados
+    'reportes_dano',
+    'notificaciones',
+    'ayuda',
+    'backups',
+    'utils',
 ]
 
 MIDDLEWARE = [
@@ -72,7 +74,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',  # Requerido por allauth
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -95,11 +97,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Configuración de Base de Datos SQLite
+# Configuración de Base de Datos MySQL
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': env('DB_NAME', default='digitsoft'),
+        'USER': env('DB_USER', default='root'),
+        'PASSWORD': env('DB_PASSWORD', default=''),
+        'HOST': env('DB_HOST', default='localhost'),
+        'PORT': env('DB_PORT', default='3306'),
     }
 }
 
@@ -130,50 +136,22 @@ TIME_ZONE = 'America/Mexico_City'
 USE_I18N = True
 
 # ============================================================================
-# CONFIGURACIÓN DE EMAIL PARA NOTIFICACIONES
+# CONFIGURACIÓN DE EMAIL
 # ============================================================================
 
-import os
-
-# Backend de email - SMTP REAL para envío rápido de correos
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-
-# Configuración SMTP para Gmail optimizada para velocidad
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_USE_SSL = False  # TLS en puerto 587 es más rápido que SSL en 465
-
-# Credenciales de Gmail
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')  # Tu email de Gmail
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')  # Contraseña de aplicación
-
-# Email por defecto para envíos
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', f'DIGIT SOFT <{EMAIL_HOST_USER}>')
-
-# Email del administrador para recibir notificaciones
-ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', EMAIL_HOST_USER)
-
-# URL del sitio (para enlaces en emails)
-SITE_URL = os.getenv('SITE_URL', 'http://localhost:8000')
-
-# Configuraciones adicionales para optimizar velocidad de envío
-EMAIL_TIMEOUT = 30  # Timeout de 30 segundos
+EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = int(env('EMAIL_PORT', default='587'))
+EMAIL_USE_TLS = env('EMAIL_USE_TLS', default='True') == 'True'
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default=f'DIGIT SOFT <{EMAIL_HOST_USER}>')
+ADMIN_EMAIL = env('ADMIN_EMAIL', default=EMAIL_HOST_USER)
+SITE_URL = env('SITE_URL', default='http://localhost:8000')
+EMAIL_TIMEOUT = 30
 EMAIL_SSL_CERTFILE = None
 EMAIL_SSL_KEYFILE = None
-
-# ⚠️ FORZAR SMTP REAL - NO cambiar a consola automáticamente
-# Si las credenciales están vacías, el sistema mostrará el código en pantalla
-# pero intentará enviar por SMTP de todas formas
-
-# ============================================================================
-# INSTRUCCIONES PARA CONFIGURAR GMAIL:
-# ============================================================================
-# 1. Ve a: https://myaccount.google.com/apppasswords
-# 2. Activa la verificación en dos pasos
-# 3. Genera una contraseña de aplicación para "Correo"
-# 4. Copia la contraseña generada y úsala en EMAIL_HOST_PASSWORD
-# ============================================================================
 
 # ============================================================================
 # CONFIGURACIÓN DE DJANGO-ALLAUTH (LOGIN CON GOOGLE)
@@ -181,42 +159,37 @@ EMAIL_SSL_KEYFILE = None
 
 SITE_ID = 1
 
-# Configuración de autenticación
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',  # Backend por defecto
-    'allauth.account.auth_backends.AuthenticationBackend',  # Backend de allauth
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-# Configuración de allauth (actualizada para Django-allauth 6.x)
 ACCOUNT_LOGIN_METHODS = {'email', 'username'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username', 'password1*', 'password2*']
-ACCOUNT_EMAIL_VERIFICATION = 'optional'  # Puedes cambiarlo a 'mandatory' si quieres
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
 
-# Permitir vincular cuentas de Google a usuarios existentes con el mismo email
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_REQUIRED = True
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'optional'
 ACCOUNT_UNIQUE_EMAIL = True
 
-# Adaptadores personalizados
 ACCOUNT_ADAPTER = 'usuarios.adapters.CustomAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'usuarios.adapters.CustomSocialAccountAdapter'
 
-# Redirecciones
 SOCIALACCOUNT_LOGIN_ON_GET = True
 LOGIN_REDIRECT_URL = 'dashboard:index'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/usuarios/login/'
 LOGOUT_REDIRECT_URL = 'core:home'
 
-# Configuración de Google OAuth
-# NOTA: Las credenciales se manejan desde la base de datos (SocialApp model)
-# No incluir 'APP' aquí porque causa MultipleObjectsReturned
+# Credenciales Google OAuth desde .env
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
+        'APP': {
+            'client_id': env('GOOGLE_CLIENT_ID', default=''),
+            'secret': env('GOOGLE_CLIENT_SECRET', default=''),
+            'key': ''
+        },
+        'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {
             'access_type': 'online',
         }
@@ -224,18 +197,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 # ============================================================================
-# INSTRUCCIONES PARA CONFIGURAR GOOGLE OAUTH:
-# ============================================================================
-# 1. Ve a: https://console.cloud.google.com/
-# 2. Crea un proyecto nuevo o selecciona uno existente
-# 3. Habilita "Google+ API"
-# 4. Ve a "Credenciales" > "Crear credenciales" > "ID de cliente de OAuth 2.0"
-# 5. Tipo de aplicación: "Aplicación web"
-# 6. URIs de redirección autorizados:
-#    - http://localhost:8000/accounts/google/login/callback/
-#    - http://127.0.0.1:8000/accounts/google/login/callback/
-# 7. Copia el Client ID y Client Secret
-# 8. Pégalos arriba en SOCIALACCOUNT_PROVIDERS
+# ARCHIVOS ESTÁTICOS Y MEDIA
 # ============================================================================
 
 STATIC_URL = '/static/'
@@ -247,7 +209,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Authentication
 LOGIN_URL = 'usuarios:login'
 LOGIN_REDIRECT_URL = 'dashboard:index'
 LOGOUT_REDIRECT_URL = 'core:home'
