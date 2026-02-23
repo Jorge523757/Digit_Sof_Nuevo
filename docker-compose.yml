@@ -1,0 +1,84 @@
+services:
+
+  # --- Servicio de la Aplicación Django ---
+  web:
+    build: .
+    image: digitsoft_web
+    container_name: digitsoft_app
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - digitsoft_static_volume:/app/staticfiles
+      - digitsoft_media_volume:/app/media
+    ports:
+      - "8000:8000"
+    networks:
+      - digitsoft_network
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=3306
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+      - CSRF_TRUSTED_ORIGINS=http://localhost:8000
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # --- Servicio de Base de Datos MySQL ---
+  db:
+    image: mysql:8.0
+    container_name: digitsoft_mysql
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - digitsoft_mysql_data:/var/lib/mysql
+    networks:
+      - digitsoft_network
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --- phpMyAdmin ---
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: digitsoft_phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    ports:
+      - "8080:80"
+    networks:
+      - digitsoft_network
+    depends_on:
+      db:
+        condition: service_healthy
+
+networks:
+  digitsoft_network:
+    name: digitsoft_network
+    driver: bridge
+
+volumes:
+  digitsoft_mysql_data:
+    name: digitsoft_mysql_data
+  digitsoft_static_volume:
+    name: digitsoft_static_volume
+  digitsoft_media_volume:
+    name: digitsoft_media_volume

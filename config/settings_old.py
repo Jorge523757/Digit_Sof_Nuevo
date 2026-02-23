@@ -6,16 +6,31 @@ Configuración Principal
 from pathlib import Path
 import os
 import environ
+from dotenv import load_dotenv #importar la librería
 
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Cargar las variables de entorno desde el archivo .env
+load_dotenv(Path(BASE_DIR, '.env'))
 # Cargar variables de entorno desde .env
 env = environ.Env()
 environ.Env.read_env(BASE_DIR / '.env')
 
+#SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = env('SECRET_KEY')# Leer desde.env
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't') # Leer desde .env
+
+
 SECRET_KEY = 'django-insecure-digt-soft-2024-cambiar-en-produccion'
 DEBUG = True
+
+# Permitir que el host de Docker y tu dominio personalizado se conecten
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'maderasisabella.artisandev.site']
+# ALLOWED_HOSTS = ['*'] # Alternativa si no permite conexiones
+CSRF_TRUSTED_ORIGINS = ['https://maderasisabella.artisandev.site']
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
@@ -103,7 +118,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': env('DB_NAME', default='digitsoft'),
         'USER': env('DB_USER', default='root'),
-        'PASSWORD': env('DB_PASSWORD', default=''),
+        'PASSWORD': env('DB_PASSWORD', default='Jd172007.'),
         'HOST': env('DB_HOST', default='localhost'),
         'PORT': env('DB_PORT', default='3306'),
     }
