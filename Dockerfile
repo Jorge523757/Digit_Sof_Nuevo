@@ -42,4 +42,6 @@ EXPOSE 8000
 # Etapa 8: Comando de Ejecución
 # El comando por defecto que se ejecutará al iniciar el contenedor.
 # Inicia el servidor de desarrollo de Django, haciéndolo accesible desde cualquier IP (0.0.0.0).
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+#!/bin/bash
+echo "Servidor corriendo en: http://localhost:8000"
+python manage.py runserver 0.0.0.0:8000
